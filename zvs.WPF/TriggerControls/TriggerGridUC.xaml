@@ -77,23 +77,24 @@
 
         <Grid  DataContext="{StaticResource device_value_triggersViewSource}">
 
-            <DataGrid x:Name="TriggerGrid" Background="Transparent" ItemsSource="{Binding}" RowEditEnding="TriggerGrid_RowEditEnding"                  
-                  HorizontalGridLinesBrush="#FFE2E2E2" RowHeaderWidth="0" CanUserAddRows="False" CanUserDeleteRows="True" 
-                 AlternatingRowBackground="#FFFFFF" GridLinesVisibility="Horizontal" RowHeight="40" AutoGenerateColumns="False"
+            <DataGrid x:Name="TriggerGrid" CellStyle="{DynamicResource NoSelectDataGridCell}" Background="Transparent" ItemsSource="{Binding}" RowEditEnding="TriggerGrid_RowEditEnding"                  
+                  HorizontalGridLinesBrush="{DynamicResource TriggerBrush}"  RowHeaderWidth="0" CanUserAddRows="False" CanUserDeleteRows="True" 
+                 AlternatingRowBackground="#FFFFFF" GridLinesVisibility="Horizontal" RowHeight="40" AutoGenerateColumns="False" SelectionUnit="FullRow" SelectionMode="Extended"
                  PreviewKeyDown="Grid_PreviewKeyDown_1" HorizontalAlignment="Center" Margin="0,0,0,40" RowBackground="White" BorderThickness="0" >
                 <DataGrid.Resources>
-                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFE49EFF"/>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="{DynamicResource TriggerSelectedColor}"/>
                     <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
-                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey }" Color="#FFEED5F7" />
+                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey }" Color="{DynamicResource TriggerNoFocusColor}" />
                 </DataGrid.Resources>
+              
 
                 <DataGrid.Columns>
 
                     <DataGridTemplateColumn HeaderStyle="{StaticResource NoSelectionDataGridHeader}" MaxWidth="50" MinWidth="50" Width="50"  Header="" 
-                                            CanUserResize="False" CanUserReorder="False" CanUserSort="False">
+                                            CanUserResize="False" CanUserReorder="False" CanUserSort="False" >
                         <DataGridTemplateColumn.CellTemplate >
                             <DataTemplate>
-                                <TextBlock Margin="6 0 6 0 " Text="&#xe002;" Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="36" />
+                                <TextBlock Margin="6 0 6 0" Text="&#xe002;" Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="36" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>

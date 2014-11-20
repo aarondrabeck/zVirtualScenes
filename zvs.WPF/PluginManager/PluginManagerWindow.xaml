@@ -1,7 +1,7 @@
 ﻿<Window x:Class="zvs.WPF.PluginManagerWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Plugin Manager" Width="800" mc:Ignorable="d" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:my="clr-namespace:zvs.DataModel;assembly=zvs.DataModel" Loaded="Window_Loaded" Icon="/zVirtualScenes;component/Images/zvs32.ico" Background="#FFF0F0F0" MinHeight="300" MinWidth="675" WindowStyle="ToolWindow" d:DesignHeight="312" Height="500" WindowStartupLocation="CenterOwner" Closed="Window_Closed_1">
+        Title="Plugin Manager" Width="800" mc:Ignorable="d" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:my="clr-namespace:zvs.DataModel;assembly=zvs.DataModel" Loaded="Window_Loaded" Icon="/zVirtualScenes;component/Images/zvs-icon.ico" Background="#FFF0F0F0" MinHeight="300" MinWidth="675" WindowStyle="ToolWindow" d:DesignHeight="312" Height="500" WindowStartupLocation="CenterOwner" Closed="Window_Closed_1">
     <Window.Resources>
         <CollectionViewSource x:Key="zvsEntities2PluginViewSource"  />
     </Window.Resources>

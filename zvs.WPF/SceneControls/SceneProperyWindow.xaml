@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:SceneControls="clr-namespace:zvs.WPF.SceneControls"
         Title="Scene Properties" Loaded="Window_Loaded_1" Height="350" Width="450" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" 
-        Icon="/zVirtualScenes;component/Images/zvs32.ico" WindowStyle="ToolWindow">
+        Icon="/zVirtualScenes;component/Images/zvs-icon.ico" >
     <Grid>
         <SceneControls:SceneProperties x:Name="SceneControl" Margin="0,0,0,55"></SceneControls:SceneProperties>
         <Button Name="DoneBtn" Content="Done" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom"  Click="DoneBtn_Click" FontSize="14" Padding="10 5" FontWeight="Medium" Background="#FFCCCCCC" BorderBrush="{x:Null}"  BorderThickness="0"/>

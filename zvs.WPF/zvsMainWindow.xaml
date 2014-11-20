@@ -16,13 +16,13 @@
     Closed="MainWindow_Closed_1" 
     Unloaded="Window_Unloaded" 
     Loaded="Window_Loaded" 
-    Icon="Images/32zvsIcon.png" 
+    Icon="/zVirtualScenes;component/Images/zvs-icon.ico"
     PreviewKeyDown="Window_PreviewKeyDown"
     mc:Ignorable="d" 
     Closing="Window_Closing_1" 
     StateChanged="Window_StateChanged_1" 
     WindowStartupLocation="CenterScreen"
-    Style="{StaticResource ChromeWindowStyle}">
+    Style="{StaticResource ChromeWindowStyle}" d:DesignHeight="1000">
 
     <zvsWpf:ChromeWindow.CommandBindings>
         <CommandBinding Command="{x:Static zvsWpf:ChromeWindow.onMinimizeCommand }" Executed="onMinimizeCommandExecuted" />

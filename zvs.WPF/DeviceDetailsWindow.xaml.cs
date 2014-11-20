@@ -17,7 +17,18 @@ namespace zvs.WPF
     public partial class DeviceDetailsWindow
     {
         private int DeviceId { get; set; } 
-        private App App { get; set; } 
+        private App App { get; set; }
+
+        public Device Device
+        {
+            get { return (Device)GetValue(DeviceProperty); }
+            set { SetValue(DeviceProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Device.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty DeviceProperty =
+            DependencyProperty.Register("Device", typeof(Device), typeof(DeviceDetailsWindow), new PropertyMetadata(new Device()));
+
 
         public DeviceDetailsWindow(int deviceId)
         {
@@ -93,58 +104,7 @@ namespace zvs.WPF
                     return;
                 }
 
-                DeviceNameTextBlock.Text = string.Format("{0} {1}", d.Location, d.Name);
-                Title = string.Format("{0} {1} Details", d.Location, d.Name);
-                DeviceCurrentStatus.Text = d.CurrentLevelText;
-
-                switch (d.Type.UniqueIdentifier)
-                {
-                    case "THERMOSTAT":
-                        {
-                            IconImg.Source = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/thermometer.png"));
-                            break;
-                        }
-                    case "DIMMER":
-                        {
-                            IconImg.Source = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/bulb.png"));
-                            break;
-                        }
-                    case "SWITCH":
-                        {
-                            IconImg.Source = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/switch.png"));
-                            break;
-                        }
-                    case "CONTROLLER":
-                        {
-                            DeviceCurrentStatus.Visibility = Visibility.Collapsed;
-                            IconImg.Source = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/controler.png"));
-                            break;
-                        }
-                    case "DOORLOCK":
-                        {
-                            IconImg.Source = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/doorlock.png"));
-                            break;
-                        }
-                }
-
-                if (d.Type.UniqueIdentifier.Equals("DIMMER"))
-                {
-                    var level = d.CurrentLevelInt;
-
-                    if (level >= 0 && level <= 20)
-                        level = 21;
-
-                    level = level / 100;
-
-                    var da = new DoubleAnimation
-                    {
-                        From = IconImg.Opacity,
-                        To = level,
-                        Duration = new Duration(TimeSpan.FromSeconds(1))
-                    };
-                    IconImg.BeginAnimation(OpacityProperty, da);
-                }
-
+                Device = d;
             }
         }
 

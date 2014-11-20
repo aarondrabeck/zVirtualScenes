@@ -20,7 +20,7 @@
         </Grid.ColumnDefinitions>
 
         <DataGrid x:Name="GroupsDataGrid" Width="350" ItemsSource="{Binding}" AllowDrop="False"  BorderThickness="0 0 1 0" BorderBrush="{DynamicResource GroupBrush}"
-                    HorizontalGridLinesBrush="{DynamicResource GroupBrush}"  AlternatingRowBackground="#FFFFFF"
+                    HorizontalGridLinesBrush="{DynamicResource GroupNoFocusBrush}"  AlternatingRowBackground="#FFFFFF"
                   GridLinesVisibility="Horizontal"  HorizontalAlignment="Left" RowHeight="45" AutoGenerateColumns="False"  
                   CellStyle="{StaticResource BodyContentDataGridCentering}" SelectionMode="Single" 
                  RowHeaderWidth="0" 
@@ -28,9 +28,9 @@
                   RowEditEnding="GroupsDataGrid_OnRowEditEnding" 
                   Background="#FFFFFF" >
             <DataGrid.Resources>
-                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFFFD582"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="{DynamicResource GroupSelectedColor}"/>
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
-                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey }" Color="#FFFFD582" />
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey }" Color="{DynamicResource GroupNoFocusColor}" />
                 <Style x:Key="NoSelectionDataGridHeader" TargetType="{x:Type DataGridColumnHeader}">
                     <Setter Property="Foreground"  Value="White" />
                     <Setter Property="Background"  Value="{DynamicResource GroupBrush}" />

@@ -1,7 +1,7 @@
 ﻿<Window x:Class="zvs.WPF.FatalErrorWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="FatalErrorWindow" Height="400" Width="568" Icon="zvs256.ico" Loaded="FatalErrorWindow_Loaded_1" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" WindowStyle="ToolWindow" >
+        Title="FatalErrorWindow" Height="400" Width="568" Icon="/zVirtualScenes;component/Images/zvs-icon.ico" Loaded="FatalErrorWindow_Loaded_1" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" WindowStyle="ToolWindow" >
     <Grid>
         <Rectangle Fill="#FFEEECFB" Margin="0,66,0,-1"/>
         <TextBlock Name="TitleTxtBl" Text="Woops! Program has encountered a problem and needs to close. We are sorry for the inconvenience." TextWrapping="Wrap"  Margin="35,10,35,0" VerticalAlignment="Top" Height="41" FontWeight="Bold" />

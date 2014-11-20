@@ -5,7 +5,7 @@
     xmlns:dataModel="clr-namespace:zvs.DataModel;assembly=zvs.DataModel" mc:Ignorable="d" x:Class="zvs.WPF.Groups.DeviceMultiselectWindow"
         Title="Add to Group" Loaded="DeviceMultiselectWindow_OnLoaded"
      WindowStartupLocation="CenterOwner" ResizeMode="NoResize" 
-        Icon="/zVirtualScenes;component/Images/zvs32.ico" WindowStyle="ToolWindow" Height="300" Width="350">
+        Icon="/zVirtualScenes;component/Images/zvs-icon.ico" WindowStyle="ToolWindow" Height="300" Width="350">
     <Window.Resources>
         <DataTemplate x:Key="ListBoxItemTemplate" DataType="{x:Type dataModel:Device}">
             <WrapPanel>
@@ -25,11 +25,14 @@
     </Window.Resources>
     <Grid DataContext="{StaticResource DeviceViewSource}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
+            <RowDefinition Height="40"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
-        <TextBlock HorizontalAlignment="Left" FontSize="14" Margin="5" TextWrapping="Wrap" Text="Select Devices" VerticalAlignment="Top" />
+        <Grid Background="{DynamicResource GroupBrush}">
+            <TextBlock HorizontalAlignment="Left" FontSize="18" Foreground="White" Margin="5" TextWrapping="Wrap" Text="Select Devices" VerticalAlignment="Center" />
+        </Grid>
+        
         <ListBox Margin="10" Grid.Row="1" FontSize="14" Name="DeviceListBox" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" SelectionMode="Multiple" SelectedValuePath="CurrentLevelInt" ItemsSource="{Binding}" ItemTemplate="{StaticResource ListBoxItemTemplate}"/>
         <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Right">
             <Button x:Name="CancelBtn" Content="Cancel" HorizontalAlignment="Right" Margin="5" VerticalAlignment="Center" Click="CancelBtn_Click"  FontSize="14" Padding="10 5" FontWeight="Medium" Background="#FFCCCCCC" BorderBrush="{x:Null}"  BorderThickness="0"/>

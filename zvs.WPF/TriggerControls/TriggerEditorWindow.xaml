@@ -3,15 +3,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:zvsEntities="clr-namespace:zvs.DataModel;assembly=zvs.DataModel" mc:Ignorable="d" x:Class="zvs.WPF.TriggerControls.TriggerEditorWindow"
-        Title="ScheduledTask Editor" Height="282" Width="572" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" WindowStyle="ToolWindow" 
-    Loaded="Window_Loaded_1" Icon="/zVirtualScenes;component/Images/zvs32.ico"
-    Name="this">
+        Title="ScheduledTask Editor" Height="282" Width="572" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" 
+    Loaded="Window_Loaded_1" Icon="/zVirtualScenes;component/Images/zvs-icon.ico" Name="this">
     <Window.Resources>
         <CollectionViewSource x:Key="deviceViewSource" d:DesignSource="{d:DesignInstance {x:Type zvsEntities:Device}, CreateList=True}"/>
         <CollectionViewSource x:Key="deviceDeviceValueViewSource" Source="{Binding Values, Source={StaticResource deviceViewSource}}"/>
     </Window.Resources>
     <Grid DataContext="{StaticResource deviceViewSource}">
-        <Rectangle Height="40" VerticalAlignment="Top" HorizontalAlignment="Stretch" Fill="#FF006AA4" />
+        <Rectangle Height="40" VerticalAlignment="Top" HorizontalAlignment="Stretch" Fill="{DynamicResource TriggerBrush}" />
         <TextBlock HorizontalAlignment="Left" FontSize="18" Foreground="White" Margin="10,8,0,0" TextWrapping="Wrap" Text="Select Device and Trigger" VerticalAlignment="Top"/>
         <TextBlock HorizontalAlignment="Left" FontSize="14" Margin="10,54,0,0" TextWrapping="Wrap" Text="When" VerticalAlignment="Top"/>
         <ComboBox x:Name="DeviceCmboBx" Height="25"  HorizontalAlignment="Left" 
@@ -35,7 +34,7 @@
         <TextBlock HorizontalAlignment="Left" FontSize="14" Margin="256,88,0,0" TextWrapping="Wrap" Text="is" VerticalAlignment="Top"/>
         <ComboBox  x:Name="OperatorCmboBx" Height="25" HorizontalAlignment="Left" Margin="280,86,0,0" VerticalAlignment="Top" Width="115" Background="#FFCCCCCC"/>
         <TextBox x:Name="ValueTxtBx" Height="25" HorizontalAlignment="Left" Margin="408,87,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="130"  FontSize="14"/>
-        <Rectangle Height="40" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="0,123,0,0" Fill="#FF0B6EB5"  />
+        <Rectangle Height="40" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="0,123,0,0" Fill="{DynamicResource TriggerBrush}"  />
         <TextBlock HorizontalAlignment="Left" FontSize="18" Foreground="White" Margin="10,131,0,0" TextWrapping="Wrap" Text="Select a Command to Run" VerticalAlignment="Top"/>
         <TextBlock Height="20" FontSize="14" Margin="144,178,7,0" TextWrapping="NoWrap" 
                    TextTrimming="CharacterEllipsis" VerticalAlignment="Top" >

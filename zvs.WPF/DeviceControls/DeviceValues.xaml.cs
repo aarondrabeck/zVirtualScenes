@@ -124,5 +124,10 @@ namespace zvs.WPF.DeviceControls
             }
             _context.Dispose();
         }
+
+        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

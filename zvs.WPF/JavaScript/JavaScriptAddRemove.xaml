@@ -1,8 +1,7 @@
 ﻿<Window x:Class="zvs.WPF.JavaScript.JavaScriptAddRemove"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-         xmlns:DeviceControls="clr-namespace:zvs.WPF.DeviceControls"
-        Title="JavaScript Commands" Height="220" Width="655" Icon="/zVirtualScenes;component/Images/zvs32.ico"
+        Title="JavaScript Commands" Height="220" Width="655" Icon="/zVirtualScenes;component/Images/zvs-icon.ico"
         WindowStartupLocation="CenterOwner" Loaded="Window_Loaded" Closed="JavaScriptAddRemove_Closed_1" mc:Ignorable="d" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:my="clr-namespace:zvs.DataModel;assembly=zvs.DataModel" ResizeMode="NoResize">

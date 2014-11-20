@@ -6,13 +6,15 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" Loaded="UserControl_Loaded_1" Unloaded="UserControl_Unloaded_1">
     <Grid>
-        <GroupBox Name="PropertiesGrpBx" Header="Scene Properties" MinHeight="100" Margin="5">
-            <Grid>
-                <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto">
-                    <StackPanel  Name="PropertiesStkPnl" Margin="0,20,0,10"></StackPanel>
-                </ScrollViewer>
-            </Grid>
-        </GroupBox>
-
+        <Grid.RowDefinitions>
+            <RowDefinition  Height="40"/>
+            <RowDefinition  Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid Background="{DynamicResource SceneBrush}">
+            <TextBlock HorizontalAlignment="Left" FontSize="18" Foreground="White" Margin="5" TextWrapping="Wrap" Text="Scene Properties" VerticalAlignment="Center" />
+        </Grid>
+        <ScrollViewer Grid.Row="1" Margin="10" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto">
+            <StackPanel  Name="PropertiesStkPnl" Margin="0,20,0,10"></StackPanel>
+        </ScrollViewer>
     </Grid>
 </UserControl>

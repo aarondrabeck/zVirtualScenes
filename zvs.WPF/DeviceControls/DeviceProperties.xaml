@@ -5,9 +5,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" Loaded="UserControl_Loaded_1" Unloaded="UserControl_Unloaded_1">
-    <StackPanel>
-        <GroupBox Name="PropertiesGrpBx" Header="Device Properties" MinHeight="100" Margin="5">
-            <StackPanel  Name="PropertiesStkPnl" Margin="0,20,0,10"></StackPanel>
-        </GroupBox>
-    </StackPanel>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition  Height="40"/>
+            <RowDefinition  Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid Background="{DynamicResource DeviceSelectedBrush}">
+            <TextBlock HorizontalAlignment="Left" FontSize="18" Foreground="White" Margin="5" TextWrapping="Wrap" Text="Device Properties" VerticalAlignment="Center" />
+        </Grid>
+        <StackPanel Grid.Row="1" Margin="10" Name="PropertiesStkPnl"></StackPanel>
+    </Grid>
 </UserControl>

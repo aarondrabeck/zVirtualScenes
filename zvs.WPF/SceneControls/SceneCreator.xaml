@@ -42,15 +42,16 @@
             <TextBlock FontSize="18" Foreground="White" Margin="10 7 0 0"  TextTrimming="CharacterEllipsis"  
                                        TextWrapping="Wrap" Text="Scene" />
         </Grid>
-        <DataGrid BorderBrush="#9EC974" BorderThickness="0 0 1 0" AllowDrop="True" Name="SceneGrid" HorizontalGridLinesBrush="{DynamicResource SceneBrush}" 
+        <DataGrid BorderBrush="{DynamicResource SceneBrush}" BorderThickness="0 0 1 0" AllowDrop="True" Name="SceneGrid" HorizontalGridLinesBrush="{DynamicResource SceneNoFocusBrush}" 
                   AlternatingRowBackground="#FFFFFF" HeadersVisibility="None" GridLinesVisibility="Horizontal"   Background="White" Margin="0 35 0 0 "
                   HorizontalAlignment="Left"  Width="355"   ItemsSource="{Binding}" RowHeight="45"
                  AutoGenerateColumns="False" PreviewKeyDown="SceneGrid_PreviewKeyDown" RowEditEnding="SceneGrid_RowEditEnding"
                   CellStyle="{StaticResource BodyContentDataGridCentering}" SelectionMode="Single" SelectionChanged="SceneGrid_SelectionChanged">
             <DataGrid.Resources>
-                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFC4EE9C"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="{DynamicResource SceneSelectedColor}"/>
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
-                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey }" Color="#FFF0FFE2" />
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey }" Color="{DynamicResource SceneNoFocusColor}" />
+
             </DataGrid.Resources>
             <DataGrid.RowStyle>
                 <Style TargetType="{x:Type DataGridRow}">
@@ -62,8 +63,30 @@
                 <DataGridTemplateColumn Header="" CanUserResize="False" CanUserReorder="False" CanUserSort="False">
                     <DataGridTemplateColumn.CellTemplate >
                         <DataTemplate>
-                            <TextBlock Margin="6 0 6 0 " Text="&#xe005;" Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="36" />
-                            <!--<Image Name="img" Width="40" Height="40" Source="/zVirtualScenes;component/Images/scene64.png" />-->
+                            <TextBlock Margin="6 0 6 0 " Text="&#xe005;" Foreground="Black"   FontFamily="flaticon" FontSize="36" >
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsRunning}" Value="True">
+                                                <DataTrigger.EnterActions>
+                                                    <BeginStoryboard x:Name="tt" >
+                                                        <Storyboard Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)">
+                                                            <ColorAnimation  RepeatBehavior="Forever"                                                                  
+                                                     FillBehavior="Stop"                                                                  
+                                                     From="Black" 
+                                                     To="LightGreen"                                                                  
+                                                     Duration="0:0:0.8" AutoReverse="True" />
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </DataTrigger.EnterActions>
+                                                <DataTrigger.ExitActions>
+                                                    <RemoveStoryboard  BeginStoryboardName="tt"></RemoveStoryboard>
+                                                </DataTrigger.ExitActions>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
                             <!--<DataTemplate.Triggers>
                                 <DataTrigger Binding="{Binding Path=IsRunning}" Value="True">
                                     <Setter TargetName="img" Property="Source" Value="pack://application:,,,/zVirtualScenes;component/Images/scene_run64.png"/>
@@ -150,14 +173,14 @@
                 </Grid>
                 <DataGrid Grid.Row="1"  MinHeight="100" BorderThickness="0"   x:Name="SceneCmdsGrid" CanUserAddRows="False" HeadersVisibility="None" 
                 ItemsSource="{Binding Source={StaticResource ScenesceneCommandsViewSource}}"
-                AllowDrop="True" DragOver="SceneCmdsGrid_DragOver_1" Drop="SceneCmdsGrid_Drop_1" HorizontalGridLinesBrush="{DynamicResource SceneBrush}" 
+                AllowDrop="True" DragOver="SceneCmdsGrid_DragOver_1" Drop="SceneCmdsGrid_Drop_1" HorizontalGridLinesBrush="{DynamicResource SceneNoFocusBrush}" 
                AlternatingRowBackground="#FFFFFF" GridLinesVisibility="Horizontal" RowHeight="29" AutoGenerateColumns="False" 
                 PreviewKeyDown="SceneCmdsGrid_PreviewKeyDown_1" CellStyle="{StaticResource BodyContentDataGridCentering}" CanUserResizeRows="False"
                 Margin="0" Background="White"  >
                     <DataGrid.Resources>
-                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFC4EE9C"/>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="{DynamicResource SceneSelectedColor}"/>
                         <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
-                        <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey }" Color="#FFF0FFE2" />
+                        <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey }" Color="{DynamicResource SceneNoFocusColor}" />
                     </DataGrid.Resources>
                     <DataGrid.Columns>
 

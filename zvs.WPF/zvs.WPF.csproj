@@ -42,7 +42,8 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>zvs256.ico</ApplicationIcon>
+    <ApplicationIcon>
+    </ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup />
   <PropertyGroup />
@@ -399,6 +400,7 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="App.config">
       <SubType>Designer</SubType>
@@ -415,18 +417,15 @@
     <None Include="Properties\DataSources\zvs.DataModel.Device.datasource" />
     <None Include="Properties\DataSources\zvs.DataModel.LogEntry.datasource" />
     <None Include="zvsCert.pfx" />
-    <Resource Include="Images\zvs256.ico" />
-    <Resource Include="Images\zvs32.ico" />
     <Resource Include="Images\JavaScriptIcon.png" />
-    <Resource Include="Images\multipleIcon.png" />
-    <Resource Include="Images\settingIcon.png" />
-    <Resource Include="Images\unknown.png" />
     <Resource Include="Images\spinner.gif" />
     <Resource Include="Images\greencheck.png" />
     <Resource Include="Images\blank.png" />
     <Resource Include="Images\red_x.png" />
     <Content Include="fonts\flaticon3.svg" />
     <Content Include="fonts\flaticon4.svg" />
+    <Resource Include="Images\zvs-icon-1024.png" />
+    <Resource Include="Images\zvs-icon.ico" />
     <Content Include="log4net.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -484,39 +483,7 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\20radio.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\20bulb.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\20controller.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\20doorlock.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\20switch.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\20thermostat.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\drag_icon.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Images\Plugin.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\drag_arrow.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\bulb.png" />
-    <Resource Include="Images\controler.png" />
-    <Resource Include="Images\doorlock.png" />
-    <Resource Include="Images\radio.png" />
-    <Resource Include="Images\switch.png" />
-    <Resource Include="Images\thermometer.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\send_signal.png" />
@@ -525,40 +492,11 @@
     <Resource Include="Images\save_check.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\scene64.png" />
-    <Resource Include="Images\scene_run64.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Images\arrow_down.png" />
     <Resource Include="Images\arrow_up.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\settings.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\log.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\trigger.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\scheduled_task.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\run.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\256zvsIcon.png" />
-    <Resource Include="Images\32zvsIcon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="zvs256.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <SplashScreen Include="SplashScreen1222.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\zvsLogoTextOnly.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ScintillaNET.xml">
@@ -587,9 +525,6 @@
       <Project>{26f2b6c6-0325-415c-bb0f-314c69f44d5a}</Project>
       <Name>zvs</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\small-icon-status.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\js.png" />

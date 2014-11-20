@@ -23,7 +23,7 @@ namespace zvs.WPF
             Notify = new NotifyIcon();
             Notify.DoubleClick += Notify_Click;
             Notify.Text = Utils.ApplicationName;
-            Notify.Icon = Resources.zvs32;
+            Notify.Icon = Resources.zvs_icon;
             Notify.Visible = true;
             Notify.ContextMenu = new ContextMenu(new MenuItem[] 
             { 

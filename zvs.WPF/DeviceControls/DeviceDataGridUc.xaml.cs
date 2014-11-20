@@ -58,7 +58,6 @@ namespace zvs.WPF.DeviceControls
                 foreach (var ent in Context.ChangeTracker.Entries<Group>())
                     await ent.ReloadAsync();
             }));
-
         }
 
         void DeviceDataGridUC_onEntityDeleted(object sender, NotifyEntityChangeContext.ChangeNotifications<Group>.EntityDeletedArgs e)
@@ -182,7 +181,6 @@ namespace zvs.WPF.DeviceControls
             var myCollectionViewSource = (CollectionViewSource)Resources["devicesViewSource"];
             myCollectionViewSource.SortDescriptions.Clear();
             myCollectionViewSource.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
-
         }
 
 #if DEBUG
@@ -379,7 +377,7 @@ namespace zvs.WPF.DeviceControls
         private void OpenDeviceDetails(Device d)
         {
             var app = (App)Application.Current;
-            var deviceDetailsWindow = new DeviceDetailsWindow(d.Id) {Owner = app.ZvsWindow};
+            var deviceDetailsWindow = new DeviceDetailsWindow(d.Id) { Owner = app.ZvsWindow };
             deviceDetailsWindow.Show();
         }
 
@@ -399,7 +397,7 @@ namespace zvs.WPF.DeviceControls
             _searchstr = textbox.Text;
             var myCollectionViewSource = (CollectionViewSource)Resources["devicesViewSource"];
             var view = myCollectionViewSource.View;
-            view.Filter = !string.IsNullOrEmpty(_searchstr) ?  new Predicate<object>(DeviceNameFilter) : null;
+            view.Filter = !string.IsNullOrEmpty(_searchstr) ? new Predicate<object>(DeviceNameFilter) : null;
         }
 
         private bool DeviceNameFilter(object item)

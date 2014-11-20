@@ -8,7 +8,8 @@
              xmlns:dataModel="clr-namespace:zvs.DataModel;assembly=zvs.DataModel"
              xmlns:tasks="clr-namespace:zvs.DataModel.Tasks;assembly=zvs.DataModel"
              mc:Ignorable="d" 
-             d:DesignHeight="934.025" d:DesignWidth="1037" Loaded="UserControl_Loaded_1" Unloaded="ScheduledTaskCreator_Unloaded_1" Initialized="UserControl_Initialized">
+             d:DesignHeight="934.025" d:DesignWidth="1037" Loaded="UserControl_Loaded_1" Unloaded="ScheduledTaskCreator_Unloaded_1" 
+    Initialized="UserControl_Initialized">
     <UserControl.Resources>
         <Style x:Key="NoSelectionDataGridHeader" TargetType="{x:Type DataGridColumnHeader}">
             <Setter Property="Foreground"  Value="White" />
@@ -48,16 +49,17 @@
     </UserControl.Resources>
 
     <Grid DataContext="{StaticResource ScheduledTaskViewSource}">
-        <DataGrid x:Name="ScheduledTaskDataGrid" Width="350" ItemsSource="{Binding}" AllowDrop="False"  BorderThickness="0 0 1 0" BorderBrush="{DynamicResource TaskBrush}"
-                    HorizontalGridLinesBrush="{DynamicResource TaskSelectedBrush}"  AlternatingRowBackground="#FFFFFF"
+        <DataGrid x:Name="ScheduledTaskDataGrid" Width="350" ItemsSource="{Binding}" AllowDrop="False"  BorderThickness="0 0 1 0" 
+                  BorderBrush="{DynamicResource TaskBrush}"
+                    HorizontalGridLinesBrush="{DynamicResource TaskNoFocusBrush}"  AlternatingRowBackground="#FFFFFF"
                   GridLinesVisibility="Horizontal"  HorizontalAlignment="Left" RowHeight="45" AutoGenerateColumns="False"  
                   CellStyle="{StaticResource BodyContentDataGridCentering}" SelectionMode="Single" 
                  RowHeaderWidth="0" PreviewKeyDown="ScheduledTaskDataGrid_PreviewKeyDown_1" RowEditEnding="ScheduledTaskDataGrid_RowEditEnding_1" 
                   SelectionChanged="ScheduledTaskDataGrid_SelectionChanged" Background="#FFFFFF" >
             <DataGrid.Resources>
-                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFFD9E9B"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="{DynamicResource TaskSelectedColor}"/>
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
-                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey }" Color="#FFFFD7D5" />
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey }" Color="{DynamicResource TaskNoFocusColor}" />
             </DataGrid.Resources>
             <DataGrid.Columns>
                 <DataGridTemplateColumn HeaderStyle="{StaticResource NoSelectionDataGridHeader}" MaxWidth="50" MinWidth="50" Width="50"  Header="" CanUserResize="False" CanUserReorder="False" CanUserSort="False">

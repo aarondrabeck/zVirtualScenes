@@ -16,10 +16,10 @@
         </Border.Effect>
         <Border BorderThickness="1" BorderBrush="#FF117DBB" Background="#FFFFFF" Width="500" Height="300">
             <Grid>
-                <Image HorizontalAlignment="Left" Height="128" Width="128"  VerticalAlignment="Top"  Source="zvs256.ico" Margin="17,17,0,0" />
-                <TextBlock FontSize="48" Foreground="#FF00AEEF" Margin="175,29,0,0" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Left"  
+                <Image HorizontalAlignment="Left" Height="128" Width="128"  VerticalAlignment="Top"  Source="Images/zvs-icon.ico" Margin="17,17,0,0" />
+                <TextBlock FontSize="48" Foreground="#333333" Margin="175,29,0,0" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Left"  
                            FontFamily="Segoe UI" Text="{Binding Source={x:Static zvsProc:Utils.ApplicationName}}" />
-                <TextBlock FontSize="35" Foreground="#FFBDBEC0" Margin="0,86,20,0" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Right"
+                <TextBlock FontSize="35" Foreground="#8D8D8D" Margin="0,86,20,0" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Right"
                            FontFamily="Segoe UI" Text="{Binding Source={x:Static zvsProc:Utils.ApplicationVersionLong}}" Height="61" />
 
                 <TextBlock TextTrimming="CharacterEllipsis"  FontSize="14" Foreground="#FF707070" HorizontalAlignment="Right" Margin="0,0,113,6" Name="txtLoading" VerticalAlignment="Bottom" Width="375">Loading plugin SXXXG ...</TextBlock>

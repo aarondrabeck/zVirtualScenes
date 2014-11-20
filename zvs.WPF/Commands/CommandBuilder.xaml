@@ -13,7 +13,7 @@
             <TabItem Name="DeviceTab" Style="{StaticResource VerticalTabItem}" >
                 <TabItem.Header >
                     <StackPanel HorizontalAlignment="Center"  >
-                        <Image Source="/zVirtualScenes;component/Images/radio.png" Height="32" Width="32" Margin="5"></Image>
+                        <TextBlock  TextAlignment="Center" Text="&#xe004;" Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="35" />
                         <TextBlock  Text="Device"/>
                     </StackPanel>
                 </TabItem.Header>
@@ -43,8 +43,8 @@
             <TabItem Name="BuiltinTab" Style="{StaticResource VerticalTabItem}" >
                 <TabItem.Header>
                     <StackPanel HorizontalAlignment="Center"  >
-                        <Image Source="/zVirtualScenes;component/Images/zvs32.ico" Height="32" Width="32" Margin="5"></Image>
-                        <TextBlock Text="Built-in"/>
+                        <TextBlock  TextAlignment="Center" Text="&#xe000;" Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="35" />
+                        <TextBlock  Text="Built-in"/>
                     </StackPanel>
                 </TabItem.Header>
                 <Grid>
@@ -57,8 +57,8 @@
             <TabItem Name="JavaScriptTab" Style="{StaticResource VerticalTabItem}">
                 <TabItem.Header>
                     <StackPanel HorizontalAlignment="Center"  >
-                        <Image Source="/zVirtualScenes;component/Images/JavaScriptIcon.png" Height="32" Width="32" Margin="5"></Image>
-                        <TextBlock Text="JavaScript"/>
+                        <TextBlock  TextAlignment="Center" Text="&#xe00b;" Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="35" />
+                        <TextBlock  Text="Javascript"/>
                     </StackPanel>
                 </TabItem.Header>
                 <Grid DataContext="{StaticResource JSCmdsViewSource}">

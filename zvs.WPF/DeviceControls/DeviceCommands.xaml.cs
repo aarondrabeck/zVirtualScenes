@@ -401,13 +401,6 @@ namespace zvs.WPF.DeviceControls
                 }
                 #endregion
             }
-
-            if (DeviceCommandsStkPnl.Children.Count == 0)
-                DeviceGrpBx.Visibility = Visibility.Collapsed;
-
-            if (TypeCommandsStkPnl.Children.Count == 0)
-                TypeGrpBx.Visibility = Visibility.Collapsed;
-
         }
 
         public void Dispose()

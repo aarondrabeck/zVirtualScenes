@@ -43,14 +43,16 @@
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <DataGrid Grid.Row="1" x:Name="LogDataGrid"  VerticalAlignment="Stretch" Background="White" RowHeaderWidth="0"
-                                   HorizontalAlignment="Stretch" AutoGenerateColumns="False" HorizontalGridLinesBrush="#FFE2E2E2" 
+        <DataGrid Grid.Row="1" CellStyle="{DynamicResource NoSelectDataGridCell}" x:Name="LogDataGrid"  VerticalAlignment="Stretch" Background="White" RowHeaderWidth="0" SelectionUnit="FullRow" SelectionMode="Extended"
+                                   HorizontalAlignment="Stretch" AutoGenerateColumns="False" HorizontalGridLinesBrush="{DynamicResource LogNoFocusBrush}" 
                   AlternatingRowBackground="#FFFFFF" GridLinesVisibility="Horizontal" 
-                                   ItemsSource="{Binding Source={StaticResource LogEntryViewSource}}" SelectionUnit="FullRow" SelectionMode="Single" 
+                                   ItemsSource="{Binding Source={StaticResource LogEntryViewSource}}"  
                   CanUserAddRows="False" BorderThickness="0" >
+           
             <DataGrid.Resources>
-                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="WhiteSmoke"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="{DynamicResource LogSelectedColor}"/>
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey }" Color="{DynamicResource LogNoFocusColor}" />
             </DataGrid.Resources>
             <DataGrid.Columns>
                 <DataGridTextColumn HeaderStyle="{StaticResource SelectionDataGridHeader}" Width="140"  Header="Date" Binding="{Binding Datetime}" IsReadOnly="True" SortDirection="Descending" />
@@ -59,6 +61,7 @@
                 <DataGridTextColumn  HeaderStyle="{StaticResource SelectionDataGridHeader}" Width="*"  Header="Message" Binding="{Binding Message}" IsReadOnly="True"/>
             </DataGrid.Columns>
         </DataGrid>
+        
         <Border Grid.Row="2" DockPanel.Dock="Bottom" Background="White"  BorderThickness="0 1 0 0" BorderBrush="#FFD5CFC4">
             <Grid >
                 <Button Name="PurgeButton" Content="Purge Log" FontSize="14" FontWeight="Medium" Background="#FFCCCCCC" Padding="10 5"  BorderBrush="{x:Null}"  BorderThickness="0" Margin="5" VerticalAlignment="Bottom" HorizontalAlignment="Left" Click="PurgeButton_Click" ></Button>

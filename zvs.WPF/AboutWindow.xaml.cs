@@ -26,16 +26,13 @@ namespace zvs.WPF
 
         private void AboutWindow_Loaded_1(object sender, RoutedEventArgs e)
         {
-            FullNameTxtBl.Text = Utils.ApplicationName;
-            VersionTxtBl.Text = string.Format("Version {0}", Utils.ApplicationVersionLong);
-            Copyrighttxtbl.Text = string.Format("© {0} Nonce Labs", DateTime.Now.Year);
         }
 
         private void WebsiteLink_MouseDown_1(object sender, MouseButtonEventArgs e)
         {
             try
             {
-                System.Diagnostics.Process.Start("http://code.google.com/p/zvirtualscenes/");
+                Process.Start("https://github.com/aarondrabeck/zVirtualScenes");
             }
             catch (Exception ex)
             {
