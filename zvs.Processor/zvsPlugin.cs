@@ -17,13 +17,16 @@ namespace zvs.Processor
         protected IEntityContextConnection EntityContextConnection { get; set; }
         protected CancellationToken CancellationToken { get; set; }
 
+        private IAdapterManager AdapterManager { get; set; }
+
         public abstract Task StartAsync();
         public abstract Task StopAsync();
 
-        public async Task Initialize(IFeedback<LogEntry> log, IEntityContextConnection entityContextConnection)
+        public async Task Initialize(IFeedback<LogEntry> log, IEntityContextConnection entityContextConnection,IAdapterManager adapterManager)
         {
             EntityContextConnection = entityContextConnection;
             Log = log;
+            AdapterManager = adapterManager;
 
             var sb = new PluginSettingBuilder(entityContextConnection, CancellationToken);
             await OnSettingsCreating(sb);
@@ -48,6 +51,13 @@ namespace zvs.Processor
         public virtual Task OnSettingsCreating(PluginSettingBuilder settingBuilder)
         {
             return Task.FromResult(0);
+        }
+
+        protected async Task<Result> RunCommandAsync(int? commandId, string argument, string argument2,
+            CancellationToken cancellationToken)
+        {
+            var commandProcessor = new CommandProcessor(AdapterManager, EntityContextConnection, Log);
+            return await commandProcessor.RunCommandAsync(commandId, argument, argument, cancellationToken);
         }
 
         public event PropertyChangedEventHandler PropertyChanged = delegate { };

@@ -17,7 +17,7 @@ namespace zvs.Processor.Tests
             var plugin = new UnitTestPlugin();
             try
             {
-                await plugin.Initialize(new StubIFeedback<LogEntry>(), new StubIEntityContextConnection());
+                await plugin.Initialize(new StubIFeedback<LogEntry>(), new StubIEntityContextConnection(), new StubIAdapterManager());
             }
             catch (Exception ex)
             {

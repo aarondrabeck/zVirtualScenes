@@ -72,6 +72,10 @@
       <Project>{10cd1de3-4e83-4bb0-a7ca-c774c298be27}</Project>
       <Name>zvs.Processor</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\zvs\zvs.csproj">
+      <Project>{26F2B6C6-0325-415C-BB0F-314C69F44D5A}</Project>
+      <Name>zvs</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />

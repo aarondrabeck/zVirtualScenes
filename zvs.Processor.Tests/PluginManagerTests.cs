@@ -21,7 +21,7 @@ namespace zvs.Processor.Tests
         {
             //arrange 
             //act
-            new PluginManager(null, new StubIEntityContextConnection(), new StubIFeedback<LogEntry>());
+            new PluginManager(null, new StubIEntityContextConnection(), new StubIFeedback<LogEntry>(), new StubIAdapterManager());
             //assert - throws exception
         }
 
@@ -31,7 +31,7 @@ namespace zvs.Processor.Tests
         {
             //arrange 
             //act
-            new PluginManager(new List<ZvsPlugin>(), null, new StubIFeedback<LogEntry>());
+            new PluginManager(new List<ZvsPlugin>(), null, new StubIFeedback<LogEntry>(), new StubIAdapterManager());
             //assert - throws exception
         }
 
@@ -41,7 +41,17 @@ namespace zvs.Processor.Tests
         {
             //arrange 
             //act
-            new PluginManager(new List<ZvsPlugin>(), new StubIEntityContextConnection(), null);
+            new PluginManager(new List<ZvsPlugin>(), new StubIEntityContextConnection(), null, new StubIAdapterManager());
+            //assert - throws exception
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ConstructorNullArg4Test()
+        {
+            //arrange 
+            //act
+            new PluginManager(new List<ZvsPlugin>(), new StubIEntityContextConnection(), new StubIFeedback<LogEntry>(), null);
             //assert - throws exception
         }
 
@@ -73,7 +83,7 @@ namespace zvs.Processor.Tests
                 OnSceneSettingsCreatingSceneSettingBuilder = (s) => Task.FromResult(0)
             };
 
-            var pluginManager = new PluginManager(new List<ZvsPlugin>() { longNamePlugin }, dbConnection, log);
+            var pluginManager = new PluginManager(new List<ZvsPlugin>() { longNamePlugin }, dbConnection, log, new StubIAdapterManager());
             //act
             await pluginManager.InitializePluginsAsync(CancellationToken.None);
 
@@ -99,7 +109,7 @@ namespace zvs.Processor.Tests
                 OnSceneSettingsCreatingSceneSettingBuilder = (s) => Task.FromResult(0)
             };
 
-            var pluginManager = new PluginManager(new List<ZvsPlugin> { unitTestingPlugin }, dbConnection, log);
+            var pluginManager = new PluginManager(new List<ZvsPlugin> { unitTestingPlugin }, dbConnection, log, new StubIAdapterManager());
 
             //act
             var result = pluginManager.GetZvsPlugins();
@@ -151,7 +161,7 @@ namespace zvs.Processor.Tests
                         .RegisterPluginSettingAsync(testSetting, o => o.PropertyTest);
             };
 
-            var pluginManager = new PluginManager(new List<ZvsPlugin> { unitTestingPlugin }, dbConnection, log);
+            var pluginManager = new PluginManager(new List<ZvsPlugin> { unitTestingPlugin }, dbConnection, log, new StubIAdapterManager());
 
             //act
             await pluginManager.InitializePluginsAsync(CancellationToken.None);
@@ -225,7 +235,7 @@ namespace zvs.Processor.Tests
                         .RegisterPluginSettingAsync(testSetting, o => o.PropertyTest);
             };
 
-            var pluginManager = new PluginManager(new List<ZvsPlugin> { unitTestingPlugin }, dbConnection, log);
+            var pluginManager = new PluginManager(new List<ZvsPlugin> { unitTestingPlugin }, dbConnection, log, new StubIAdapterManager());
 
             //act
             await pluginManager.InitializePluginsAsync(CancellationToken.None);
@@ -278,7 +288,7 @@ namespace zvs.Processor.Tests
                         .RegisterPluginSettingAsync(testSetting, o => o.PropertyTest);
             };
 
-            var pluginManager = new PluginManager(new List<ZvsPlugin> { unitTestingPlugin }, dbConnection, log);
+            var pluginManager = new PluginManager(new List<ZvsPlugin> { unitTestingPlugin }, dbConnection, log, new StubIAdapterManager());
 
             //act
             await pluginManager.InitializePluginsAsync(CancellationToken.None);
@@ -343,7 +353,7 @@ namespace zvs.Processor.Tests
                         .RegisterPluginSettingAsync(testSetting, o => o.PropertyTest);
             };
 
-            var pluginManager = new PluginManager(new List<ZvsPlugin> { unitTestingPlugin }, dbConnection, log);
+            var pluginManager = new PluginManager(new List<ZvsPlugin> { unitTestingPlugin }, dbConnection, log, new StubIAdapterManager());
 
             //act
             await pluginManager.InitializePluginsAsync(CancellationToken.None);
@@ -372,7 +382,7 @@ namespace zvs.Processor.Tests
                 StartAsync01 = async () => hasStarted = true
             };
 
-            var pluginManager = new PluginManager(new List<ZvsPlugin> { unitTestingPlugin }, dbConnection, log);
+            var pluginManager = new PluginManager(new List<ZvsPlugin> { unitTestingPlugin }, dbConnection, log, new StubIAdapterManager());
 
             var plugin = new Plugin
             {
@@ -400,7 +410,7 @@ namespace zvs.Processor.Tests
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var log = new StubIFeedback<LogEntry>();
-            var pluginManager = new PluginManager(new List<ZvsPlugin>(), dbConnection, log);
+            var pluginManager = new PluginManager(new List<ZvsPlugin>(), dbConnection, log, new StubIAdapterManager());
 
             //act
             var result = await pluginManager.EnablePluginAsync(Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"), CancellationToken.None);
@@ -429,7 +439,7 @@ namespace zvs.Processor.Tests
                 StopAsync01 = async () => hasStopped = true
             };
 
-            var pluginManager = new PluginManager(new List<ZvsPlugin> { unitTestingPlugin }, dbConnection, log);
+            var pluginManager = new PluginManager(new List<ZvsPlugin> { unitTestingPlugin }, dbConnection, log, new StubIAdapterManager());
 
             var plugin = new Plugin
             {
@@ -457,7 +467,7 @@ namespace zvs.Processor.Tests
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var log = new StubIFeedback<LogEntry>();
-            var pluginManager = new PluginManager(new List<ZvsPlugin> { }, dbConnection, log);
+            var pluginManager = new PluginManager(new List<ZvsPlugin> { }, dbConnection, log, new StubIAdapterManager());
 
             //act
             var result = await pluginManager.DisablePluginAsync(Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"), CancellationToken.None);

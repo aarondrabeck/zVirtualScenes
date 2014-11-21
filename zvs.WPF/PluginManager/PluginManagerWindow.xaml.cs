@@ -121,9 +121,9 @@ namespace zvs.WPF.PluginManager
 
                     //STOP OR START
                     if (isChecked)
-                        await App.ZvsEngine.AdapterManager.EnableAdapterAsync(plugin.PluginGuid, App.Cts.Token);
+                        await App.ZvsEngine.PluginManager.EnablePluginAsync(plugin.PluginGuid, App.Cts.Token);
                     else
-                        await App.ZvsEngine.AdapterManager.DisableAdapterAsync(plugin.PluginGuid, App.Cts.Token);
+                        await App.ZvsEngine.PluginManager.DisablePluginAsync(plugin.PluginGuid, App.Cts.Token);
                 },
                 _icon);
             ControlsStkPnl.Children.Add(c);
@@ -149,7 +149,7 @@ namespace zvs.WPF.PluginManager
                                 pluginSettings.Value = isChecked.ToString();
                                 var result = await Context.TrySaveChangesAsync(App.Cts.Token);
                                 if (result.HasError)
-                                    await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving adapter setting. {0}", result.Message);
+                                    await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving plugin setting. {0}", result.Message);
 
                                 //TODO: FIX
                                // App.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
@@ -169,7 +169,7 @@ namespace zvs.WPF.PluginManager
                                 pluginSettings.Value = value;
                                 var result = await Context.TrySaveChangesAsync(App.Cts.Token);
                                 if (result.HasError)
-                                    await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving adapter setting. {0}", result.Message);
+                                    await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving plugin setting. {0}", result.Message);
 
                                 //App.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
                             },
@@ -189,7 +189,7 @@ namespace zvs.WPF.PluginManager
 
                                 var result = await Context.TrySaveChangesAsync(App.Cts.Token);
                                 if (result.HasError)
-                                    await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving adapter setting. {0}", result.Message);
+                                    await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving plugin setting. {0}", result.Message);
 
                                // App.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
                             },
@@ -209,7 +209,7 @@ namespace zvs.WPF.PluginManager
 
                                 var result = await Context.TrySaveChangesAsync(App.Cts.Token);
                                 if (result.HasError)
-                                    await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving adapter setting. {0}", result.Message);
+                                    await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving plugin setting. {0}", result.Message);
 
                                // App.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
                             },
@@ -228,7 +228,7 @@ namespace zvs.WPF.PluginManager
                                 pluginSettings.Value = value;
                                 var result = await Context.TrySaveChangesAsync(App.Cts.Token);
                                 if (result.HasError)
-                                    await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving adapter setting. {0}", result.Message);
+                                    await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving plugin setting. {0}", result.Message);
 
                                 //App.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
                             },
@@ -247,7 +247,7 @@ namespace zvs.WPF.PluginManager
                                 pluginSettings.Value = value;
                                 var result = await Context.TrySaveChangesAsync(App.Cts.Token);
                                 if (result.HasError)
-                                    await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving adapter setting. {0}", result.Message);
+                                    await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving plugin setting. {0}", result.Message);
 
                                 //App.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
                             },
@@ -265,7 +265,7 @@ namespace zvs.WPF.PluginManager
                                 pluginSettings.Value = value;
                                 var result = await Context.TrySaveChangesAsync(App.Cts.Token);
                                 if (result.HasError)
-                                    await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving adapter setting. {0}", result.Message);
+                                    await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving plugin setting. {0}", result.Message);
 
                                 //App.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
                             },
@@ -284,7 +284,7 @@ namespace zvs.WPF.PluginManager
                                 pluginSettings.Value = value.ToString();
                                 var result = await Context.TrySaveChangesAsync(App.Cts.Token);
                                 if (result.HasError)
-                                    await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving adapter setting. {0}", result.Message);
+                                    await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving plugin setting. {0}", result.Message);
 
                                 //App.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
                             },

@@ -127,7 +127,7 @@ namespace zvs.WPF
             if (pluginFindResult.HasError)
                 await Log.ReportErrorAsync(pluginFindResult.Message, Cts.Token);
 
-            var pluginManager = new Processor.PluginManager(pluginFindResult.Plugins, EntityContextConnection, new DatabaseFeedback(EntityContextConnection));
+            var pluginManager = new Processor.PluginManager(pluginFindResult.Plugins, EntityContextConnection, new DatabaseFeedback(EntityContextConnection), adapterManager);
 
 
             var triggerRunner = new TriggerRunner(new DatabaseFeedback(EntityContextConnection), new CommandProcessor(adapterManager, EntityContextConnection, new DatabaseFeedback(EntityContextConnection)), EntityContextConnection);
