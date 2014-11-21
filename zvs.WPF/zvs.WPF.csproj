@@ -51,7 +51,8 @@
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>zvsCert.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
@@ -416,7 +417,6 @@
     </None>
     <None Include="Properties\DataSources\zvs.DataModel.Device.datasource" />
     <None Include="Properties\DataSources\zvs.DataModel.LogEntry.datasource" />
-    <None Include="zvsCert.pfx" />
     <Resource Include="Images\JavaScriptIcon.png" />
     <Resource Include="Images\spinner.gif" />
     <Resource Include="Images\greencheck.png" />

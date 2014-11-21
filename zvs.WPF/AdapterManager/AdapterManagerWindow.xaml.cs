@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -19,15 +20,15 @@ namespace zvs.WPF.AdapterManager
     public partial class AdapterManagerWindow : IDisposable
     {
         private IFeedback<LogEntry> Log { get; set; }
-        private readonly App _app = (App)Application.Current;
+        private App App { get; set; }
         private readonly BitmapImage _icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/save_check.png"));
-        private readonly ZvsContext _context;
+        private ZvsContext Context { get; set; }
 
         public AdapterManagerWindow()
         {
-            Log = new DatabaseFeedback(_app.EntityContextConnection) { Source = "Adapter Manager Window" };
-            _context = new ZvsContext(_app.EntityContextConnection);
-
+            App = (App)Application.Current;
+            Log = new DatabaseFeedback(App.EntityContextConnection) { Source = "Adapter Manager Window" };
+            Context = new ZvsContext(App.EntityContextConnection);
             InitializeComponent();
 
             NotifyEntityChangeContext.ChangeNotifications<Adapter>.OnEntityAdded += AdapterManagerWindow_onEntityAdded;
@@ -63,25 +64,25 @@ namespace zvs.WPF.AdapterManager
             // Do not load your data at design time.
             if (DesignerProperties.GetIsInDesignMode(this)) return;
             //Load your data here and assign the result to the CollectionViewSource.
-            var zvsEntities2ViewSource = ((CollectionViewSource)(FindResource("zvsEntities2adapterViewSource")));
+            var zvsEntities2ViewSource = ((CollectionViewSource)(FindResource("ZvsEntities2AdapterViewSource")));
 
             //Get a list of loaded plug-ins
             UpdateAdapterList();
 
             //Only load the plug-in options for the plug-ins that are currently loaded.
-            zvsEntities2ViewSource.Source = _context.Adapters.Local;
+            zvsEntities2ViewSource.Source = Context.Adapters.Local;
         }
 
         private void UpdateAdapterList()
         {
-            if (_context == null)
+            if (Context == null)
                 return;
 
-            Dispatcher.Invoke(new Action(async () =>
+            Dispatcher.Invoke(async () =>
             {
-                var loadedAdapterGuids = _app.ZvsEngine.AdapterManager.GetZvsAdapters().Select(o => o.AdapterGuid).ToList();
-                await _context.Adapters.Where(o => loadedAdapterGuids.Contains(o.AdapterGuid)).ToListAsync();
-            }));
+                var loadedAdapterGuids = App.ZvsEngine.AdapterManager.GetZvsAdapters().Select(o => o.AdapterGuid).ToList();
+                await Context.Adapters.Where(o => loadedAdapterGuids.Contains(o.AdapterGuid)).ToListAsync();
+            });
         }
 
         private void Window_Closed_1(object sender, EventArgs e)
@@ -89,7 +90,7 @@ namespace zvs.WPF.AdapterManager
             NotifyEntityChangeContext.ChangeNotifications<Adapter>.OnEntityAdded -= AdapterManagerWindow_onEntityAdded;
             NotifyEntityChangeContext.ChangeNotifications<Adapter>.OnEntityDeleted -= AdapterManagerWindow_onEntityDeleted;
             NotifyEntityChangeContext.ChangeNotifications<Adapter>.OnEntityUpdated -= AdapterManagerWindow_onEntityUpdated;
-            _context.Dispose();
+            Context.Dispose();
         }
 
         private void CancelBtn_Click(object sender, RoutedEventArgs e)
@@ -97,11 +98,11 @@ namespace zvs.WPF.AdapterManager
             Close();
         }
 
-        private void PluginLstVw_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void AdapterListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ControlsStkPnl.Children.Clear();
 
-            var adapter = (Adapter)AdapterLstVw.SelectedItem;
+            var adapter = (Adapter)AdapterListView.SelectedItem;
             if (adapter == null) return;
             //ADD THE ENABLED BUTTON
             var c = new CheckboxControl(string.Format("{0} is enabled", adapter.Name),
@@ -112,15 +113,15 @@ namespace zvs.WPF.AdapterManager
                     //Save to the database
                     adapter.IsEnabled = isChecked;
 
-                    var result = await _context.TrySaveChangesAsync(_app.Cts.Token);
+                    var result = await Context.TrySaveChangesAsync(App.Cts.Token);
                     if (result.HasError)
-                        await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error enabling adapter. {0}", result.Message);
+                        await Log.ReportErrorFormatAsync(App.Cts.Token, "Error enabling adapter. {0}", result.Message);
 
                     //STOP OR START
                     if (isChecked)
-                        await _app.ZvsEngine.AdapterManager.EnableAdapterAsync(adapter.AdapterGuid, _app.Cts.Token);
+                        await App.ZvsEngine.AdapterManager.EnableAdapterAsync(adapter.AdapterGuid, App.Cts.Token);
                     else
-                        await _app.ZvsEngine.AdapterManager.DisableAdapterAsync(adapter.AdapterGuid, _app.Cts.Token);
+                        await App.ZvsEngine.AdapterManager.DisableAdapterAsync(adapter.AdapterGuid, App.Cts.Token);
                 },
                 _icon);
             ControlsStkPnl.Children.Add(c);
@@ -144,9 +145,9 @@ namespace zvs.WPF.AdapterManager
                                 async isChecked =>
                                 {
                                     adapterSetting.Value = isChecked.ToString();
-                                    var result = await _context.TrySaveChangesAsync(_app.Cts.Token);
+                                    var result = await Context.TrySaveChangesAsync(App.Cts.Token);
                                     if (result.HasError)
-                                        await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving adapter setting. {0}", result.Message);
+                                        await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving adapter setting. {0}", result.Message);
                                 },
                                 _icon);
                             ControlsStkPnl.Children.Add(control);
@@ -161,9 +162,9 @@ namespace zvs.WPF.AdapterManager
                                 async value =>
                                 {
                                     adapterSetting.Value = value;
-                                    var result = await _context.TrySaveChangesAsync(_app.Cts.Token);
+                                    var result = await Context.TrySaveChangesAsync(App.Cts.Token);
                                     if (result.HasError)
-                                        await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving adapter setting. {0}", result.Message);
+                                        await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving adapter setting. {0}", result.Message);
                                 },
                                 _icon);
                             ControlsStkPnl.Children.Add(control);
@@ -179,9 +180,9 @@ namespace zvs.WPF.AdapterManager
                                 {
                                     adapterSetting.Value = value;
 
-                                    var result = await _context.TrySaveChangesAsync(_app.Cts.Token);
+                                    var result = await Context.TrySaveChangesAsync(App.Cts.Token);
                                     if (result.HasError)
-                                        await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving adapter setting. {0}", result.Message);
+                                        await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving adapter setting. {0}", result.Message);
                                 },
                                 _icon);
                             ControlsStkPnl.Children.Add(control);
@@ -197,9 +198,9 @@ namespace zvs.WPF.AdapterManager
                                 {
                                     adapterSetting.Value = value;
 
-                                    var result = await _context.TrySaveChangesAsync(_app.Cts.Token);
+                                    var result = await Context.TrySaveChangesAsync(App.Cts.Token);
                                     if (result.HasError)
-                                        await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving adapter setting. {0}", result.Message);
+                                        await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving adapter setting. {0}", result.Message);
                                 },
                                 _icon);
                             ControlsStkPnl.Children.Add(control);
@@ -214,9 +215,9 @@ namespace zvs.WPF.AdapterManager
                                 async value =>
                                 {
                                     adapterSetting.Value = value;
-                                    var result = await _context.TrySaveChangesAsync(_app.Cts.Token);
+                                    var result = await Context.TrySaveChangesAsync(App.Cts.Token);
                                     if (result.HasError)
-                                        await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving adapter setting. {0}", result.Message);
+                                        await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving adapter setting. {0}", result.Message);
                                 },
                                 _icon);
                             ControlsStkPnl.Children.Add(control);
@@ -231,9 +232,9 @@ namespace zvs.WPF.AdapterManager
                                 async value =>
                                 {
                                     adapterSetting.Value = value;
-                                    var result = await _context.TrySaveChangesAsync(_app.Cts.Token);
+                                    var result = await Context.TrySaveChangesAsync(App.Cts.Token);
                                     if (result.HasError)
-                                        await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving adapter setting. {0}", result.Message);
+                                        await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving adapter setting. {0}", result.Message);
                                 },
                                 _icon);
                             ControlsStkPnl.Children.Add(control);
@@ -247,9 +248,9 @@ namespace zvs.WPF.AdapterManager
                                 async value =>
                                 {
                                     adapterSetting.Value = value;
-                                    var result = await _context.TrySaveChangesAsync(_app.Cts.Token);
+                                    var result = await Context.TrySaveChangesAsync(App.Cts.Token);
                                     if (result.HasError)
-                                        await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving adapter setting. {0}", result.Message);
+                                        await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving adapter setting. {0}", result.Message);
                                 },
                                 _icon);
                             ControlsStkPnl.Children.Add(control);
@@ -264,9 +265,9 @@ namespace zvs.WPF.AdapterManager
                                 async value =>
                                 {
                                     adapterSetting.Value = value.ToString();
-                                    var result = await _context.TrySaveChangesAsync(_app.Cts.Token);
+                                    var result = await Context.TrySaveChangesAsync(App.Cts.Token);
                                     if (result.HasError)
-                                        await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving adapter setting. {0}", result.Message);
+                                        await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving adapter setting. {0}", result.Message);
                                 },
                                 _icon);
                             ControlsStkPnl.Children.Add(control);
@@ -285,12 +286,12 @@ namespace zvs.WPF.AdapterManager
         protected virtual void Dispose(bool disposing)
         {
             if (!disposing) return;
-            if (_context == null)
+            if (Context == null)
             {
                 return;
             }
 
-            _context.Dispose();
+            Context.Dispose();
         }
     }
 }

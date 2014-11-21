@@ -1,25 +1,63 @@
-﻿<Window x:Class="zvs.WPF.PluginManagerWindow"
+﻿<Window x:Class="zvs.WPF.PluginManager.PluginManagerWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Plugin Manager" Width="800" mc:Ignorable="d" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:my="clr-namespace:zvs.DataModel;assembly=zvs.DataModel" Loaded="Window_Loaded" Icon="/zVirtualScenes;component/Images/zvs-icon.ico" Background="#FFF0F0F0" MinHeight="300" MinWidth="675" WindowStyle="ToolWindow" d:DesignHeight="312" Height="500" WindowStartupLocation="CenterOwner" Closed="Window_Closed_1">
+        Title="Plugin Manager" Width="800" mc:Ignorable="d" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        Loaded="Window_Loaded" Icon="/zVirtualScenes;component/Images/zvs-icon.ico"  MinHeight="300" MinWidth="675" WindowStyle="ToolWindow" d:DesignHeight="312" Height="500" WindowStartupLocation="CenterOwner" Closed="Window_Closed_1">
     <Window.Resources>
-        <CollectionViewSource x:Key="zvsEntities2PluginViewSource"  />
+        <CollectionViewSource x:Key="ZvsEntities2PluginViewSource"  />
     </Window.Resources>
-    <Grid DataContext="{StaticResource zvsEntities2PluginViewSource}">
-        <ListView HorizontalAlignment="Left" Margin="8,7,0,44" Name="PluginLstVw" Width="219" DisplayMemberPath="Name" ItemsSource="{Binding}" SelectedValuePath="Description" SelectionMode="Single" SelectionChanged="PluginLstVw_SelectionChanged" />
+    <Grid DataContext="{StaticResource ZvsEntities2PluginViewSource}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="60"/>
+        </Grid.RowDefinitions>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <ListView Grid.Column="0" HorizontalAlignment="Left" Name="PluginListView" Margin="10 10 10 0"  DisplayMemberPath="Name" BorderBrush="#B2EBF2" ItemsSource="{Binding}" 
+                  SelectedValuePath="Description" SelectionMode="Single" SelectionChanged="PluginListView_SelectionChanged" MinWidth="200" >
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="{x:Type ListViewItem}">
+                        <Style.Resources>
+                            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#B2EBF2"/>
+                            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
+                            <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey }" Color="#E0F7FA" />
+                        </Style.Resources>
+                    </Style>
+                </ListView.ItemContainerStyle>
+            </ListView>
 
-        <DockPanel Name="ControlsStackPanelParent" Margin="233,8,12,63" >
-            <StackPanel DockPanel.Dock="Top">
-                <TextBlock Name="AdapterNameTxt" Text="{Binding Path=Name, StringFormat={}{0} for zVirtualScenes}" FontSize="15" FontWeight="Bold" Margin="0,0,0,5" />
-                <TextBlock Name="DescriptionTxt" Text="{Binding Path=Description}" TextWrapping="Wrap" TextTrimming="WordEllipsis" Margin="0,0,0,10"/>
-                <Rectangle Stroke="#FFA0A0A0" Height="1" Margin="0,0,0,10"  />
-            </StackPanel>
-            <ScrollViewer HorizontalScrollBarVisibility="Disabled"  VerticalScrollBarVisibility="Auto">
-                <StackPanel Name="ControlsStkPnl"  Orientation="Vertical" Margin="0,10,0,20"></StackPanel>
-            </ScrollViewer>
-        </DockPanel>
-        <Button Content="Done" Height="23" HorizontalAlignment="Right" Margin="0,0,12,12" Name="CancelBtn" VerticalAlignment="Bottom" Width="75" Click="CancelBtn_Click" />
-        <Rectangle Height="1" Margin="240,0,12,47" Name="rectangle1" Stroke="#FFA0A0A0" VerticalAlignment="Bottom" />
+            <Grid Grid.Column="1" Margin="0 10 10 0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="75"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Grid Background="#26C6DA">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="{Binding Path=Name, StringFormat={}{0} for zVirtualScenes, FallbackValue=Plugins for zVirtualSenes}" Foreground="White" FontSize="18"  Margin="5 10 5 0" />
+                    <TextBlock Grid.Row="1" Text="{Binding Path=Description, FallbackValue=Integrate with zVirtualScenes by creating custom plug-ins.}" TextWrapping="Wrap"  
+                                   Foreground="White" TextTrimming="WordEllipsis" Margin="15 3 5 5"/>
+                </Grid>
+                <Border  Grid.Row="1" BorderBrush="#B2EBF2" BorderThickness="1 0 1 1">
+                    <ScrollViewer HorizontalScrollBarVisibility="Disabled"  VerticalScrollBarVisibility="Auto" >
+                        <StackPanel Name="ControlsStkPnl"  Orientation="Vertical" Margin="0,10,0,0"></StackPanel>
+                    </ScrollViewer>
+                </Border>
+            </Grid>
+
+        </Grid>
+        <Button Grid.Row="1" Content="Done"  HorizontalAlignment="Right" Margin="0,0,10,0" VerticalAlignment="Center" Name="CancelBtn"  Click="CancelBtn_Click" FontSize="14" Padding="10 5" FontWeight="Medium" Background="#FFCCCCCC" BorderBrush="{x:Null}"  BorderThickness="0"/>
+
+
+
+
 
     </Grid>
 </Window>

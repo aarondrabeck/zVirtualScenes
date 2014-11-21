@@ -13,20 +13,26 @@ namespace zvs.Processor
         public abstract Guid PluginGuid { get; }
         public abstract string Name { get; }
         public abstract string Description { get; }
+        protected IFeedback<LogEntry> Log { get; private set; }
+        protected IEntityContextConnection EntityContextConnection { get; set; }
+        protected CancellationToken CancellationToken { get; set; }
 
-        public abstract Task StartAsync(CancellationToken cancellationToken);
-        public abstract Task StopAsync(CancellationToken cancellationToken);
+        public abstract Task StartAsync();
+        public abstract Task StopAsync();
 
-        public async Task Initialize(IFeedback<LogEntry> log, ZvsContext zvsContext)
+        public async Task Initialize(IFeedback<LogEntry> log, IEntityContextConnection entityContextConnection)
         {
-          //  var sb = new PluginSettingBuilder(log, zvsContext);
-         //   await OnSettingsCreating(sb);
+            EntityContextConnection = entityContextConnection;
+            Log = log;
 
-         //   var ssb = new SceneSettingBuilder(zvsContext);
-        //    await OnSceneSettingsCreating(ssb);
+            var sb = new PluginSettingBuilder(entityContextConnection, CancellationToken);
+            await OnSettingsCreating(sb);
 
-          //  var dsb = new DeviceSettingBuilder(zvsContext);
-          //  await OnDeviceSettingsCreating(dsb);
+            var ssb = new SceneSettingBuilder(EntityContextConnection);
+            await OnSceneSettingsCreating(ssb);
+
+            var dsb = new DeviceSettingBuilder(EntityContextConnection);
+            await OnDeviceSettingsCreating(dsb);
         }
 
         public virtual Task OnDeviceSettingsCreating(DeviceSettingBuilder settingBuilder)
@@ -44,10 +50,8 @@ namespace zvs.Processor
             return Task.FromResult(0);
         }
 
-        public abstract Task DeviceValueChangedAsync(Int64 deviceValueId, string newValue, string oldValue);
-
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
-        protected void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
+        public void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }

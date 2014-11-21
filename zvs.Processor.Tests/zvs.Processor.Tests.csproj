@@ -81,6 +81,7 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PluginManagerTests.cs" />
     <Compile Include="AdapterManagerTests.cs" />
     <Compile Include="BuiltinCommandBuilderTests.cs" />
     <Compile Include="PluginSettingBuilderTests.cs" />
@@ -102,7 +103,9 @@
     <Compile Include="SceneSettingBuilderTests.cs" />
     <Compile Include="FeedbackExtensionMethodTests.cs" />
     <Compile Include="CreateFakeData.cs" />
+    <Compile Include="ZvsEngineTests.cs" />
     <Compile Include="UnitTestingAdapter.cs" />
+    <Compile Include="ZvsPluginTests.cs" />
     <Compile Include="ZvsAdapterTests.cs" />
   </ItemGroup>
   <ItemGroup>

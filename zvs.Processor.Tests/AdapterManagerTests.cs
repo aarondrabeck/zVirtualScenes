@@ -132,6 +132,31 @@ namespace zvs.Processor.Tests
         }
 
         [TestMethod]
+        public async Task GetZvsAdaptersTest()
+        {
+            //Arrange 
+            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-GetZvsAdapters" };
+            Database.SetInitializer(new CreateFreshDbInitializer());
+
+            var log = new StubIFeedback<LogEntry>();
+            var unitTestingAdapter = new StubUnitTestAdapter
+            {
+                AdapterGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
+                NameGet = () => "Unit Testing Adapter",
+                DescriptionGet = () => "",
+                OnDeviceTypesCreatingDeviceTypeBuilder = (s) => Task.FromResult(0)
+            };
+
+            var adapterManager = new AdapterManager(new List<ZvsAdapter> { unitTestingAdapter }, dbConnection, log);
+
+            //act
+            var result = adapterManager.GetZvsAdapters();
+
+            //assert 
+            Assert.IsTrue(result.Count() == 1, "Expected 1 adapter in the list");
+        }
+
+        [TestMethod]
         public async Task LoadAdaptersAsyncBadPropertyTest()
         {
             //Arrange 

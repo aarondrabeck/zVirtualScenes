@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Diagnostics;
 using System.Globalization;
-using System.Runtime.Remoting.Messaging;
-using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -230,7 +228,7 @@ namespace zvs.Processor.Tests
             //Assert
             Assert.IsTrue(result.HasError);
             Assert.IsTrue(ranstoredCommands.Count == 0, "Process did not run the correct amount of commands.");
-            Assert.IsTrue(result.Message.Contains("Cannot locate"), "Expect error message to contain 'Cannot locate'");
+            Assert.IsTrue(result.Message.Contains("Cannot find device"), "Expect error message to contain 'Cannot find device'");
         }
 
         [TestMethod]
@@ -512,6 +510,45 @@ namespace zvs.Processor.Tests
         }
 
         [TestMethod]
+        public async Task ExecuteBuiltinCommandInvlaidDeviceIdAsyncRepollMeTest()
+        {
+            //Arrange 
+            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "CP-ExecuteBuiltinCommandInvlaidDeviceIdAsyncRepollMeTest" };
+            Database.SetInitializer(new CreateFreshDbInitializer());
+
+            var repollDeviceIdRequestSentToAdapter = new List<int>();
+            var adapterManager = new StubIAdapterManager
+            {
+                FindZvsAdapterGuid = adapterGuid => new StubZvsAdapter
+                {
+                    IsEnabled = true,
+                    RepollAsyncDevice = async (d) => repollDeviceIdRequestSentToAdapter.Add(d.Id)
+                }
+            };
+            var log = new StubIFeedback<LogEntry>();
+            var cts = new CancellationTokenSource();
+            var commmandProcessor = new CommandProcessor(adapterManager, dbConnection, log);
+
+            using (var context = new ZvsContext(dbConnection))
+            {
+                var builtinCommand = new BuiltinCommand
+                {
+                    UniqueIdentifier = "REPOLL_ME"
+                };
+                context.Commands.Add(builtinCommand);
+                await context.SaveChangesAsync(new CancellationToken());
+
+                //Act
+                var result = await commmandProcessor.ExecuteBuiltinCommandAsync(builtinCommand, 12.ToString(CultureInfo.InvariantCulture), "", cts.Token);
+                Console.WriteLine(result.Message);
+
+                //Assert
+                Assert.IsTrue(result.HasError);
+                Assert.IsTrue(result.Message.Contains("Cannot find device "), "Expect error message to contain 'Cannot find device '");
+            }
+        }
+
+        [TestMethod]
         public async Task ExecuteBuiltinCommandAsyncRepollAllTest()
         {
             //Arrange 
@@ -588,6 +625,58 @@ namespace zvs.Processor.Tests
                 //Assert
                 Assert.IsTrue(result.HasError);
                 Assert.IsTrue(result.Message.Contains("Invalid group"), "Expected to see 'Invalid group' in log");
+            }
+        }
+
+        [TestMethod]
+        public async Task ExecuteBuiltinCommandAsyncGroupOnNoDevicesTest()
+        {
+            //Arrange 
+            var dbConnection = new StubIEntityContextConnection
+            {
+                NameOrConnectionStringGet = () => "CP-ExecuteBuiltinCommandAsyncGroupOnNoDevicesTest"
+            };
+            Database.SetInitializer(new CreateFreshDbInitializer());
+
+            var groupOnIdsRequestSentToAdapter = new List<Group>();
+            var adapterManager = new StubIAdapterManager
+            {
+                FindZvsAdapterGuid = adapterGuid => new StubZvsAdapter
+                {
+                    IsEnabled = true,
+                    ActivateGroupAsyncGroup = async (g) => groupOnIdsRequestSentToAdapter.Add(g)
+                }
+            };
+            var log = new StubIFeedback<LogEntry>();
+            var cts = new CancellationTokenSource();
+            var commmandProcessor = new CommandProcessor(adapterManager, dbConnection, log);
+
+            using (var context = new ZvsContext(dbConnection))
+            {
+                var group = new Group
+                {
+                    Name = "Test Group"
+                };
+                context.Groups.Add(group);
+
+                var builtinCommand = new BuiltinCommand
+                {
+                    Name = "Turn on a Group",
+                    UniqueIdentifier = "GROUP_ON"
+                };
+                context.Commands.Add(builtinCommand);
+                await context.SaveChangesAsync(new CancellationToken());
+
+                //Act
+                var result =
+                    await
+                        commmandProcessor.ExecuteBuiltinCommandAsync(builtinCommand,
+                            group.Id.ToString(CultureInfo.InvariantCulture), "", cts.Token);
+                Console.WriteLine(result.Message);
+
+                //Assert
+                Assert.IsTrue(result.HasError);
+                Assert.IsTrue(result.Message.Contains("no devices found "), "Expected to see 'no devices found' in log when executed group with no devices");
             }
         }
 

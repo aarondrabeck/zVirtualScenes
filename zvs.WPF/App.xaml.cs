@@ -121,9 +121,18 @@ namespace zvs.WPF
                 await Log.ReportErrorAsync(result.Message, Cts.Token);
 
             var adapterManager = new Processor.AdapterManager(result.Adapters, EntityContextConnection, new DatabaseFeedback(EntityContextConnection));
+
+            var pluginLoader = new PluginLoader();
+            var pluginFindResult = await pluginLoader.FindPluginsAsync("plugins", Cts.Token);
+            if (pluginFindResult.HasError)
+                await Log.ReportErrorAsync(pluginFindResult.Message, Cts.Token);
+
+            var pluginManager = new Processor.PluginManager(pluginFindResult.Plugins, EntityContextConnection, new DatabaseFeedback(EntityContextConnection));
+
+
             var triggerRunner = new TriggerRunner(new DatabaseFeedback(EntityContextConnection), new CommandProcessor(adapterManager, EntityContextConnection, new DatabaseFeedback(EntityContextConnection)), EntityContextConnection);
             var scheduledTaskRunner = new ScheduledTaskRunner(new DatabaseFeedback(EntityContextConnection), new CommandProcessor(adapterManager, EntityContextConnection, new DatabaseFeedback(EntityContextConnection)), EntityContextConnection, new CurrentTimeProvider());
-            ZvsEngine = new ZvsEngine(new DatabaseFeedback(EntityContextConnection), adapterManager, EntityContextConnection, triggerRunner, scheduledTaskRunner);
+            ZvsEngine = new ZvsEngine(new DatabaseFeedback(EntityContextConnection), adapterManager, pluginManager, EntityContextConnection, triggerRunner, scheduledTaskRunner);
 
             var splashscreen = new SplashScreen();
             splashscreen.SetLoadingTextFormat("Starting {0}", Utils.ApplicationNameAndVersion);
@@ -138,7 +147,24 @@ namespace zvs.WPF
 #if (RELEASE)
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
 #endif
+            using (var context = new ZvsContext(new ZvsEntityContextConnection()))
+            {
+                //Install Program Options
+                var option =
+                    await
+                        context.ProgramOptions.FirstOrDefaultAsync(o => o.UniqueIdentifier == "LOGDIRECTION",
+                            Cts.Token);
+                if (option != null) return;
 
+                var registerLogDirectionResult = await ProgramOption.TryAddOrEditAsync(context, new ProgramOption
+                {
+                    UniqueIdentifier = "LOGDIRECTION",
+                    Value = "Descending"
+                }, Cts.Token);
+
+                if (registerLogDirectionResult.HasError)
+                    await Log.ReportErrorAsync(registerLogDirectionResult.Message, Cts.Token);
+            }
             using (var context = new ZvsContext(new ZvsEntityContextConnection()))
             {
                 var adapter = CreateFakeAdapter();
@@ -222,7 +248,7 @@ namespace zvs.WPF
                 device.Values.Add(value);
                 context.Devices.Add(device);
 
-               // context.SaveChanges();
+                // context.SaveChanges();
             }
 
             #region Create Logger

@@ -23,7 +23,7 @@ namespace zvs.Processor.Tests
                     logEntry = value;
                 }
             };
-                
+
             //Act
             await log.ReportErrorAsync("Error Message", CancellationToken.None);
 
@@ -124,7 +124,7 @@ namespace zvs.Processor.Tests
             //Arrange
             IFeedback<LogEntry> log = new StubIFeedback<LogEntry>
             {
-                ReportAsyncT0CancellationToken =  (value, ct) =>
+                ReportAsyncT0CancellationToken = (value, ct) =>
                 {
                     logEntry = value;
                     return Task.FromResult(0);
@@ -137,6 +137,50 @@ namespace zvs.Processor.Tests
             //Assert
             Assert.IsTrue(logEntry.Level == LogEntryLevel.Info);
             Assert.IsTrue(logEntry.Message.Equals("Info Message 1"));
+        }
+
+        [TestMethod]
+        public async Task ReportResultAsyncSuccessTest()
+        {
+            LogEntry logEntry = null;
+            //Arrange
+            IFeedback<LogEntry> log = new StubIFeedback<LogEntry>
+            {
+                ReportAsyncT0CancellationToken = (value, ct) =>
+                {
+                    logEntry = value;
+                    return Task.FromResult(0);
+                }
+            };
+
+            //Act
+            await log.ReportResultAsync(Result.ReportSuccess("Message Body"), CancellationToken.None);
+
+            //Assert
+            Assert.IsTrue(logEntry.Level == LogEntryLevel.Info);
+            Assert.IsTrue(logEntry.Message.Equals("Message Body"));
+        }
+
+        [TestMethod]
+        public async Task ReportResultAsyncErrorTest()
+        {
+            LogEntry logEntry = null;
+            //Arrange
+            IFeedback<LogEntry> log = new StubIFeedback<LogEntry>
+            {
+                ReportAsyncT0CancellationToken = (value, ct) =>
+                {
+                    logEntry = value;
+                    return Task.FromResult(0);
+                }
+            };
+
+            //Act
+            await log.ReportResultAsync(Result.ReportError("Message Body"), CancellationToken.None);
+
+            //Assert
+            Assert.IsTrue(logEntry.Level == LogEntryLevel.Error);
+            Assert.IsTrue(logEntry.Message.Equals("Message Body"));
         }
     }
 }

@@ -3,19 +3,18 @@ using System.Data.Entity;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Controls;
 using zvs.DataModel;
 
 namespace zvs.Processor
 {
-    public class TriggerRunner
+    public class TriggerRunner : IRunner
     {
         private IEntityContextConnection EntityContextConnection { get; set; }
         private IFeedback<LogEntry> Log { get; set; }
         private CancellationToken Ct { get; set; }
         private ICommandProcessor CommandProcessor { get; set; }
 
-        bool IsRunning { get; set; }
+        public bool IsRunning { get; private set; }
         public TriggerRunner(IFeedback<LogEntry> log, ICommandProcessor commandProcessor, IEntityContextConnection entityContextConnection)
         {
             if (log == null)

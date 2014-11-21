@@ -10,7 +10,7 @@ using zvs.Processor.ScheduledTask;
 
 namespace zvs.Processor
 {
-    public class ScheduledTaskRunner
+    public class ScheduledTaskRunner : IRunner
     {
         private IEntityContextConnection EntityContextConnection { get; set; }
         private IFeedback<LogEntry> Log { get; set; }

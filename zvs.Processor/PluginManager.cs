@@ -5,72 +5,59 @@ using System.Linq;
 using System;
 using System.ComponentModel;
 using System.Data.Entity;
+using System.Threading;
 using zvs.DataModel;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 
 namespace zvs.Processor
 {
-    public class PluginManager
+    public class PluginManager : IPluginManager
     {
-        public PluginManager()
+        private IEnumerable<ZvsPlugin> Plugins { get; set; } 
+        private IEntityContextConnection EntityContextConnection { get; set; }
+        private IFeedback<LogEntry> Log { get; set; }
+
+        private readonly Dictionary<Guid, ZvsPlugin> _pluginLookup = new Dictionary<Guid, ZvsPlugin>();
+
+        public PluginManager(IEnumerable<ZvsPlugin> plugins, IEntityContextConnection entityContextConnection, IFeedback<LogEntry> log)
         {
-            DeviceValue.DeviceValueDataChangedEvent += DeviceValue_DeviceValueDataChangedEvent;
+            if (plugins == null)
+                throw new ArgumentNullException("plugins");
+
+            if (entityContextConnection == null)
+                throw new ArgumentNullException("entityContextConnection");
+
+            if (log == null)
+                throw new ArgumentNullException("log");
+
+            EntityContextConnection = entityContextConnection;
+            Log = log;
+            Plugins = plugins;
+
+            Log.Source = "Plugin Manager";
+
+            _pluginLookup = Plugins.ToDictionary(o => o.PluginGuid, o => o);
         }
 
-        private async void DeviceValue_DeviceValueDataChangedEvent(object sender, DeviceValue.ValueDataChangedEventArgs e)
+        public async Task InitializePluginsAsync(CancellationToken cancellationToken)
         {
-            foreach (var plugin in PluginGuidToPluginDictionary.Values.Where(o => o.IsEnabled))
+            using (var context = new ZvsContext(EntityContextConnection))
             {
-                await plugin.DeviceValueChangedAsync(e.DeviceValueId, e.NewValue, e.OldValue);
-            }
-        }
-
-        private ZvsEngine ZvsEngine { get; set; }
-
-#pragma warning disable 649
-        [ImportMany]
-        private IEnumerable<zvsPlugin> _plugins;
-#pragma warning restore 649
-
-        private readonly Dictionary<Guid, zvsPlugin> _pluginLookup = new Dictionary<Guid, zvsPlugin>();
-
-        public async Task LoadPluginsAsync(ZvsEngine zvsEngine)
-        {
-            ZvsEngine = zvsEngine;
-            var catalog = new SafeDirectoryCatalog("plugins");
-            var compositionContainer = new CompositionContainer(catalog);
-            compositionContainer.ComposeParts(this);
-
-            if (catalog.LoadErrors.Count > 0)
-            {
-                ZvsEngine.log.WarnFormat(@"The following plug-ins could not be loaded: {0}",
-                    string.Join(", " + Environment.NewLine, catalog.LoadErrors));
-            }
-
-            using (var context = new ZvsContext())
-            {
-                // Iterate the plug-ins found in dlls
-                foreach (var plugin in _plugins)
+                // Iterate the plugins found in dlls
+                foreach (var plugin in Plugins)
                 {
-                    //keeps this plug-in in scope 
+                    //keeps this plugin in scope 
                     var zvsPlugin = plugin;
 
-                    if (!_pluginLookup.ContainsKey(zvsPlugin.PluginGuid))
-                        _pluginLookup.Add(zvsPlugin.PluginGuid, zvsPlugin);
-
-                    //Check Database for this plug-in
+                    //Check Database for this plugin
                     var dbPlugin = await context.Plugins
-                        .FirstOrDefaultAsync(p => p.PluginGuid == zvsPlugin.PluginGuid);
+                        .FirstOrDefaultAsync(p => p.PluginGuid == zvsPlugin.PluginGuid, cancellationToken);
 
                     var changed = false;
-
                     if (dbPlugin == null)
                     {
-                        dbPlugin = new Plugin
-                        {
-                            PluginGuid = zvsPlugin.PluginGuid
-                        };
+                        dbPlugin = new Plugin { PluginGuid = zvsPlugin.PluginGuid };
                         context.Plugins.Add(dbPlugin);
                         changed = true;
                     }
@@ -92,115 +79,140 @@ namespace zvs.Processor
 
                     if (changed)
                     {
-                        var result = await context.TrySaveChangesAsync();
+                        var result = await context.TrySaveChangesAsync(cancellationToken);
                         if (result.HasError)
-                            zvsEngine.log.Error(result.Message);
+                        {
+                            await
+                                Log.ReportErrorFormatAsync(cancellationToken,
+                                    "Plugin not loaded. Error while saving loaded '{0}' plugin to database. {1}", zvsPlugin.Name, result.Message);
+                            break;
+                        }
                     }
 
-                    var msg = string.Format("Initializing '{0}'", zvsPlugin.Name);
-                    ZvsEngine.log.Info(msg);
+                    await Log.ReportInfoFormatAsync(cancellationToken, "Initializing '{0}'", zvsPlugin.Name);
 
                     //Plug-in need access to the zvsEngine in order to use the Logger
-                    await zvsPlugin.Initialize(ZvsEngine);
+                    await zvsPlugin.Initialize(Log, EntityContextConnection);
 
                     //Reload just installed settings
-                    dbPlugin = await context.Plugins
-                      .Include(o => o.Settings)
-                      .FirstOrDefaultAsync(p => p.PluginGuid == zvsPlugin.PluginGuid);
+                    var pluginSettings = await context.PluginSettings
+                        .Include(o => o.Plugin)
+                        .Where(p => p.Plugin.PluginGuid == zvsPlugin.PluginGuid)
+                        .ToListAsync(cancellationToken);
 
                     //Set plug-in settings from database values
-                    foreach (var setting in dbPlugin.Settings)
+                    foreach (var setting in pluginSettings)
                     {
-                        SetPluginProperty(zvsPlugin, setting.UniqueIdentifier, setting.Value);
+                        var prop = zvsPlugin.GetType().GetProperty(setting.UniqueIdentifier);
+                        if (prop == null)
+                        {
+                            await
+                                Log.ReportErrorFormatAsync(cancellationToken,
+                                    "Cannot find property called {0} on this plugin", setting.UniqueIdentifier);
+                            continue;
+                        }
+
+                        try
+                        {
+                            var convertedValue =
+                                TypeDescriptor.GetConverter(prop.PropertyType).ConvertFrom(setting.Value);
+                            prop.SetValue(zvsPlugin, convertedValue);
+                        }
+                        catch
+                        {
+                            Log.ReportErrorFormatAsync(cancellationToken, "Cannot cast value on plugin setting {0}", setting.UniqueIdentifier).Wait(cancellationToken);
+                        }
+
                     }
 
                     if (dbPlugin.IsEnabled)
                         await zvsPlugin.StartAsync();
-
                 }
             }
+
         }
 
-        public ReadOnlyDictionary<Guid, zvsPlugin> PluginGuidToPluginDictionary
+        public ZvsPlugin FindZvsPlugin(Guid pluginGuid)
         {
-            get { return new ReadOnlyDictionary<Guid, zvsPlugin>(_pluginLookup); }
+            return !_pluginLookup.ContainsKey(pluginGuid) ? null : _pluginLookup[pluginGuid];
         }
 
-        public async void EnablePluginAsync(Guid pluginGuid)
+        public IReadOnlyList<ZvsPlugin> GetZvsPlugins()
         {
-            if (_pluginLookup.ContainsKey(pluginGuid))
-            {
-                _pluginLookup[pluginGuid].IsEnabled = true;
-                await _pluginLookup[pluginGuid].StartAsync();
-            }
+            return Plugins.ToList();
+        }
 
-            //Save Database Value
-            using (var context = new ZvsContext())
+        public async Task<Result> EnablePluginAsync(Guid pluginGuid, CancellationToken cancellationToken)
+        {
+            var plugin = FindZvsPlugin(pluginGuid);
+            if (plugin == null)
+                return Result.ReportErrorFormat("Unable to enable plugin with Guid of {0}", pluginGuid);
+
+            plugin.IsEnabled = true;
+            await plugin.StartAsync();
+
+            using (var context = new ZvsContext(EntityContextConnection))
             {
-                var a = await context.Plugins.FirstOrDefaultAsync(o => o.PluginGuid == pluginGuid);
+                //Save Database Value
+                var a = await context.Plugins.FirstOrDefaultAsync(o => o.PluginGuid == pluginGuid, cancellationToken);
                 if (a != null)
                     a.IsEnabled = true;
 
-                await context.TrySaveChangesAsync();
+                await context.TrySaveChangesAsync(cancellationToken);
             }
+            return Result.ReportSuccess();
         }
 
-        public async void DisablePluginAsync(Guid pluginGuid)
+        public async Task<Result> DisablePluginAsync(Guid pluginGuid, CancellationToken cancellationToken)
         {
-            if (_pluginLookup.ContainsKey(pluginGuid))
-            {
-                _pluginLookup[pluginGuid].IsEnabled = false;
-                await _pluginLookup[pluginGuid].StopAsync();
-            }
+            var plugin = FindZvsPlugin(pluginGuid);
+            if (plugin == null)
+                return Result.ReportErrorFormat("Unable to disable plugin with Guid of {0}", pluginGuid);
 
-            //Save Database Value
-            using (var context = new ZvsContext())
+            plugin.IsEnabled = false;
+            await plugin.StopAsync();
+
+            using (var context = new ZvsContext(EntityContextConnection))
             {
-                var a = await context.Plugins.FirstOrDefaultAsync(o => o.PluginGuid == pluginGuid);
+                //Save Database Value
+                var a = await context.Plugins.FirstOrDefaultAsync(o => o.PluginGuid == pluginGuid, cancellationToken);
                 if (a != null)
                     a.IsEnabled = false;
 
-                await context.TrySaveChangesAsync();
+                await context.TrySaveChangesAsync(cancellationToken);
             }
+            return Result.ReportSuccess();
         }
 
-        public void NotifyPluginSettingsChanged(PluginSetting pluginSetting)
-        {
-            if (!_pluginLookup.ContainsKey(pluginSetting.Plugin.PluginGuid))
-                return;
+        //public void NotifyPluginSettingsChanged(PluginSetting pluginSetting)
+        //{
+        //    if (!_pluginLookup.ContainsKey(pluginSetting.Plugin.PluginGuid))
+        //        return;
 
-            var plugin = _pluginLookup[pluginSetting.Plugin.PluginGuid];
-            SetPluginProperty(plugin, pluginSetting.UniqueIdentifier, pluginSetting.Value);
-        }
+        //    var plugin = _pluginLookup[pluginSetting.Plugin.PluginGuid];
+        //    SetPluginProperty(plugin, pluginSetting.UniqueIdentifier, pluginSetting.Value);
+        //}
+        
+        //private void SetPluginProperty(object zvsPlugin, string propertyName, object value)
+        //{
+        //    var prop = zvsPlugin.GetType().GetProperty(propertyName);
+        //    if (prop == null)
+        //    {
+        //        ZvsEngine.log.ErrorFormat("Cannot find property called {0} on this plug-in", propertyName);
+        //        return;
+        //    }
 
-        public zvsPlugin GetPlugin(string uniqueIdentifier)
-        {
-            return _plugins.FirstOrDefault(p => p.Name == uniqueIdentifier);
-        }
+        //    try
+        //    {
+        //        var convertedValue = TypeDescriptor.GetConverter(prop.PropertyType).ConvertFrom(value);
+        //        prop.SetValue(zvsPlugin, convertedValue);
+        //    }
+        //    catch
+        //    {
+        //        ZvsEngine.log.ErrorFormat("Cannot cast value on {0} on this plugin", propertyName);
+        //    }
+        //}
 
-        public IEnumerable<zvsPlugin> GetPlugins()
-        {
-            return _plugins;
-        }
-
-        private void SetPluginProperty(object zvsPlugin, string propertyName, object value)
-        {
-            var prop = zvsPlugin.GetType().GetProperty(propertyName);
-            if (prop == null)
-            {
-                ZvsEngine.log.ErrorFormat("Cannot find property called {0} on this plug-in", propertyName);
-                return;
-            }
-
-            try
-            {
-                var convertedValue = TypeDescriptor.GetConverter(prop.PropertyType).ConvertFrom(value);
-                prop.SetValue(zvsPlugin, convertedValue);
-            }
-            catch
-            {
-                ZvsEngine.log.ErrorFormat("Cannot cast value on {0} on this adapter", propertyName);
-            }
-        }
+        
     }
 }
