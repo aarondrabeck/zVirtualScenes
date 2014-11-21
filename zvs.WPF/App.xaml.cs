@@ -154,16 +154,17 @@ namespace zvs.WPF
                     await
                         context.ProgramOptions.FirstOrDefaultAsync(o => o.UniqueIdentifier == "LOGDIRECTION",
                             Cts.Token);
-                if (option != null) return;
-
-                var registerLogDirectionResult = await ProgramOption.TryAddOrEditAsync(context, new ProgramOption
+                if (option == null)
                 {
-                    UniqueIdentifier = "LOGDIRECTION",
-                    Value = "Descending"
-                }, Cts.Token);
+                    var registerLogDirectionResult = await ProgramOption.TryAddOrEditAsync(context, new ProgramOption
+                    {
+                        UniqueIdentifier = "LOGDIRECTION",
+                        Value = "Descending"
+                    }, Cts.Token);
 
-                if (registerLogDirectionResult.HasError)
-                    await Log.ReportErrorAsync(registerLogDirectionResult.Message, Cts.Token);
+                    if (registerLogDirectionResult.HasError)
+                        await Log.ReportErrorAsync(registerLogDirectionResult.Message, Cts.Token);
+                }
             }
             using (var context = new ZvsContext(new ZvsEntityContextConnection()))
             {
