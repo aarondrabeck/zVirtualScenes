@@ -151,7 +151,7 @@ namespace zvs.Processor.Tests
             var isPluginManagerInitialized = false;
            
 
-            var am = new StubIAdapterManager { InitializeAdaptersAsyncCancellationToken = async (ct) =>isAdapterManagerInitialized = true };
+            var am = new StubIAdapterManager { StartAsyncCancellationToken = async (ct) =>isAdapterManagerInitialized = true };
             var pm = new StubIPluginManager { StartAsyncCancellationToken = async (ct) => isPluginManagerInitialized = true };
             var tr = new TriggerRunner(log, new StubICommandProcessor(), dbConnection);
             var st = new ScheduledTaskRunner(log, new StubICommandProcessor(), dbConnection,new CurrentTimeProvider());

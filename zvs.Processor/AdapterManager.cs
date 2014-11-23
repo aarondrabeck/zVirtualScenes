@@ -11,11 +11,13 @@ namespace zvs.Processor
 {
     public class AdapterManager : IAdapterManager
     {
-        private IEnumerable<ZvsAdapter> Adapters { get; set; } 
+        private IEnumerable<ZvsAdapter> Adapters { get; set; }
         private IEntityContextConnection EntityContextConnection { get; set; }
         private IFeedback<LogEntry> Log { get; set; }
+        private bool IsRunning { get; set; }
 
         private readonly Dictionary<Guid, ZvsAdapter> _adapterLookup = new Dictionary<Guid, ZvsAdapter>();
+        private readonly Dictionary<int, Guid> _adapterIdToGuid = new Dictionary<int, Guid>();
 
         public AdapterManager(IEnumerable<ZvsAdapter> adapters, IEntityContextConnection entityContextConnection, IFeedback<LogEntry> log)
         {
@@ -47,8 +49,17 @@ namespace zvs.Processor
             return Adapters.ToList();
         }
 
-        public async Task InitializeAdaptersAsync(CancellationToken cancellationToken)
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
+            if (IsRunning)
+            {
+                await
+                    Log.ReportWarningAsync("Cannot start adapter manager because it is already running!",
+                        cancellationToken);
+                return;
+            }
+            IsRunning = true;
+
             using (var context = new ZvsContext(EntityContextConnection))
             {
                 // Iterate the adapters found in dlls
@@ -109,35 +120,76 @@ namespace zvs.Processor
 
                     //Set plug-in settings from database values
                     foreach (var setting in adapterSettings)
-                    {
-                        var prop = zvsAdapter.GetType().GetProperty(setting.UniqueIdentifier);
-                        if (prop == null)
-                        {
-                            await
-                                Log.ReportErrorFormatAsync(cancellationToken,
-                                    "Cannot find property called {0} on this adapter", setting.UniqueIdentifier);
-                            continue;
-                        }
-
-                        try
-                        {
-                            var convertedValue =
-                                TypeDescriptor.GetConverter(prop.PropertyType).ConvertFrom(setting.Value);
-                            prop.SetValue(zvsAdapter, convertedValue);
-                        }
-                        catch
-                        {
-                            Log.ReportErrorFormatAsync(cancellationToken, "Cannot cast value on adapter setting {0}", setting.UniqueIdentifier).Wait(cancellationToken);
-                        }
-
-                    }
+                        await SetAdapterProperty(adapter, setting.UniqueIdentifier, setting.Value, CancellationToken.None);
 
                     if (dbAdapter.IsEnabled)
                         await zvsAdapter.StartAsync();
+
+                    if (!_adapterIdToGuid.ContainsKey(dbAdapter.Id))
+                        _adapterIdToGuid.Add(dbAdapter.Id, dbAdapter.AdapterGuid);
                 }
             }
-
+            NotifyEntityChangeContext.ChangeNotifications<AdapterSetting>.OnEntityUpdated += ChangeNotificationsOnOnEntityUpdated;
         }
+
+
+        public async Task StopAsync(CancellationToken cancellationToken)
+        {
+            if (!IsRunning)
+            {
+                await
+                    Log.ReportWarningAsync("Cannot stop adapter manager because it is not running!",
+                        cancellationToken);
+                return;
+            }
+
+            IsRunning = false;
+
+            foreach (var adapter in Adapters)
+            {
+                await adapter.StopAsync();
+            }
+
+            NotifyEntityChangeContext.ChangeNotifications<AdapterSetting>.OnEntityUpdated -= ChangeNotificationsOnOnEntityUpdated;
+        }
+        private async void ChangeNotificationsOnOnEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<AdapterSetting>.EntityUpdatedArgs entityUpdatedArgs)
+        {
+            var adapter = FindZvsAdapter(entityUpdatedArgs.NewEntity.AdapterId);
+            if (adapter == null)
+                return;
+
+            await SetAdapterProperty(adapter, entityUpdatedArgs.NewEntity.UniqueIdentifier, entityUpdatedArgs.NewEntity.Value, CancellationToken.None);
+        }
+
+        public ZvsAdapter FindZvsAdapter(int adapterId)
+        {
+            if (!_adapterIdToGuid.ContainsKey(adapterId))
+                return null;
+
+            var guid = _adapterIdToGuid[adapterId];
+            return !_adapterLookup.ContainsKey(guid) ? null : _adapterLookup[guid];
+        }
+
+        internal async Task SetAdapterProperty(ZvsAdapter zvsAdapter, string propertyName, object value, CancellationToken cancellationToken)
+        {
+            var prop = zvsAdapter.GetType().GetProperty(propertyName);
+            if (prop == null)
+            {
+                await Log.ReportErrorFormatAsync(cancellationToken, "Cannot find property called {0} on this adapter", propertyName);
+                return;
+            }
+
+            try
+            {
+                var convertedValue = TypeDescriptor.GetConverter(prop.PropertyType).ConvertFrom(value);
+                prop.SetValue(zvsAdapter, convertedValue);
+            }
+            catch
+            {
+                Log.ReportErrorFormatAsync(cancellationToken, "Cannot cast value on {0} on this adapter", propertyName).Wait(cancellationToken);
+            }
+        }
+
 
         public async Task<Result> EnableAdapterAsync(Guid adapterGuid, CancellationToken cancellationToken)
         {

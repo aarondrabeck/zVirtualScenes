@@ -12,6 +12,7 @@ namespace zvs.Processor
         ZvsAdapter FindZvsAdapter(Guid adapterGuid);
         Task<Result> EnableAdapterAsync(Guid adapterGuid, CancellationToken cancellationToken);
         Task<Result> DisableAdapterAsync(Guid adapterGuid, CancellationToken cancellationToken);
-        Task InitializeAdaptersAsync(CancellationToken cancellationToken);
+        Task StartAsync(CancellationToken cancellationToken);
+        Task StopAsync(CancellationToken cancellationToken);
     }
 }
