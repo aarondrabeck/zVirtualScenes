@@ -116,7 +116,7 @@ namespace zvs.Processor
             #endregion
 
             await AdapterManager.InitializeAdaptersAsync(cancellationToken);
-            await PluginManager.InitializePluginsAsync(cancellationToken);
+            await PluginManager.StartAsync(cancellationToken);
             await ScheduledTaskRunner.StartAsync(cancellationToken);
             await TriggerRunner.StartAsync(cancellationToken);
 

@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.ComponentModel.Composition.Hosting;
 using System.Linq;
 using System;
 using System.ComponentModel;
@@ -8,7 +6,6 @@ using System.Data.Entity;
 using System.Threading;
 using zvs.DataModel;
 using System.Threading.Tasks;
-using System.Collections.ObjectModel;
 
 namespace zvs.Processor
 {
@@ -18,6 +15,7 @@ namespace zvs.Processor
         private IEntityContextConnection EntityContextConnection { get; set; }
         private IFeedback<LogEntry> Log { get; set; }
         private IAdapterManager AdapterManager { get; set; }
+        private bool IsRunning { get; set; }
 
         private readonly Dictionary<Guid, ZvsPlugin> _pluginLookup = new Dictionary<Guid, ZvsPlugin>();
         private readonly Dictionary<int, Guid> _pluginIdToGuid = new Dictionary<int, Guid>();
@@ -46,8 +44,17 @@ namespace zvs.Processor
             _pluginLookup = Plugins.ToDictionary(o => o.PluginGuid, o => o);
         }
 
-        public async Task InitializePluginsAsync(CancellationToken cancellationToken)
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
+            if (IsRunning)
+            {
+                await
+                    Log.ReportWarningAsync("Cannot start plugin manager because it is already running!",
+                        cancellationToken);
+                return;
+            }
+            IsRunning = true;
+
             using (var context = new ZvsContext(EntityContextConnection))
             {
                 // Iterate the plugins found in dlls
@@ -109,38 +116,37 @@ namespace zvs.Processor
 
                     //Set plug-in settings from database values
                     foreach (var setting in pluginSettings)
-                    {
-                        var prop = zvsPlugin.GetType().GetProperty(setting.UniqueIdentifier);
-                        if (prop == null)
-                        {
-                            await
-                                Log.ReportErrorFormatAsync(cancellationToken,
-                                    "Cannot find property called {0} on this plugin", setting.UniqueIdentifier);
-                            continue;
-                        }
-
-                        try
-                        {
-                            var convertedValue =
-                                TypeDescriptor.GetConverter(prop.PropertyType).ConvertFrom(setting.Value);
-                            prop.SetValue(zvsPlugin, convertedValue);
-                        }
-                        catch
-                        {
-                            Log.ReportErrorFormatAsync(cancellationToken, "Cannot cast value on plugin setting {0}", setting.UniqueIdentifier).Wait(cancellationToken);
-                        }
-
-                    }
+                        await SetPluginProperty(plugin, setting.UniqueIdentifier, setting.Value, CancellationToken.None);
 
                     if (dbPlugin.IsEnabled)
                         await zvsPlugin.StartAsync();
 
-                    _pluginIdToGuid.Add(dbPlugin.Id, dbPlugin.PluginGuid);
+                    if (!_pluginIdToGuid.ContainsKey(dbPlugin.Id))
+                        _pluginIdToGuid.Add(dbPlugin.Id, dbPlugin.PluginGuid);
                 }
             }
             NotifyEntityChangeContext.ChangeNotifications<PluginSetting>.OnEntityUpdated += PluginManager_OnEntityUpdated;
         }
 
+        public async Task StopAsync(CancellationToken cancellationToken)
+        {
+            if (!IsRunning)
+            {
+                await
+                    Log.ReportWarningAsync("Cannot stop plugin manager because it is not running!",
+                        cancellationToken);
+                return;
+            }
+
+            IsRunning = false;
+
+            foreach (var plugin in Plugins)
+            {
+                await plugin.StopAsync();
+            }
+
+            NotifyEntityChangeContext.ChangeNotifications<PluginSetting>.OnEntityUpdated -= PluginManager_OnEntityUpdated;
+        }
 
         public ZvsPlugin FindZvsPlugin(Guid pluginGuid)
         {
@@ -212,7 +218,7 @@ namespace zvs.Processor
             return !_pluginLookup.ContainsKey(guid) ? null : _pluginLookup[guid];
         }
 
-        private async Task SetPluginProperty(object zvsPlugin, string propertyName, object value, CancellationToken cancellationToken)
+        internal async Task SetPluginProperty(ZvsPlugin zvsPlugin, string propertyName, object value, CancellationToken cancellationToken)
         {
             var prop = zvsPlugin.GetType().GetProperty(propertyName);
             if (prop == null)

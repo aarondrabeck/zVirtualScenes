@@ -11,6 +11,7 @@ namespace zvs.Processor
         ZvsPlugin FindZvsPlugin(Guid pluginGuid);
         Task<Result> EnablePluginAsync(Guid pluginGuid, CancellationToken cancellationToken);
         Task<Result> DisablePluginAsync(Guid pluginGuid, CancellationToken cancellationToken);
-        Task InitializePluginsAsync(CancellationToken cancellationToken);
+        Task StartAsync(CancellationToken cancellationToken);
+        Task StopAsync(CancellationToken cancellationToken);
     }
 }

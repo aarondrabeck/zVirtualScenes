@@ -150,9 +150,6 @@ namespace zvs.WPF.PluginManager
                                 var result = await Context.TrySaveChangesAsync(App.Cts.Token);
                                 if (result.HasError)
                                     await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving plugin setting. {0}", result.Message);
-
-                                //TODO: FIX
-                               // App.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
                             },
                             _icon);
                         ControlsStkPnl.Children.Add(control);
@@ -170,8 +167,6 @@ namespace zvs.WPF.PluginManager
                                 var result = await Context.TrySaveChangesAsync(App.Cts.Token);
                                 if (result.HasError)
                                     await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving plugin setting. {0}", result.Message);
-
-                                //App.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
                             },
                             _icon);
                         ControlsStkPnl.Children.Add(control);
@@ -190,8 +185,6 @@ namespace zvs.WPF.PluginManager
                                 var result = await Context.TrySaveChangesAsync(App.Cts.Token);
                                 if (result.HasError)
                                     await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving plugin setting. {0}", result.Message);
-
-                               // App.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
                             },
                             _icon);
                         ControlsStkPnl.Children.Add(control);
@@ -210,8 +203,6 @@ namespace zvs.WPF.PluginManager
                                 var result = await Context.TrySaveChangesAsync(App.Cts.Token);
                                 if (result.HasError)
                                     await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving plugin setting. {0}", result.Message);
-
-                               // App.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
                             },
                             _icon);
                         ControlsStkPnl.Children.Add(control);
@@ -229,8 +220,6 @@ namespace zvs.WPF.PluginManager
                                 var result = await Context.TrySaveChangesAsync(App.Cts.Token);
                                 if (result.HasError)
                                     await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving plugin setting. {0}", result.Message);
-
-                                //App.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
                             },
                             _icon);
                         ControlsStkPnl.Children.Add(control);
@@ -248,8 +237,6 @@ namespace zvs.WPF.PluginManager
                                 var result = await Context.TrySaveChangesAsync(App.Cts.Token);
                                 if (result.HasError)
                                     await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving plugin setting. {0}", result.Message);
-
-                                //App.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
                             },
                             _icon);
                         ControlsStkPnl.Children.Add(control);
@@ -266,8 +253,6 @@ namespace zvs.WPF.PluginManager
                                 var result = await Context.TrySaveChangesAsync(App.Cts.Token);
                                 if (result.HasError)
                                     await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving plugin setting. {0}", result.Message);
-
-                                //App.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
                             },
                             _icon);
                         ControlsStkPnl.Children.Add(control);
@@ -285,8 +270,6 @@ namespace zvs.WPF.PluginManager
                                 var result = await Context.TrySaveChangesAsync(App.Cts.Token);
                                 if (result.HasError)
                                     await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving plugin setting. {0}", result.Message);
-
-                                //App.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
                             },
                             _icon);
                         ControlsStkPnl.Children.Add(control);
