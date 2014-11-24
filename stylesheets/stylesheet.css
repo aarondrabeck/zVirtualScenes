@@ -157,6 +157,8 @@ p img {
   border: none;
 }
 
+
+
 pre, code {
   width: 100%;
   color: #222;
@@ -259,6 +261,13 @@ form {
 /*******************************************************************************
 Full-Width Styles
 *******************************************************************************/
+
+.mainlogo {
+float: left;
+margin: 0px 30px 10px 0px;
+border: 0;
+box-shadow: none;
+}
 
 .outer {
   width: 100%;
