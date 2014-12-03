@@ -11,7 +11,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>zvs.Processor.Tests</RootNamespace>
     <AssemblyName>zvs.Processor.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -21,12 +21,13 @@
     <TestProjectType>CodedUITest</TestProjectType>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\bin\tests\debug\</OutputPath>
+    <OutputPath>bin\debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -34,7 +35,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\bin\tests\Release\</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -45,6 +46,9 @@
       <HintPath>..\packages\EntityFramework.6.1.1\lib\net45\EntityFramework.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="EntityFramework.6.0.0.0.Fakes">
+      <HintPath>FakesAssemblies\EntityFramework.6.0.0.0.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="EntityFramework.SqlServer">
       <HintPath>..\packages\EntityFramework.6.1.1\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
@@ -52,6 +56,9 @@
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.ComponentModel.Composition.4.0.0.0.Fakes">
+      <HintPath>FakesAssemblies\System.ComponentModel.Composition.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -103,6 +110,7 @@
     <Compile Include="SceneSettingBuilderTests.cs" />
     <Compile Include="FeedbackExtensionMethodTests.cs" />
     <Compile Include="CreateFakeData.cs" />
+    <Compile Include="JavaScriptRunnerTests.cs" />
     <Compile Include="ZvsEngineTests.cs" />
     <Compile Include="UnitTestingAdapter.cs" />
     <Compile Include="ZvsPluginTests.cs" />
@@ -111,15 +119,20 @@
   <ItemGroup>
     <Content Include="lib\xunit.dll" />
     <Content Include="lib\xunit.runner.msbuild.dll" />
+    <Content Include="scripts\TestScript2.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="scripts\TestScript1.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestScript0.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\zvs.Entities\zvs.DataModel.csproj">
       <Project>{e1758d0b-5a3a-4a1b-b5de-acd1302f23a7}</Project>
       <Name>zvs.DataModel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\zvs.Processor.UnitTestAdapter\zvs.Processor.UnitTestAdapter.csproj">
-      <Project>{f74279f0-569a-43e6-9be6-96714e89bd0c}</Project>
-      <Name>zvs.Processor.UnitTestAdapter</Name>
     </ProjectReference>
     <ProjectReference Include="..\zvs.Processor\zvs.Processor.csproj">
       <Project>{10cd1de3-4e83-4bb0-a7ca-c774c298be27}</Project>
@@ -137,7 +150,9 @@
     <Fakes Include="Fakes\zvs.fakes" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
     <Fakes Include="Fakes\EntityFramework.fakes" />
     <Fakes Include="Fakes\zvs.DataModel.fakes" />
     <Fakes Include="Fakes\System.ComponentModel.Composition.fakes" />

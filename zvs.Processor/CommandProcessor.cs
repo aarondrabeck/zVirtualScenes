@@ -224,7 +224,7 @@ namespace zvs.Processor
         {
             //var javaScriptCommand = (JavaScriptCommand)command;
 
-            //var je = new JavaScriptExecuter(sender, ZvsEngine);
+            //var je = new JavaScriptRunner(sender, ZvsEngine);
             //je.onReportProgress += (s, args) =>
             //{
             //    ZvsEngine.log.Info(args.Progress);

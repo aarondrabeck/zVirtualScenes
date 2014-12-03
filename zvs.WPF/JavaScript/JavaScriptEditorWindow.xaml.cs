@@ -74,13 +74,13 @@ namespace zvs.WPF.JavaScript
 
             //This is run outside of CommandProcessor because it is not a command yet.  It is for testing JavaScript
             //TODO: enable
-            //var jse = new Processor.JavaScriptExecuter(this, _app.ZvsEngine);
+            //var jse = new Processor.JavaScriptRunner(this, _app.ZvsEngine);
             //jse.onReportProgress += (sender, args) =>
             //{
             //    SetFeedBackText(args.Progress);
             //    _app.ZvsEngine.log.Info(args.Progress);
             //};
-            //JavaScriptExecuter.JavaScriptResult result = await jse.ExecuteScriptAsync(script, _context);
+            //JavaScriptRunner.JavaScriptResult result = await jse.ExecuteScriptAsync(script, _context);
             //IsRunning = false;
             //_app.ZvsEngine.log.Info(result.Details);
             //SetFeedBackText(result.Details);

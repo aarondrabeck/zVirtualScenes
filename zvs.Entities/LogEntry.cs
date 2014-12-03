@@ -34,7 +34,7 @@ namespace zvs.DataModel
 
         public override string ToString()
         {
-            return String.Format("{0:yyyy-MM-dd-hh:mm:ss:fff}|{1,-20}|{2}", Datetime, Source, Message);
+            return String.Format("{0:yyyy-MM-dd-hh:mm:ss:fff}|{1,-20}|{2,-20}|{3}", Datetime, Source, Level, Message);
         }
     }
 }

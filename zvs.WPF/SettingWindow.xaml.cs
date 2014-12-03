@@ -19,7 +19,7 @@ namespace zvs.WPF
         private async void SettingWindow_Loaded_1(object sender, RoutedEventArgs e)
         {
             //TODO: enable
-          //  EnableJavaScriptDebugger.IsChecked = zvs.Processor.JavaScriptExecuter.JavascriptDebugEnabled; 
+          //  EnableJavaScriptDebugger.IsChecked = zvs.Processor.JavaScriptRunner.JavascriptDebugEnabled; 
             using (var context = new ZvsContext(_app.EntityContextConnection))
             {
                 var option = await context.ProgramOptions.FirstOrDefaultAsync(o => o.UniqueIdentifier == "LOGDIRECTION");
@@ -66,7 +66,7 @@ namespace zvs.WPF
         private void BtnDone_Click(object sender, RoutedEventArgs e)
         {
             //TODO: RESTORE
-          //  if(EnableJavaScriptDebugger.IsChecked.HasValue) zvs.Processor.JavaScriptExecuter.JavascriptDebugEnabled = EnableJavaScriptDebugger.IsChecked.Value;
+          //  if(EnableJavaScriptDebugger.IsChecked.HasValue) zvs.Processor.JavaScriptRunner.JavascriptDebugEnabled = EnableJavaScriptDebugger.IsChecked.Value;
             Close();
         }
 

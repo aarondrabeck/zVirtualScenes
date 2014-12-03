@@ -18,7 +18,7 @@ namespace zvs.Processor
         {
             get
             {
-                return System.IO.Path.GetDirectoryName(typeof(Utils).Assembly.Location);
+                return Path.GetDirectoryName(typeof(Utils).Assembly.Location);
             }
         }
 

@@ -1,0 +1,1 @@
+﻿logInfo('TestScript0 loaded.');
