@@ -239,7 +239,7 @@ namespace zvs.WPF.SceneControls
 
         private async void SortUp_Click_1(object sender, RoutedEventArgs e)
         {
-            var scene = (((FrameworkElement)sender).DataContext) as Scene;
+            var scene = SceneGrid.SelectedItem as Scene;
             if (scene == null) return;
 
             var sceneWeAreReplacing = _sceneCollection.FirstOrDefault(s => s.SortOrder == scene.SortOrder - 1);
@@ -258,7 +258,7 @@ namespace zvs.WPF.SceneControls
 
         private async void SortDown_Click_1(object sender, RoutedEventArgs e)
         {
-            var scene = (((FrameworkElement)sender).DataContext) as Scene;
+            var scene = SceneGrid.SelectedItem as Scene;
             if (scene == null) return;
             var sceneWeAreReplacing = _sceneCollection.FirstOrDefault(s => s.SortOrder == scene.SortOrder + 1);
             if (sceneWeAreReplacing != null)
@@ -301,134 +301,12 @@ namespace zvs.WPF.SceneControls
 
         private async void ActivateScene_Click_1(object sender, RoutedEventArgs e)
         {
-            var scene = (((FrameworkElement)sender).DataContext) as Scene;
+            var scene = SceneGrid.SelectedItem as Scene;
             if (scene == null) return;
             var cmd = await _context.BuiltinCommands.FirstOrDefaultAsync(c => c.UniqueIdentifier == "RUN_SCENE");
             if (cmd == null) return;
 
             await _app.ZvsEngine.RunCommandAsync(cmd.Id, scene.Id.ToString(CultureInfo.InvariantCulture), string.Empty, _app.Cts.Token);
-        }
-
-        private void SceneGrid_Row_PreviewMouseRightButtonDown(object sender, RoutedEventArgs e)
-        {
-            var scene = (((FrameworkElement)sender).DataContext) as Scene;
-            if (scene == null) return;
-
-            var menu = new ContextMenu();
-            var dup = new MenuItem { Header = "Duplicate Scene" };
-            dup.Click += async (s, args) =>
-            {
-                if (MessageBox.Show("Are you sure you want to duplicate this scene?",
-                    "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
-
-                var newScene = new Scene { Name = "Copy of " + scene.Name, SortOrder = SceneGrid.Items.Count + 1 };
-                foreach (var sc in scene.Commands)
-                {
-                    newScene.Commands.Add(new SceneStoredCommand
-                    {
-                        Argument = sc.Argument,
-                        Argument2 = sc.Argument2,
-                        CommandId = sc.CommandId,
-                        Description = sc.Description,
-                        TargetObjectName = sc.TargetObjectName,
-                        SortOrder = sc.SortOrder
-                    });
-                    SceneGrid.Focus();
-                }
-                _context.Scenes.Local.Add(newScene);
-                var result = await _context.TrySaveChangesAsync(_app.Cts.Token);
-                if (result.HasError)
-                    await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error duplicating scene. {0}", result.Message);
-            };
-
-            menu.Items.Add(dup);
-            ContextMenu = menu;
-        }
-
-        private void SceneCmdsGrid_DragOver_1(object sender, DragEventArgs e)
-        {
-            if (e.Data.GetData("deviceList") != null && e.Data.GetData("deviceList").GetType() == typeof(List<Device>))
-            {
-                e.Effects = DragDropEffects.Link;
-            }
-            e.Effects = DragDropEffects.None;
-        }
-
-        private async void SceneCmdsGrid_Drop_1(object sender, DragEventArgs e)
-        {
-            if (e.Data.GetData("deviceList") != null && e.Data.GetData("deviceList").GetType() == typeof(List<Device>))
-            {
-                var devices = (List<Device>)e.Data.GetData("deviceList");
-
-                var selectedScene = SceneGrid.SelectedItem as Scene;
-                if (selectedScene != null)
-                {
-                    SceneCmdsGrid.SelectedItems.Clear();
-
-                    foreach (var d in devices)
-                    {
-                        var d1 = d;
-                        var d2 = await _context.Devices
-                            .Include(o => o.Commands)
-                            .FirstOrDefaultAsync(o => o.Id == d1.Id);
-
-                        if (d2 == null)
-                            continue;
-
-                        //Create a Stored Command.
-                        //pre-fill the device with users dropped device.
-                        var sceneStoredCommand = new SceneStoredCommand { Command = d2.Commands.FirstOrDefault() };
-
-                        //Send it to the command builder to get filled with a command
-                        var cbWindow = new CommandBuilder(_context, sceneStoredCommand) { Owner = _app.ZvsWindow };
-
-                        if (!(cbWindow.ShowDialog() ?? false)) continue;
-
-                        //Set Order
-                        var max = selectedScene.Commands.Max(o => o.SortOrder);
-                        if (max.HasValue)
-                            sceneStoredCommand.SortOrder = max.Value + 1;
-                        else
-                            sceneStoredCommand.SortOrder = 0;
-
-                        if (selectedScene.IsRunning)
-                        {
-                            ShowSceneEditWarning(selectedScene.Name);
-                        }
-                        else
-                        {
-                            selectedScene.Commands.Add(sceneStoredCommand);
-
-                            var result = await _context.TrySaveChangesAsync(_app.Cts.Token);
-                            if (result.HasError)
-                                await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error adding scene command. {0}", result.Message);
-
-                            SceneCmdsGrid.SelectedItems.Add(sceneStoredCommand);
-                        }
-                    }
-
-                    SceneCmdsGrid.Focus();
-                }
-                e.Effects = DragDropEffects.Move;
-            }
-            e.Handled = true;
-        }
-
-        private async void SceneGrid_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            var dg = sender as DataGrid;
-            if (dg == null) return;
-
-            var dgr = (DataGridRow)(dg.ItemContainerGenerator.ContainerFromIndex(dg.SelectedIndex));
-            if (e.Key != Key.Delete) return;
-
-            e.Handled = true;
-
-            if (dgr.IsEditing) return;
-
-            var scene = dgr.Item as Scene;
-            if (scene != null)
-                await DeleteSelectedScene(scene);
         }
 
         private void ShowSceneProperties(int sceneId, string name)
@@ -472,17 +350,6 @@ namespace zvs.WPF.SceneControls
                                   "Scene Edit Warning", MessageBoxButton.YesNo, MessageBoxImage.Question);
         }
 
-        private async void SceneCmdsGrid_PreviewKeyDown_1(object sender, KeyEventArgs e)
-        {
-            var dg = sender as DataGrid;
-            if (dg == null) return;
-
-            if (e.Key != Key.Delete) return;
-
-            e.Handled = true;
-            await DeleteSelectedSceneCommandsAsync();
-        }
-
         private async Task DeleteSelectedSceneCommandsAsync()
         {
             if (SceneCmdsGrid.SelectedItems.Count > 0)
@@ -510,23 +377,23 @@ namespace zvs.WPF.SceneControls
 
         private async Task SaveSceneCmdAsync()
         {
-            if (SceneGrid.SelectedItem is Scene)
-            {
-                var selectedscene = SceneGrid.SelectedItem as Scene;
-                //normalize sort order
-                foreach (var cmd in selectedscene.Commands)
-                {
-                    var cmd1 = cmd;
-                    foreach (var item in SceneCmdsGrid.Items.Cast<SceneStoredCommand>().Where(item => item.Id == cmd1.Id))
-                    {
-                        cmd.SortOrder = SceneCmdsGrid.Items.IndexOf(item);
-                    }
-                }
+            var selectedscene = SceneGrid.SelectedItem as Scene;
+            if (selectedscene == null)
+                return;
 
-                var result = await _context.TrySaveChangesAsync(_app.Cts.Token);
-                if (result.HasError)
-                    await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving scene command. {0}", result.Message);
+            //normalize sort order
+            foreach (var cmd in selectedscene.Commands)
+            {
+                var cmd1 = cmd;
+                foreach (var item in SceneCmdsGrid.Items.Cast<SceneStoredCommand>().Where(item => item.Id == cmd1.Id))
+                {
+                    cmd.SortOrder = SceneCmdsGrid.Items.IndexOf(item);
+                }
             }
+
+            var result = await _context.TrySaveChangesAsync(_app.Cts.Token);
+            if (result.HasError)
+                await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving scene command. {0}", result.Message);
         }
 
         private void SortSceneCmDsGridBySortOrder()
@@ -546,7 +413,7 @@ namespace zvs.WPF.SceneControls
 
         private async void SortUpSceneCmd_Click_1(object sender, RoutedEventArgs e)
         {
-            var sceneCommand = (((FrameworkElement)sender).DataContext) as SceneStoredCommand;
+            var sceneCommand = SceneCmdsGrid.SelectedItem as SceneStoredCommand;
             if (sceneCommand == null) return;
 
             var scenecmdWeAreReplacing = sceneCommand.Scene.Commands.FirstOrDefault(s => s.SortOrder == sceneCommand.SortOrder - 1);
@@ -565,7 +432,7 @@ namespace zvs.WPF.SceneControls
 
         private async void SortDownSceneCmd_Click_1(object sender, RoutedEventArgs e)
         {
-            var sceneCommand = (((FrameworkElement)sender).DataContext) as SceneStoredCommand;
+            var sceneCommand = SceneCmdsGrid.SelectedItem as SceneStoredCommand;
             if (sceneCommand == null) return;
 
             var scenecmdWeAreReplacing = sceneCommand.Scene.Commands.FirstOrDefault(s => s.SortOrder == sceneCommand.SortOrder + 1);
@@ -601,9 +468,23 @@ namespace zvs.WPF.SceneControls
 
         }
 
+        class IgnoreNewItemPlaceholderConverter : IValueConverter {
+    public static readonly IgnoreNewItemPlaceholderConverter Instance = new IgnoreNewItemPlaceholderConverter();
+
+    public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
+        if (value != null && value.ToString() == "{NewItemPlaceholder}")
+            return DependencyProperty.UnsetValue;
+        return value;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
+        throw new NotImplementedException();
+    }
+}
+
         private async void SettingBtn_Click_1(object sender, RoutedEventArgs e)
         {
-            var sceneCommand = (((FrameworkElement)sender).DataContext) as SceneStoredCommand;
+            var sceneCommand = SceneCmdsGrid.SelectedItem as SceneStoredCommand;
             if (sceneCommand == null) return;
 
             //Send it to the command builder to get edited
@@ -622,11 +503,9 @@ namespace zvs.WPF.SceneControls
             }
         }
 
-
-
         private void SceneSettingBtn_Click_1(object sender, RoutedEventArgs e)
         {
-            var scene = (((FrameworkElement)sender).DataContext) as Scene;
+            var scene = SceneGrid.SelectedItem as Scene;
             if (scene == null) return;
             ShowSceneProperties(scene.Id, scene.Name);
         }
@@ -666,8 +545,49 @@ namespace zvs.WPF.SceneControls
                 SceneCmdsGrid.SelectedItems.Add(sceneStoredCommand);
             }
         }
+
+        private async void ButtonDelete_OnClick(object sender, RoutedEventArgs e)
+        {
+            var scene = SceneGrid.SelectedItem as Scene;
+            if (scene == null) return;
+
+            await DeleteSelectedScene(scene);
+        }
+
+        private async void ButtonDuplicate_OnClick(object sender, RoutedEventArgs e)
+        {
+            var scene = SceneGrid.SelectedItem as Scene;
+            if (scene == null) return;
+
+            if (MessageBox.Show("Are you sure you want to duplicate this scene?",
+                   "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
+
+            var newScene = new Scene { Name = "Copy of " + scene.Name, SortOrder = SceneGrid.Items.Count + 1 };
+            foreach (var sc in scene.Commands)
+            {
+                newScene.Commands.Add(new SceneStoredCommand
+                {
+                    Argument = sc.Argument,
+                    Argument2 = sc.Argument2,
+                    CommandId = sc.CommandId,
+                    Description = sc.Description,
+                    TargetObjectName = sc.TargetObjectName,
+                    SortOrder = sc.SortOrder
+                });
+                SceneGrid.Focus();
+            }
+            _context.Scenes.Local.Add(newScene);
+            var result = await _context.TrySaveChangesAsync(_app.Cts.Token);
+            if (result.HasError)
+                await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error duplicating scene. {0}", result.Message);
+        }
+
+        private async void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        {
+            await DeleteSelectedSceneCommandsAsync();
+        }
     }
 
-
+    
 }
 

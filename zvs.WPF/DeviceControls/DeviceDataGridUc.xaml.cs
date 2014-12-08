@@ -203,7 +203,6 @@ namespace zvs.WPF.DeviceControls
                 _showMore = value;
                 if (value == false)
                 {
-                    DateCol.Visibility = Visibility.Collapsed;
                     DeviceTypeCol.Visibility = Visibility.Collapsed;
                     GroupCol.Visibility = Visibility.Collapsed;
                     NodeID.Visibility = Visibility.Collapsed;
@@ -211,7 +210,6 @@ namespace zvs.WPF.DeviceControls
                 }
                 else
                 {
-                    DateCol.Visibility = Visibility.Visible;
                     DeviceTypeCol.Visibility = Visibility.Visible;
                     GroupCol.Visibility = Visibility.Visible;
                     NodeID.Visibility = Visibility.Visible;
@@ -231,21 +229,17 @@ namespace zvs.WPF.DeviceControls
                 _minimalistDisplay = value;
                 if (value == false)
                 {
-                    DateCol.Visibility = Visibility.Collapsed;
                     LevelCol.Visibility = Visibility.Collapsed;
                     DeviceTypeCol.Visibility = Visibility.Collapsed;
                     GroupCol.Visibility = Visibility.Collapsed;
                     NodeID.Visibility = Visibility.Collapsed;
-                    SettingsCol.Visibility = Visibility.Collapsed;
 
                 }
                 else
                 {
-                    DateCol.Visibility = Visibility.Visible;
                     LevelCol.Visibility = Visibility.Visible;
                     DeviceTypeCol.Visibility = Visibility.Visible;
                     GroupCol.Visibility = Visibility.Visible;
-                    SettingsCol.Visibility = Visibility.Visible;
                 }
             }
         }
@@ -383,7 +377,7 @@ namespace zvs.WPF.DeviceControls
 
         private void SettingBtn_Click_1(object sender, RoutedEventArgs e)
         {
-            var device = (((FrameworkElement)sender).DataContext) as Device;
+            var device = DeviceGrid.SelectedItem as Device;
             if (device == null) return;
 
             OpenDeviceDetails(device);
@@ -416,21 +410,6 @@ namespace zvs.WPF.DeviceControls
             ShowMore = false;
         }
 
-        private async void Grid_PreviewKeyDown_1(object sender, KeyEventArgs e)
-        {
-            if (e.Key != Key.Delete) return;
-            if (_minimalistDisplay)
-            {
-
-                if (MessageBox.Show("Are you sure you want to delete the selected devices?",
-                    "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-                {
-                    await DeleteSelectedItemsAsync();
-                }
-            }
-            e.Handled = true;
-        }
-
         public void Dispose()
         {
             Dispose(true);
@@ -446,6 +425,15 @@ namespace zvs.WPF.DeviceControls
             }
 
             Context.Dispose();
+        }
+
+        private async void ButtonDeleteDevice_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (MessageBox.Show("Are you sure you want to delete the selected devices?",
+                    "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            {
+                await DeleteSelectedItemsAsync();
+            }
         }
     }
 }

@@ -37,12 +37,12 @@ namespace zvs.WPF
 
         void ZvsMainWindow_OnEntityAdded(object sender, NotifyEntityChangeContext.ChangeNotifications<LogEntry>.EntityAddedArgs e)
         {
-            Dispatcher.Invoke(() =>
-            {
-                StatusBarDescriptionTxt.Text = e.AddedEntity.Message;
-                StatusBarSourceTxt.Text = e.AddedEntity.Source;
-                StatusBarUrgencyTxt.Text = e.AddedEntity.Level.ToString();
-            });
+            //Dispatcher.Invoke(() =>
+            //{
+            //    StatusBarDescriptionTxt.Text = e.AddedEntity.Message;
+            //    StatusBarSourceTxt.Text = e.AddedEntity.Source;
+            //    StatusBarUrgencyTxt.Text = e.AddedEntity.Level.ToString();
+            //});
         }
 
 #if DEBUG

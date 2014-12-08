@@ -4,25 +4,15 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:zvsEntities="clr-namespace:zvs.DataModel;assembly=zvs.DataModel"
+    xmlns:sceneControls="clr-namespace:zvs.WPF.SceneControls"
+    xmlns:converters="clr-namespace:zvs.WPF.Converters"
     x:Class="zvs.WPF.SceneControls.SceneCreator" 
     mc:Ignorable="d" 
     Loaded="UserControl_Loaded_1" 
     Unloaded="UserControl_Unloaded_1"
-    Initialized="UserControl_Initialized" d:DesignHeight="600" d:DesignWidth="800">
+    Initialized="UserControl_Initialized" d:DesignHeight="600" d:DesignWidth="800" FontFamily="Roboto" >
 
     <UserControl.Resources>
-        <Style x:Key="BodyContentDataGridCentering"
-        TargetType="{x:Type DataGridCell}">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type DataGridCell}">
-                        <Grid Background="{TemplateBinding Background}">
-                            <ContentPresenter VerticalAlignment="Center" />
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
         <CollectionViewSource x:Key="sceneViewSource" d:DesignSource="{d:DesignInstance {x:Type zvsEntities:Scene}, CreateList=True}">
             <CollectionViewSource.SortDescriptions>
                 <d:SortDescription PropertyName="SortOrder"/>
@@ -34,149 +24,27 @@
                 <d:SortDescription PropertyName="SortOrder" Direction="Acending"/>
             </CollectionViewSource.SortDescriptions>
         </CollectionViewSource>
-
+        <converters:IsNewItemPlaceholderConverter x:Key="IsNewItemPlaceholderConverter"/>
     </UserControl.Resources>
 
     <Grid DataContext="{StaticResource sceneViewSource}" >
-        <Grid Background="{DynamicResource SceneBrush}" Height="35"  Width="355" VerticalAlignment="Top" HorizontalAlignment="Left" >
-            <TextBlock FontSize="18" Foreground="White" Margin="10 7 0 0"  TextTrimming="CharacterEllipsis"  
-                                       TextWrapping="Wrap" Text="Scene" />
-        </Grid>
-        <DataGrid BorderBrush="{DynamicResource SceneBrush}" BorderThickness="0 0 1 0" AllowDrop="True" Name="SceneGrid" HorizontalGridLinesBrush="{DynamicResource SceneNoFocusBrush}" 
-                  AlternatingRowBackground="#FFFFFF" HeadersVisibility="None" GridLinesVisibility="Horizontal"   Background="White" Margin="0 35 0 0 "
-                  HorizontalAlignment="Left"  Width="355"   ItemsSource="{Binding}" RowHeight="45"
-                 AutoGenerateColumns="False" PreviewKeyDown="SceneGrid_PreviewKeyDown" RowEditEnding="SceneGrid_RowEditEnding"
-                  CellStyle="{StaticResource BodyContentDataGridCentering}" SelectionMode="Single" SelectionChanged="SceneGrid_SelectionChanged">
-            <DataGrid.Resources>
-                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="{DynamicResource SceneSelectedColor}"/>
-                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
-                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey }" Color="{DynamicResource SceneNoFocusColor}" />
 
-            </DataGrid.Resources>
-            <DataGrid.RowStyle>
-                <Style TargetType="{x:Type DataGridRow}">
-                    <EventSetter  Event="PreviewMouseRightButtonDown" Handler="SceneGrid_Row_PreviewMouseRightButtonDown"/>
-                </Style>
-            </DataGrid.RowStyle>
-            <DataGrid.Columns>
-
-                <DataGridTemplateColumn Header="" CanUserResize="False" CanUserReorder="False" CanUserSort="False">
-                    <DataGridTemplateColumn.CellTemplate >
-                        <DataTemplate>
-                            <TextBlock Margin="6 0 6 0 " Text="&#xe005;" Foreground="Black"   FontFamily="flaticon" FontSize="36" >
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsRunning}" Value="True">
-                                                <DataTrigger.EnterActions>
-                                                    <BeginStoryboard x:Name="tt" >
-                                                        <Storyboard Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)">
-                                                            <ColorAnimation  RepeatBehavior="Forever"                                                                  
-                                                     FillBehavior="Stop"                                                                  
-                                                     From="Black" 
-                                                     To="LightGreen"                                                                  
-                                                     Duration="0:0:0.8" AutoReverse="True" />
-                                                        </Storyboard>
-                                                    </BeginStoryboard>
-                                                </DataTrigger.EnterActions>
-                                                <DataTrigger.ExitActions>
-                                                    <RemoveStoryboard  BeginStoryboardName="tt"></RemoveStoryboard>
-                                                </DataTrigger.ExitActions>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
-                            <!--<DataTemplate.Triggers>
-                                <DataTrigger Binding="{Binding Path=IsRunning}" Value="True">
-                                    <Setter TargetName="img" Property="Source" Value="pack://application:,,,/zVirtualScenes;component/Images/scene_run64.png"/>
-                                </DataTrigger>
-                            </DataTemplate.Triggers>-->
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-
-                <DataGridTextColumn Width="*" MinWidth="50" FontSize="16" Header="Scene" Binding="{Binding Path=Name, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False"  CanUserReorder="False" CanUserSort="False">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-                <!--<DataGridTextColumn  Width="25" MinWidth="50" Header="Sort" Binding="{Binding Path=sort_order,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  IsReadOnly="False"  CanUserReorder="False" CanUserSort="True" />-->
-
-                <DataGridTemplateColumn MaxWidth="100" MinWidth="95" Width="100" Header="" CanUserResize="False" CanUserReorder="False" CanUserSort="False">
-                    <DataGridTemplateColumn.CellTemplate >
-                        <DataTemplate>
-                            <StackPanel  Orientation="Horizontal" Margin="3,0">
-                                <Button Name="ActivateScene" Content="Run" Click="ActivateScene_Click_1" Height="32"  ToolTip="Activate" FontSize="14" Padding="10 5" FontWeight="Medium" Background="#FFCCCCCC" BorderBrush="{x:Null}"  BorderThickness="0">
-
-                                </Button>
-
-                                <Button Name="SortUp" Height="32" Width="20"  ToolTip="Move Up" Click="SortUp_Click_1" Background="#FFCCCCCC" BorderBrush="{x:Null}"   BorderThickness="0" Margin="5,0,0,0">
-                                    <Image Source="../Images/arrow_up.png" ></Image>
-                                </Button>
-                                <Button Name="SortDown"  Height="32" Width="20"  ToolTip="Move Down" Click="SortDown_Click_1"  Background="#FFCCCCCC" BorderBrush="{x:Null}"  BorderThickness="0" Margin="5,0,0,0">
-                                    <Image Source="../Images/arrow_down.png" ></Image>
-                                </Button>
-
-                            </StackPanel>
-
-
-
-                            <DataTemplate.Triggers>
-                                <DataTrigger Binding="{Binding Path=IsRunning }" Value="False">
-                                    <Setter TargetName="ActivateScene" Property="IsEnabled" Value="True"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=IsRunning }" Value="True">
-                                    <Setter TargetName="ActivateScene" Property="IsEnabled" Value="False"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=Commands.Count }" Value="0">
-                                    <Setter TargetName="ActivateScene" Property="IsEnabled" Value="False"/>
-                                </DataTrigger>
-
-                                <!--<DataTrigger Binding="{Binding Path=SceneId, Converter={StaticResource IsValidScene}}" Value="False">
-                                    <Setter TargetName="SControls" Property="Visibility" Value="Hidden"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=SceneId, Converter={StaticResource IsValidScene}}" Value="True">
-                                    <Setter TargetName="SControls" Property="Visibility" Value="Visible"/>
-                                </DataTrigger>-->
-                            </DataTemplate.Triggers>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-
-                <DataGridTemplateColumn x:Name="SceneSettingsCol" MaxWidth="50" MinWidth="50" Width="50"  Header="" CanUserResize="False" CanUserReorder="False">
-                    <DataGridTemplateColumn.CellTemplate >
-                        <DataTemplate>
-                            <Button Name="SettingBtn"  Click="SceneSettingBtn_Click_1" ToolTip="Scene Settings" Padding="3" Background="Transparent" BorderBrush="{x:Null}"
-                                    BorderThickness="0" HorizontalAlignment="Center">
-                                <TextBlock Text="&#xe00B;" Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="25" />
-                            </Button>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-            </DataGrid.Columns>
-        </DataGrid>
-        <Border Name="SceneCommandGrid"  Margin="355,0,0,0" Background="#FFFDFDFD"   >
+       
+        <Border Name="SceneCommandGrid"  Margin="400,60,0,0" Background="#E7E7E7"   >
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="60"></RowDefinition>
                     <RowDefinition Height="*"></RowDefinition>
-                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="40"></RowDefinition>
                 </Grid.RowDefinitions>
-                <Grid Background="{DynamicResource SceneBrush}" Height="35" >
-                    <Image Name="SignalImg" Source="../Images/send_signal.png" Height="15" Margin="0 0 10 0" VerticalAlignment="Center"
-                                   HorizontalAlignment="Right" Opacity="0"></Image>
-                    <TextBlock FontSize="18" Foreground="White" Margin="10,0,40,0"  TextTrimming="CharacterEllipsis"  
-                                       TextWrapping="Wrap" Text="{Binding Name, StringFormat={}{0} Commands, FallbackValue=Commands}" VerticalAlignment="Center"/>
-                </Grid>
-                <DataGrid Grid.Row="1"  MinHeight="100" BorderThickness="0"   x:Name="SceneCmdsGrid" CanUserAddRows="False" HeadersVisibility="None" 
-                ItemsSource="{Binding Source={StaticResource ScenesceneCommandsViewSource}}"
-                AllowDrop="True" DragOver="SceneCmdsGrid_DragOver_1" Drop="SceneCmdsGrid_Drop_1" HorizontalGridLinesBrush="{DynamicResource SceneNoFocusBrush}" 
-               AlternatingRowBackground="#FFFFFF" GridLinesVisibility="Horizontal" RowHeight="29" AutoGenerateColumns="False" 
-                PreviewKeyDown="SceneCmdsGrid_PreviewKeyDown_1" CellStyle="{StaticResource BodyContentDataGridCentering}" CanUserResizeRows="False"
-                Margin="0" Background="White"  >
+               
+                <DataGrid Grid.Row="1" Background="#FAFAFA" RowBackground="#FAFAFA" AlternatingRowBackground="#FAFAFA" MinHeight="100" BorderThickness="0" 
+                          x:Name="SceneCmdsGrid" CanUserAddRows="False" HeadersVisibility="None" CanUserDeleteRows="False"
+                        ItemsSource="{Binding Source={StaticResource ScenesceneCommandsViewSource}}" 
+                          HorizontalGridLinesBrush="{DynamicResource SceneNoFocusBrush}" 
+                        GridLinesVisibility="Horizontal" RowHeight="55" AutoGenerateColumns="False" 
+                        CellStyle="{StaticResource BodyContentDataGridCentering}" CanUserResizeRows="False"
+                        Margin="0" >
                     <DataGrid.Resources>
                         <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="{DynamicResource SceneSelectedColor}"/>
                         <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
@@ -184,10 +52,11 @@
                     </DataGrid.Resources>
                     <DataGrid.Columns>
 
-                        <DataGridTextColumn Width="*"   MinWidth="150" IsReadOnly="True" CanUserReorder="False" CanUserSort="False"  >
+                        <DataGridTextColumn Width="*" MinWidth="150" IsReadOnly="True" CanUserReorder="False" CanUserSort="False" FontSize="16"  >
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
-                                    <Setter Property="Padding" Value="5,0,0,0"/>
+                                    <Setter Property="Padding" Value="8" />
+                                    <Setter Property="Foreground" Value="#181818"/>
                                     <Setter Property="TextWrapping"  Value="NoWrap" />
                                     <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
                                     <Setter Property="ToolTip" Value="{Binding Path=Description, Mode=OneWay}"/>
@@ -203,50 +72,360 @@
                         </DataGridTextColumn>
 
 
-                        <DataGridTextColumn  Width="50"  SortDirection="Descending" MinWidth="50"  Binding="{Binding Path=SortOrder,UpdateSourceTrigger=PropertyChanged}" Header="Sort" IsReadOnly="False"  CanUserReorder="False" CanUserSort="False" >
+                        <DataGridTextColumn  Width="50"  SortDirection="Descending" MinWidth="50"  FontSize="16" 
+                                             Binding="{Binding Path=SortOrder,UpdateSourceTrigger=PropertyChanged}" Header="Sort" IsReadOnly="False" 
+                                             CanUserReorder="False" CanUserSort="False" >
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
-                                    <Setter Property="Padding" Value="5,0,0,0"/>
+                                    <Setter Property="Padding" Value="8" />
+                                    <Setter Property="Foreground" Value="#B2B2B2"/>
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
 
-                        <DataGridTemplateColumn MaxWidth="60" MinWidth="60" Width="60" Header="" CanUserResize="False" CanUserReorder="False" CanUserSort="False">
+                <Grid Grid.Row="2"  HorizontalAlignment="Right" Margin="0 -40 25 0" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0"
+                            Margin="10 0 0 0" 
+                            Height="40" 
+                            Width="40"
+                            Content="é"
+                            FontFamily="Wingdings"
+                            Click="SortUpSceneCmd_Click_1" 
+                            ToolTip="Move Up">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialFloatingAction}">
+                                <Setter Property="IsEnabled" Value="True" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=SceneCmdsGrid, Path=SelectedItem}" Value="{x:Null}">
+                                        <!--Comment the following line out to view in editor {x:Null}-->
+                                        <Setter Property="IsEnabled" Value="False" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Button Grid.Column="1" Margin="10 0 0 0" 
+                            Height="40" 
+                            Width="40"
+                            Content="ê"
+                            FontFamily="Wingdings"
+                            Click="SortDownSceneCmd_Click_1" 
+                            ToolTip="Move Down">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialFloatingAction}">
+                                <Setter Property="IsEnabled" Value="True" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=SceneCmdsGrid, Path=SelectedItem}" Value="{x:Null}">
+                                        <!--Comment the following line out to view in editor {x:Null}-->
+                                        <Setter Property="IsEnabled" Value="False" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Button Grid.Column="2" Margin="10 0 0 0" 
+                            Height="40" 
+                            Width="40"
+                            Content="3"
+                            FontFamily="Wingdings 2"
+                          Click="ButtonBase_OnClick"
+                            ToolTip="Delete Command">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialFloatingAction}">
+                                <Setter Property="IsEnabled" Value="True" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=SceneCmdsGrid, Path=SelectedItem}" Value="{x:Null}">
+                                        <!--Comment the following line out to view in editor {x:Null}-->
+                                        <Setter Property="IsEnabled" Value="False" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Button Grid.Column="3" Margin="10 0 0 0" 
+                            Height="40" 
+                            Width="40"
+                            Content="&#xe00B;"
+                            FontFamily="flaticon"
+                            Click="SettingBtn_Click_1" 
+                            ToolTip="Command Settings">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialFloatingAction}">
+                                <Setter Property="IsEnabled" Value="True" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=SceneCmdsGrid, Path=SelectedItem}" Value="{x:Null}">
+                                        <!--Comment the following line out to view in editor {x:Null}-->
+                                        <Setter Property="IsEnabled" Value="False" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Button Grid.Column="4"
+                            Margin="20 0 0 0" 
+                            Height="40" 
+                            Width="40"
+                            Content="+"
+                            FontFamily="Roboto"
+                            Click="AddCommand_Click" 
+                            ToolTip="Add Command">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialFloatingAction}">
+                                <Setter Property="IsEnabled" Value="True" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=SceneGrid, Path=SelectedItem}" Value="{x:Null}">
+                                        <!--Comment the following line out to view in editor {x:Null}-->
+                                        <Setter Property="IsEnabled" Value="False" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+
+
+                </Grid>
+                <Border Grid.Row="0" Background="#E7E7E7"  >
+                    <Grid>
+                        <Image Name="SignalImg" Source="../Images/send_signal.png" Height="15" Margin="0 0 10 0" VerticalAlignment="Center"
+                                   HorizontalAlignment="Right" Opacity="0"></Image>
+                        <TextBlock FontSize="20"   Margin="8 0 0 0"  Foreground="Gray" Padding="8" VerticalAlignment="Center"  TextTrimming="CharacterEllipsis"  
+                                       TextWrapping="Wrap" Text="{Binding Name, StringFormat={}{0} Commands, FallbackValue=Commands}"/>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Border>
+
+        <Border Background="#E7E7E7"  HorizontalAlignment="Left" BorderThickness="0 0 1 0"  Margin="0 60 0 0 " BorderBrush="{DynamicResource SceneBrush}"  Width="400">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="40"/>
+                </Grid.RowDefinitions>
+                <DataGrid BorderThickness="0" Background="#FAFAFA" RowBackground="#FAFAFA" AlternatingRowBackground="#FAFAFA" AllowDrop="True" Name="SceneGrid"  CanUserDeleteRows="False"
+                          HorizontalGridLinesBrush="{DynamicResource SceneNoFocusBrush}" 
+                   HeadersVisibility="None" GridLinesVisibility="Horizontal"   
+                     ItemsSource="{Binding}" RowHeight="55"
+                 AutoGenerateColumns="False"  RowEditEnding="SceneGrid_RowEditEnding"
+                  CellStyle="{StaticResource BodyContentDataGridCentering}" SelectionMode="Single" SelectionChanged="SceneGrid_SelectionChanged">
+                    <DataGrid.Resources>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="{DynamicResource SceneSelectedColor}"/>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey }" Color="{DynamicResource SceneNoFocusColor}" />
+                    </DataGrid.Resources>
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="" MaxWidth="70" MinWidth="70" Width="70"  CanUserResize="False" CanUserReorder="False" CanUserSort="False">
                             <DataGridTemplateColumn.CellTemplate >
                                 <DataTemplate>
-                                    <StackPanel Orientation="Horizontal" Margin="5,0,0,0">
-                                        <Button Name="SortUpSceneCmd" Height="20" ToolTip="Move Up" Width="20" Click="SortUpSceneCmd_Click_1" Background="#FFCCCCCC"  BorderBrush="{x:Null}"  BorderThickness="0" Margin="5,0,0,0">
-                                            <Image Source="../Images/arrow_up.png" ></Image>
-                                        </Button>
-                                        <Button Name="SortDownSceneCmd"  Height="20" ToolTip="Move Down" Width="20" Click="SortDownSceneCmd_Click_1" Background="#FFCCCCCC"  BorderBrush="{x:Null}"  BorderThickness="0" Margin="5,0,0,0">
-                                            <Image Source="../Images/arrow_down.png"></Image>
-                                        </Button>
-                                    </StackPanel>
+                                    <Grid Height="40" Width="40">
+                                        <Ellipse  Name="Ellipse" Fill="#B2B2B2">
+                                            <Ellipse.Style>
+                                                <Style TargetType="Ellipse">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsRunning}" Value="True">
+                                                            <DataTrigger.EnterActions>
+                                                                <BeginStoryboard x:Name="tt" >
+                                                                    <Storyboard Storyboard.TargetProperty="(Ellipse.Fill).(SolidColorBrush.Color)">
+                                                                        <ColorAnimation  RepeatBehavior="Forever"                                                                  
+                                                     FillBehavior="Stop"                                                                  
+                                                     From="#B2B2B2" 
+                                                     To="#66BB6A"                                                                  
+                                                     Duration="0:0:0.8" AutoReverse="True" />
+                                                                    </Storyboard>
+                                                                </BeginStoryboard>
+                                                            </DataTrigger.EnterActions>
+                                                            <DataTrigger.ExitActions>
+                                                                <RemoveStoryboard  BeginStoryboardName="tt"></RemoveStoryboard>
+                                                            </DataTrigger.ExitActions>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Ellipse.Style>
+                                        </Ellipse>
+                                        <TextBlock Name="imgFont" Text="&#xe005;" FontFamily="flaticon" Foreground="White" 
+                                           FontSize="22" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                                    </Grid>
                                 </DataTemplate>
-
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
 
-                        <DataGridTemplateColumn x:Name="SettingsCol" MaxWidth="25" MinWidth="25" Width="25"  Header="" CanUserResize="False" CanUserReorder="False">
-                            <DataGridTemplateColumn.CellTemplate >
-                                <DataTemplate>
-
-
-
-                                    <Button Name="SettingBtn"  Click="SettingBtn_Click_1" ToolTip="Scene Settings" Padding="3" Background="Transparent" BorderBrush="{x:Null}"
-                                    BorderThickness="0" HorizontalAlignment="Center">
-                                        <TextBlock Text="&#xe00B;" Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="20" />
-                                    </Button>
-
-
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Width="*" MinWidth="50" FontSize="16" Header="Scene" Binding="{Binding Path=Name, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False"  CanUserReorder="False" CanUserSort="False">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                    <Setter Property="Padding" Value="8" />
+                                    <Setter Property="Foreground" Value="#181818"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <!--<DataGridTextColumn  Width="25" MinWidth="50" Header="Sort" Binding="{Binding Path=sort_order,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  IsReadOnly="False"  CanUserReorder="False" CanUserSort="True" />-->
 
                     </DataGrid.Columns>
                 </DataGrid>
-                <Button Grid.Row="2"  Name="AddCommand"  Content="Add Command" 
-                         HorizontalAlignment="Right"  VerticalAlignment="Bottom" Margin="10" FontSize="14" Padding="10 5" FontWeight="Medium" Background="#FFCCCCCC" BorderBrush="{x:Null}"  BorderThickness="0" Click="AddCommand_Click" />
+                <Grid Grid.Row="1" HorizontalAlignment="Right" Margin="0 -40 25 0" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Name="ActivateScene"  
+                            Margin="10 0 0 0" 
+                            Height="40" 
+                            Width="40"
+                            Content="&#xe005;"
+                            FontFamily="flaticon"
+                            Click="ActivateScene_Click_1" 
+                            ToolTip="Play scene">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialFloatingAction}">
+                                <Setter Property="IsEnabled" Value="True" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=SceneGrid, Path=SelectedItem.IsRunning}" Value="True">
+                                        <Setter Property="IsEnabled" Value="False" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding ElementName=SceneGrid, Path=SelectedItem}" Value="{x:Null}">
+                                        <Setter Property="IsEnabled" Value="False" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding ElementName=SceneGrid, Path=SelectedItem.Commands.Count}" Value="0">
+                                        <Setter Property="IsEnabled" Value="False" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding ElementName=SceneGrid, Path=SelectedItem, Converter={StaticResource IsNewItemPlaceholderConverter}}" Value="True">
+                                        <Setter Property="IsEnabled" Value="False" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Button Grid.Column="1" Name="SortUp"
+                            Margin="10 0 0 0" 
+                            Height="40" 
+                            Width="40"
+                            Content="é"
+                            FontFamily="Wingdings"
+                            Click="SortUp_Click_1" 
+                            ToolTip="Move Up">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialFloatingAction}">
+                                <Setter Property="IsEnabled" Value="True" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=SceneGrid, Path=SelectedItem}" Value="{x:Null}">
+                                        <!--Comment the following line out to view in editor {x:Null}-->
+                                        <Setter Property="IsEnabled" Value="False" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding ElementName=SceneGrid, Path=SelectedItem, Converter={StaticResource IsNewItemPlaceholderConverter}}" Value="True">
+                                        <Setter Property="IsEnabled" Value="False" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Button Grid.Column="2" Name="SortDown" Margin="10 0 0 0" 
+                            Height="40" 
+                            Width="40"
+                            Content="ê"
+                            FontFamily="Wingdings"
+                            Click="SortDown_Click_1" 
+                            ToolTip="Move Down">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialFloatingAction}">
+                                <Setter Property="IsEnabled" Value="True" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=SceneGrid, Path=SelectedItem}" Value="{x:Null}">
+                                        <!--Comment the following line out to view in editor {x:Null}-->
+                                        <Setter Property="IsEnabled" Value="False" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding ElementName=SceneGrid, Path=SelectedItem, Converter={StaticResource IsNewItemPlaceholderConverter}}" Value="True">
+                                        <Setter Property="IsEnabled" Value="False" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Button Grid.Column="3" Margin="10 0 0 0" 
+                            Height="40" 
+                            Width="40"
+                            Content="4"
+                            Click="ButtonDuplicate_OnClick"
+                            FontFamily="Wingdings"
+                            ToolTip="Dulpicate Scene">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialFloatingAction}">
+                                <Setter Property="IsEnabled" Value="True" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=SceneGrid, Path=SelectedItem}" Value="{x:Null}">
+                                        <!--Comment the following line out to view in editor {x:Null}-->
+                                        <Setter Property="IsEnabled" Value="False" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding ElementName=SceneGrid, Path=SelectedItem, Converter={StaticResource IsNewItemPlaceholderConverter}}" Value="True">
+                                        <Setter Property="IsEnabled" Value="False" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Button Grid.Column="5" Margin="10 0 0 0" 
+                            Height="40" 
+                            Width="40"
+                            Content="&#xe00B;"
+                            FontFamily="flaticon"
+                            Click="SceneSettingBtn_Click_1" 
+                            ToolTip="Scene Settings">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialFloatingAction}">
+                                <Setter Property="IsEnabled" Value="True" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=SceneGrid, Path=SelectedItem}" Value="{x:Null}">
+                                        <!--Comment the following line out to view in editor {x:Null}-->
+                                        <Setter Property="IsEnabled" Value="False" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding ElementName=SceneGrid, Path=SelectedItem, Converter={StaticResource IsNewItemPlaceholderConverter}}" Value="True">
+                                        <Setter Property="IsEnabled" Value="False" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Button Grid.Column="4" Margin="10 0 0 0" 
+                            Height="40" 
+                            Width="40"
+                            Content="3"
+                            FontFamily="Wingdings 2"
+                            Click="ButtonDelete_OnClick"
+                            ToolTip="Delete Scene">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialFloatingAction}">
+                                <Setter Property="IsEnabled" Value="True" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=SceneGrid, Path=SelectedItem}" Value="{x:Null}">
+                                        <!--Comment the following line out to view in editor {x:Null}-->
+                                        <Setter Property="IsEnabled" Value="False" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding ElementName=SceneGrid, Path=SelectedItem, Converter={StaticResource IsNewItemPlaceholderConverter}}" Value="True">
+                                        <Setter Property="IsEnabled" Value="False" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </Grid>
+            </Grid>
+        </Border>
+        <Border Effect="{DynamicResource z-depth1}" Background="{DynamicResource SceneBrush}"  Height="60"  VerticalAlignment="Top">
+            <Grid>
+                <TextBlock FontSize="20" Foreground="White" Padding="8" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"  
+                                       TextWrapping="Wrap" Text="Scene" Margin="8 0 0 0" />
             </Grid>
         </Border>
     </Grid>
