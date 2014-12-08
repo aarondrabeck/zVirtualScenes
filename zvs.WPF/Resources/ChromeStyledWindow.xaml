@@ -27,7 +27,7 @@
             <Border Name="ChromeWindowFrame" Style="{StaticResource ChromewindowBorder}">
                 <DockPanel >
                     <!-- The title bar. -->
-                    <DockPanel Name="TitleBar" DockPanel.Dock="Top" Background="White" LastChildFill="True">
+                    <DockPanel Name="TitleBar" DockPanel.Dock="Top"  Background="#FAFAFA" LastChildFill="True">
                         <Image Name="TitleBarIcon"
                             DockPanel.Dock="Left"
                             Width="25" 

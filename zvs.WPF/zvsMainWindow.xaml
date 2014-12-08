@@ -22,6 +22,7 @@
     Closing="Window_Closing_1" 
     StateChanged="Window_StateChanged_1" 
     WindowStartupLocation="CenterScreen"
+   
     Style="{StaticResource ChromeWindowStyle}" d:DesignHeight="1000">
 
     <zvsWpf:ChromeWindow.CommandBindings>
@@ -124,80 +125,47 @@
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         </Style>-->
     </zvsWpf:ChromeWindow.Resources>
-    <DockPanel Background="White">
-      
+    <DockPanel Background="#EAEAEA">
+
         <Grid >
-            <TabControl Margin="0 5 0 0" Style="{StaticResource ZvsVerticalTabControl}" >
-                <TabItem Style="{StaticResource DeviceTabItem}">
-                    <TabItem.Header >
-                        <StackPanel VerticalAlignment="Center"  HorizontalAlignment="Center" >
-                            <TextBlock Foreground="White" TextAlignment="Center" Text="&#xe004;" 
-                                       Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="50" Margin="0 0 0 10" />
-                            <TextBlock Foreground="White" Text="Devices" FontSize="20" FontFamily="Roboto"/>
-                        </StackPanel>
-                    </TabItem.Header>
-                    <Grid>
-                        <deviceControls:DeviceDataGridUc x:Name="dList1" Margin="0,0,0,0" />
-                    </Grid>
+            <TabControl Style="{DynamicResource MaterialTabControl}">
+                <TabItem Style="{StaticResource MaterialTabItem}">
+                    <TabItem.Header>DEVICES</TabItem.Header>
+                    <Border Padding="10" >
+                        <deviceControls:DeviceDataGridUc x:Name="dList1"  />
+                    </Border>
                 </TabItem>
-                <TabItem  Style="{StaticResource SceneTabItem}">
-                    <TabItem.Header >
-                        <StackPanel VerticalAlignment="Center"  HorizontalAlignment="Center" >
-                            <TextBlock Foreground="White" TextAlignment="Center" Text="&#xe005;" 
-                                       Style="{DynamicResource ZvsFont}" FontFamily="flaticon" FontSize="50" Margin="0 0 0 10"/>
-                            <TextBlock Foreground="White" Text="Scenes" FontFamily="Roboto" FontSize="20"/>
-                        </StackPanel>
-                    </TabItem.Header>
-
-                    <sceneControls:SceneCreator x:Name="SceneControl" />
-
+                <TabItem  Style="{StaticResource MaterialTabItem}">
+                    <TabItem.Header>SCENES</TabItem.Header>
+                    <Border  Padding="10" >
+                        <sceneControls:SceneCreator x:Name="SceneControl"  />
+                    </Border>
                 </TabItem>
-                <TabItem   Style="{StaticResource TriggersTabItem}">
-                    <TabItem.Header >
-                        <StackPanel VerticalAlignment="Center"  HorizontalAlignment="Center" Margin="5">
-                            <TextBlock Foreground="White" TextAlignment="Center" Text="&#xe002;" 
-                                       Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="50" Margin="0 0 0 10"/>
-                            <TextBlock Foreground="White" Text="Triggers" FontFamily="Roboto" FontSize="20"/>
-                        </StackPanel>
-                    </TabItem.Header>
-                    <triggerControl:TriggerGridUc x:Name="triggerControl"></triggerControl:TriggerGridUc>
+                <TabItem    Style="{StaticResource MaterialTabItem}">
+                    <TabItem.Header>TRIGGERS</TabItem.Header>
+                    <Border  Padding="10" >
+                        <triggerControl:TriggerGridUc x:Name="triggerControl"></triggerControl:TriggerGridUc>
+                    </Border>
                 </TabItem>
-                <TabItem  Style="{StaticResource TasksTabItem}" Padding="16">
-                    <TabItem.Header >
-                        <StackPanel VerticalAlignment="Center"  HorizontalAlignment="Center" Margin="8">
-                            <TextBlock Foreground="White" TextAlignment="Center" Text="&#xe008;" 
-                                       Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="50" Margin="0 0 0 10"/>
-                            <TextBlock Foreground="White" Text="Tasks" FontSize="20" FontFamily="Roboto"/>
-                        </StackPanel>
-                    </TabItem.Header>
-                    <scheduledTaskControls:ScheduledTaskCreator x:Name="scheduletaskControl"></scheduledTaskControls:ScheduledTaskCreator>
+                <TabItem   Style="{StaticResource MaterialTabItem}">
+                    <TabItem.Header>TASKS</TabItem.Header>
+                    <Border  Padding="10" >
+                        <scheduledTaskControls:ScheduledTaskCreator x:Name="scheduletaskControl"></scheduledTaskControls:ScheduledTaskCreator>
+                    </Border>
                 </TabItem>
-                <TabItem   Style="{StaticResource GroupsTabItem}" Margin="0" >
-                    <TabItem.Header >
-                        <StackPanel VerticalAlignment="Center"  HorizontalAlignment="Center" Margin="5">
-                            <TextBlock Foreground="White" TextAlignment="Center" Text="&#xe00c;" 
-                                       Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="50" Margin="0 0 0 10"/>
-                            <TextBlock Foreground="White" Text="Groups" FontFamily="Roboto" FontSize="20"/>
-                        </StackPanel>
-                    </TabItem.Header>
-                    <Grid>
+                <TabItem    Style="{StaticResource MaterialTabItem}">
+                    <TabItem.Header>GROUPS</TabItem.Header>
+                    <Border  Padding="10" >
                         <groups:GroupEditorUserControl/>
-                    </Grid>
+                    </Border>
                 </TabItem>
-                <TabItem Style="{StaticResource LogTabItem}">
-                    <TabItem.Header >
-                        <StackPanel VerticalAlignment="Center"  HorizontalAlignment="Center" Margin="5">
-                            <TextBlock Foreground="White" TextAlignment="Center" Text="&#xe001;" 
-                                       Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="50" Margin="0 0 0 10"/>
-                            <TextBlock Foreground="White" Text="Logs" FontFamily="Roboto" FontSize="20"/>
-                        </StackPanel>
-                    </TabItem.Header>
-                    <Grid>
+                <TabItem  Style="{StaticResource MaterialTabItem}">
+                    <TabItem.Header>LOG</TabItem.Header>
+                    <Border  Padding="10" >
                         <zvsWpf:LogUserControl/>
-                    </Grid>
-
+                    </Border>
                 </TabItem>
-                <TabItem  Style="{StaticResource SettingTabItem}" >
+                <!--<TabItem  Style="{StaticResource SettingTabItem}" >
                     <TabItem.Header >
                         <Menu  Background="{DynamicResource SettingBrush}" >
                             <Menu.ItemsPanel>
@@ -238,7 +206,7 @@
                             </MenuItem>
                         </Menu>
                     </TabItem.Header>
-                </TabItem>
+                </TabItem>-->
             </TabControl>
 
         </Grid>

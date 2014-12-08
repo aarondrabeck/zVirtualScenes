@@ -14,12 +14,13 @@
         <CollectionViewSource x:Key="devicesViewSource" d:DesignSource="{d:DesignInstance my:Device, CreateList=True}"/>
         <converters:IsNewItemPlaceholderConverter x:Key="IsNewItemPlaceholderConverter"/>
     </UserControl.Resources>
-    <Grid DataContext="{StaticResource devicesViewSource}">
+    <Grid DataContext="{StaticResource devicesViewSource}" Effect="{DynamicResource z-depth1}">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="40"/>
+            <RowDefinition Height="60"/>
         </Grid.RowDefinitions>
-        <DataGrid x:Name="DeviceGrid" Background="#FAFAFA" RowBackground="#FAFAFA" AlternatingRowBackground="#FAFAFA" CellStyle="{StaticResource BodyContentDataGridCentering}" CanUserDeleteRows="False"
+        <DataGrid  x:Name="DeviceGrid" Background="#FAFAFA" RowBackground="#FAFAFA" AlternatingRowBackground="#FAFAFA" 
+                  CellStyle="{StaticResource BodyContentDataGridCentering}" CanUserDeleteRows="False"
                   HorizontalGridLinesBrush="{DynamicResource DeviceNoFocusBrush}"  
                    GridLinesVisibility="Horizontal" RowHeight="55" CanUserAddRows="False" AutoGenerateColumns="False" 
                   ItemsSource="{Binding}" PreviewMouseLeftButtonDown="DeviceGrid_PreviewMouseLeftButtonDown" 
@@ -36,7 +37,7 @@
                     <Setter Property="BorderThickness"  Value="0 0 0 1" />
                     <Setter Property="FontSize"  Value="20" />
                     <Setter Property="Padding"  Value="8" />
-                    <Setter Property="Height"  Value="50" />
+                    <Setter Property="Height"  Value="60" />
                 </Style>
                 <Style x:Key="SelectionDataGridHeader" TargetType="{x:Type DataGridColumnHeader}">
                     <Setter Property="Foreground"  Value="White" />
@@ -46,7 +47,7 @@
                     <Setter Property="FontSize"  Value="20" />
                     <Setter Property="Cursor" Value="Hand" />
                     <Setter Property="Padding"  Value="8" />
-                    <Setter Property="Height"  Value="50" />
+                    <Setter Property="Height"  Value="60" />
                     <Style.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Background"  Value="{DynamicResource DeviceSelectedBrush}" />
@@ -202,19 +203,27 @@
             </DataGrid.Columns>
         </DataGrid>
         <Border Grid.Row="1" Margin="0">
-            <Grid Background="#E7E7E7" >
+            <Grid Background="#EEEEEE" >
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="175"  />
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"  />
+                    <ColumnDefinition Width="1*"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="Filter"  VerticalAlignment="Center" Margin="5,0" FontSize="16" Foreground="#B2B2B2"  ></TextBlock>
-                <TextBox Name="Filter" VerticalContentAlignment="Center" Height="30" TextChanged="Filter_TextChanged_1" Grid.Column="1" Margin="5" Foreground="#B2B2B2" FontSize="16"  ></TextBox>
-                <CheckBox Name="ShowMoreBtn" HorizontalAlignment="Left"  VerticalAlignment="Center" Checked="ShowMoreBtn_Checked_1" Foreground="#B2B2B2"  FontSize="16"  
-                          Unchecked="ShowMoreBtn_Unchecked_1"  IsChecked="False" Content="More Details" Grid.Column="2" Margin="10,0,0,0" />
+                <StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center">
+                    <TextBlock Text="Filter"  HorizontalAlignment="Left" Margin="10 0 0 0" FontSize="12" Foreground="#A2A2A2" />
+                    <TextBox Style="{DynamicResource TextBoxMaterial}" Name="Filter" HorizontalAlignment="Left" 
+                              Width="150" 
+                             TextChanged="Filter_TextChanged_1" 
+                             Margin="10 0 0 0" FontSize="16"  ></TextBox>
+                </StackPanel>
 
-                <Grid Grid.Column="3"  HorizontalAlignment="Right" Margin="0 -40 25 0">
+                <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center" >
+                    <TextBlock Text="Show More"  HorizontalAlignment="Left" Margin="10 0 0 0" FontSize="12" Foreground="#A2A2A2" />
+                    <ToggleButton Cursor="Hand"  Style="{StaticResource AnimatedSwitch}" Height="25" Name="ShowMoreBtn" HorizontalAlignment="Left"  
+                              VerticalAlignment="Center" Checked="ShowMoreBtn_Checked_1" Foreground="#B2B2B2"  FontSize="16"  
+                          Unchecked="ShowMoreBtn_Unchecked_1"  IsChecked="False" Content="More Details"  Margin="10,5,0,0" />
+                </StackPanel>
+                <Grid Grid.Column="2"  HorizontalAlignment="Right" Margin="0 0 25 0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
@@ -227,7 +236,7 @@
                             Click="ButtonDeleteDevice_OnClick"
                             ToolTip="Delete Device">
                         <Button.Style>
-                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialFloatingAction}">
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialToolbarButton}">
                                 <Setter Property="IsEnabled" Value="True" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding ElementName=DeviceGrid, Path=SelectedItem}" Value="{x:Null}">
@@ -249,7 +258,7 @@
                             Click="SettingBtn_Click_1" 
                             ToolTip="Device Settings">
                         <Button.Style>
-                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialFloatingAction}">
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialToolbarButton}">
                                 <Setter Property="IsEnabled" Value="True" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding ElementName=DeviceGrid, Path=SelectedItem}" Value="{x:Null}">
