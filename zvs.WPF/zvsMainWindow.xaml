@@ -51,79 +51,7 @@
             <GradientStop Color="White" Offset="1"/>
         </LinearGradientBrush>
 
-        <!-- TabControl style -->
-        <!--<Style x:Key="TabControlStyle" TargetType="{x:Type TabControl}">
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="TabControl">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-                            <Border Grid.Row="1" BorderThickness="1,0,1,1" Panel.ZIndex="2" CornerRadius="0,0,2,2"
-                                BorderBrush="{StaticResource BorderBrush}"
-                                Background="{StaticResource TabControlBackgroundBrush}">
-                                <ContentPresenter ContentSource="SelectedContent"/>
-                            </Border>
-                            <StackPanel Orientation="Horizontal" Grid.Row="0" Panel.ZIndex="1" IsItemsHost="true"/>
-                            <Rectangle Grid.Row="0" Height="2" VerticalAlignment="Bottom"
-                                   Fill="{StaticResource BorderBrush}"/>
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>-->
-        <!-- TabItem style -->
-        <!--<Style x:Key="{x:Type TabItem}" TargetType="{x:Type TabItem}">
-            <Setter Property="SnapsToDevicePixels" Value="True"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="TabItem">
-                        <Grid x:Name="grd">
-                            <Path x:Name="TabPath" StrokeThickness="1"
-      Margin="{Binding ElementName=TabItemContent,
-               Converter={StaticResource content2MarginConverter}}"
-      Stroke="{StaticResource BorderBrush}"
-      Fill="{StaticResource TabItemPathBrush}"
-      Data="{Binding ElementName=TabItemContent,
-             Converter={StaticResource content2PathConverter}}">
-                                <Path.LayoutTransform>
-                                    <ScaleTransform ScaleY="-1"/>
-                                </Path.LayoutTransform>
-                            </Path>
-                            <Rectangle x:Name="TabItemTopBorder" Height="2" Visibility="Visible"
-                                   VerticalAlignment="Bottom" Fill="{StaticResource BorderBrush}"
-                                   Margin="{Binding ElementName=TabItemContent, Converter={StaticResource content2MarginConverter}}" />
-                            <ContentPresenter x:Name="TabItemContent" ContentSource="Header"
-                                          Margin="10,2,10,2" VerticalAlignment="Center"
-                                          TextElement.Foreground="#FF000000"/>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True" SourceName="grd">
-                                <Setter Property="Fill" Value="{StaticResource HoverBrush}" TargetName="TabPath"/>
-                            </Trigger>
-                            <Trigger Property="Selector.IsSelected" Value="True">
-                                <Setter Property="Fill" TargetName="TabPath" Value="{StaticResource SelectedBrush}">
-                                </Setter>
-                                <Setter Property="BitmapEffect">
-                                    <Setter.Value>
-                                        <DropShadowBitmapEffect Direction="302" Opacity="0.4" 
-                                                        ShadowDepth="4" Softness="0.5"/>
-                                    </Setter.Value>
-                                </Setter>
-                                <Setter Property="Panel.ZIndex" Value="2"/>
-                                <Setter Property="Visibility" Value="Hidden" TargetName="TabItemTopBorder"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>-->
-        <!--<Style TargetType="{x:Type ListViewItem}">
-            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-        </Style>-->
+     
     </zvsWpf:ChromeWindow.Resources>
     <DockPanel Background="#EAEAEA">
 
@@ -153,7 +81,7 @@
                         <scheduledTaskControls:ScheduledTaskCreator x:Name="scheduletaskControl"></scheduledTaskControls:ScheduledTaskCreator>
                     </Border>
                 </TabItem>
-                <TabItem    Style="{StaticResource MaterialTabItem}">
+                <TabItem Style="{StaticResource MaterialTabItem}">
                     <TabItem.Header>GROUPS</TabItem.Header>
                     <Border  Padding="10" >
                         <groups:GroupEditorUserControl/>
@@ -165,50 +93,38 @@
                         <zvsWpf:LogUserControl/>
                     </Border>
                 </TabItem>
-                <!--<TabItem  Style="{StaticResource SettingTabItem}" >
-                    <TabItem.Header >
-                        <Menu  Background="{DynamicResource SettingBrush}" >
-                            <Menu.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-                                </ItemsPanelTemplate>
-                            </Menu.ItemsPanel>
-                            <MenuItem >
-                                <MenuItem.Header>
-                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="14 0 0 0" >
-                                        <TextBlock Foreground="White" TextAlignment="Center" Text="&#xe00b;" Style="{DynamicResource ZvsFont}"  
-                                                   FontFamily="flaticon" FontSize="50" Margin="0 0 0 10"/>
-                                        <TextBlock Foreground="White" Text="Settings" FontFamily="Roboto" FontSize="20"/>
-                                    </StackPanel>
-                                </MenuItem.Header>
-
-                                <MenuItem Header="_File"  >
-                                    <MenuItem Header="Backup and Restore..." x:Name="BackupRestoreMI" Click="BackupRestoreMI_Click" />
-                                    <Separator />
-                                    <MenuItem Name="ExitMI" Header="Exit zVirtualScenes" Click="ExitMI_Click_1" />
-
-                                </MenuItem>
-                                <MenuItem Header="Commands">
-                                    <MenuItem Name="AddEditJSCmds" Header="Add / Edit JavaScript Commands..." Click="AddEditJSCmds_Click_1" />
-                                    <Separator />
-                                    <MenuItem Name="RepollAllMI" Header="Repoll All" Click="RepollAllMI_Click_1" />
-                                </MenuItem>
-                                <MenuItem Header="Tools">
-                                    <MenuItem Header="Manage Adapters..." Click="MenuItem_Click_1" />
-                                    <MenuItem Header="Manage Plug-ins..." Click="ManagePluginsMi" />
-                                    <MenuItem Name="SettingMI" Header="Settings..." Click="SettingMI_Click_1" />
-                                    <Separator />
-                                    <MenuItem Header="View Database" Name="ViewDBMI"   Click="ViewDBMI_Click_1" />
-                                </MenuItem>
-                                <MenuItem Header="Help">
-                                    <MenuItem Name="AboutMI" Header="About zVirtualScenes" Click="AboutMI_Click_1" />
-                                </MenuItem>
-                            </MenuItem>
-                        </Menu>
-                    </TabItem.Header>
-                </TabItem>-->
+                
             </TabControl>
 
+
+                <Menu VerticalAlignment="Top" HorizontalAlignment="Right" Background="Transparent" Margin="0 10">
+                    <MenuItem>
+                    <MenuItem.Header>
+                        <Button  Content="&#xe00B;" 
+                            FontFamily="flaticon" Style="{DynamicResource MaterialFloatingAction}"></Button></MenuItem.Header>
+                        <MenuItem Header="_File"  >
+                            <MenuItem Header="Backup and Restore..." x:Name="BackupRestoreMi" Click="BackupRestoreMI_Click" />
+                            <Separator />
+                            <MenuItem Name="ExitMI" Header="Exit zVirtualScenes" Click="ExitMI_Click_1" />
+
+                        </MenuItem>
+                        <MenuItem Header="Commands">
+                            <MenuItem Name="AddEditJSCmds" Header="Add / Edit JavaScript Commands..." Click="AddEditJSCmds_Click_1" />
+                            <Separator />
+                            <MenuItem Name="RepollAllMI" Header="Repoll All" Click="RepollAllMI_Click_1" />
+                        </MenuItem>
+                        <MenuItem Header="Tools">
+                            <MenuItem Header="Manage Adapters..." Click="MenuItem_Click_1" />
+                            <MenuItem Header="Manage Plug-ins..." Click="ManagePluginsMi" />
+                            <MenuItem Name="SettingMI" Header="Settings..." Click="SettingMI_Click_1" />
+                            <Separator />
+                            <MenuItem Header="View Database" Name="ViewDBMI"   Click="ViewDBMI_Click_1" />
+                        </MenuItem>
+                        <MenuItem Header="Help">
+                            <MenuItem Name="AboutMI" Header="About zVirtualScenes" Click="AboutMI_Click_1" />
+                        </MenuItem>
+                    </MenuItem>
+                </Menu>
         </Grid>
     </DockPanel>
 </zvsWpf:ChromeWindow>

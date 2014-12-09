@@ -7,26 +7,31 @@
     xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:dataModel="clr-namespace:zvs.DataModel;assembly=zvs.DataModel"
              xmlns:tasks="clr-namespace:zvs.DataModel.Tasks;assembly=zvs.DataModel"
+             xmlns:converters="clr-namespace:zvs.WPF.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="934.025" d:DesignWidth="1037" Loaded="UserControl_Loaded_1" Unloaded="ScheduledTaskCreator_Unloaded_1" 
-    Initialized="UserControl_Initialized">
+    Initialized="UserControl_Initialized" FontFamily="Roboto">
     <UserControl.Resources>
         <Style x:Key="NoSelectionDataGridHeader" TargetType="{x:Type DataGridColumnHeader}">
             <Setter Property="Foreground"  Value="White" />
             <Setter Property="Background"  Value="{DynamicResource TaskBrush}" />
             <Setter Property="BorderBrush"  Value="{DynamicResource TaskSelectedBrush}" />
             <Setter Property="BorderThickness"  Value="0 0 0 1" />
-            <Setter Property="FontSize"  Value="18" />
-            <Setter Property="Padding"  Value="5" />
+            <Setter Property="FontSize"  Value="20" />
+            <Setter Property="FontWeight"  Value="Medium" />
+            <Setter Property="Padding"  Value="8" />
+            <Setter Property="Height"  Value="60" />
         </Style>
         <Style x:Key="SelectionDataGridHeader" TargetType="{x:Type DataGridColumnHeader}">
             <Setter Property="Foreground"  Value="White" />
             <Setter Property="Background"  Value="{DynamicResource TaskBrush}" />
             <Setter Property="BorderBrush"  Value="{DynamicResource TaskSelectedBrush}" />
             <Setter Property="BorderThickness"  Value="0 0 0 1" />
-            <Setter Property="FontSize"  Value="18" />
+            <Setter Property="FontSize"  Value="20" />
+            <Setter Property="FontWeight"  Value="Medium" />
             <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Padding"  Value="5" />
+            <Setter Property="Padding"  Value="8" />
+            <Setter Property="Height"  Value="60" />
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background"  Value="{DynamicResource TaskSelectedBrush}" />
@@ -39,7 +44,7 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
-
+        <converters:IsNewItemPlaceholderConverter x:Key="IsNewItemPlaceholderConverter"/>
         <ObjectDataProvider x:Key="ScheduledTaskTypeEnum" MethodName="GetValues" ObjectType="{x:Type system:Enum}">
             <ObjectDataProvider.MethodParameters>
                 <x:Type TypeName="tasks:ScheduledTaskType"/>
@@ -49,81 +54,119 @@
     </UserControl.Resources>
 
     <Grid DataContext="{StaticResource ScheduledTaskViewSource}">
-        <DataGrid x:Name="ScheduledTaskDataGrid" Width="350" ItemsSource="{Binding}" AllowDrop="False"  BorderThickness="0 0 1 0" 
-                  BorderBrush="{DynamicResource TaskBrush}"
-                    HorizontalGridLinesBrush="{DynamicResource TaskNoFocusBrush}"  AlternatingRowBackground="#FFFFFF"
-                  GridLinesVisibility="Horizontal"  HorizontalAlignment="Left" RowHeight="45" AutoGenerateColumns="False"  
-                  CellStyle="{StaticResource BodyContentDataGridCentering}" SelectionMode="Single" 
-                 RowHeaderWidth="0" PreviewKeyDown="ScheduledTaskDataGrid_PreviewKeyDown_1" RowEditEnding="ScheduledTaskDataGrid_RowEditEnding_1" 
-                  SelectionChanged="ScheduledTaskDataGrid_SelectionChanged" Background="#FFFFFF" >
-            <DataGrid.Resources>
-                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="{DynamicResource TaskSelectedColor}"/>
-                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
-                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey }" Color="{DynamicResource TaskNoFocusColor}" />
-            </DataGrid.Resources>
-            <DataGrid.Columns>
-                <DataGridTemplateColumn HeaderStyle="{StaticResource NoSelectionDataGridHeader}" MaxWidth="50" MinWidth="50" Width="50"  Header="" CanUserResize="False" CanUserReorder="False" CanUserSort="False">
-                    <DataGridTemplateColumn.CellTemplate >
-                        <DataTemplate>
-                            <TextBlock Margin="6 0 6 0 " Text="&#xe008;" Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="36" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="400"/>
+                <ColumnDefinition Width="15"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Border Grid.Column="0"  Background="#EEEEEE" BorderThickness="0" CornerRadius="2" Effect="{DynamicResource z-depth2}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="60"/>
+                    </Grid.RowDefinitions>
+                    <DataGrid x:Name="ScheduledTaskDataGrid" ItemsSource="{Binding}" BorderThickness="0" Background="#FAFAFA" CanUserDeleteRows="False"
+                              RowBackground="#FAFAFA" AlternatingRowBackground="#FAFAFA" AllowDrop="False" BorderBrush="{DynamicResource TaskBrush}"
+                              HorizontalGridLinesBrush="{DynamicResource TaskNoFocusBrush}" GridLinesVisibility="Horizontal"  HorizontalAlignment="Left" 
+                              RowHeight="55" AutoGenerateColumns="False"  CellStyle="{StaticResource BodyContentDataGridCentering}" SelectionMode="Single" 
+                              RowHeaderWidth="0" SelectionChanged="ScheduledTaskDataGrid_SelectionChanged" RowEditEnding="ScheduledTaskDataGrid_RowEditEnding_1" >
+                        <DataGrid.Resources>
+                            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="{DynamicResource TaskSelectedColor}"/>
+                            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
+                            <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey }" Color="{DynamicResource TaskNoFocusColor}" />
+                        </DataGrid.Resources>
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn HeaderStyle="{StaticResource NoSelectionDataGridHeader}" Header="" MaxWidth="70" MinWidth="70" Width="70" 
+                                                    CanUserResize="False" CanUserReorder="False" CanUserSort="False">
+                                <DataGridTemplateColumn.CellTemplate >
+                                    <DataTemplate>
+                                        <Grid Height="40" Width="40">
+                                            <Ellipse  Name="Ellipse" Fill="#B2B2B2"/>
+                                            <TextBlock Name="imgFont" Text="&#xe008;" FontFamily="flaticon" Foreground="White" 
+                                           FontSize="22" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
 
-                <DataGridTextColumn HeaderStyle="{StaticResource SelectionDataGridHeader}" Width="*" MinWidth="50" FontSize="16" Header="Scheduled Task" Binding="{Binding Path=Name, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False"  CanUserReorder="False" CanUserSort="True">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
+                            <DataGridTextColumn HeaderStyle="{StaticResource SelectionDataGridHeader}" Width="*" MinWidth="50" FontSize="16" Header="Scheduled Task" Binding="{Binding Path=Name, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False"  CanUserReorder="False" CanUserSort="True">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
 
-                <DataGridCheckBoxColumn HeaderStyle="{StaticResource SelectionDataGridHeader}" Header="Enabled" MinWidth="75" Width="75"  CellStyle="{StaticResource BodyHozCenter}" 
-                                        Binding="{Binding IsEnabled, UpdateSourceTrigger=PropertyChanged }" IsReadOnly="False" >
-                </DataGridCheckBoxColumn>
-            </DataGrid.Columns>
-        </DataGrid>
-        <Grid  Margin="350,0,0,0" Background="#FFFDFDFD">
-            <Grid >
-                <Border Name="TaskDetails"   LostFocus="TaskUserControlGrid_OnLostFocus">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-                        <Grid Background="{DynamicResource TaskBrush}"  Height="35">
-                            <Image Name="SignalImg" Source="../Images/send_signal.png" Height="15" Margin="0 0 10 0" VerticalAlignment="Center"
+                            <DataGridCheckBoxColumn HeaderStyle="{StaticResource SelectionDataGridHeader}" Header="Enabled" MinWidth="90" Width="90"  IsReadOnly="False" 
+                                                    CellStyle="{StaticResource BodyHozCenter}" Binding="{Binding IsEnabled, UpdateSourceTrigger=PropertyChanged }" >
+                            </DataGridCheckBoxColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <Grid Grid.Row="1"  Background="#EEEEEE" >
+                        <Button Grid.Column="0" Margin="10 0 10 0" HorizontalAlignment="Right" 
+                            Height="40" 
+                            Width="40"
+                            Content="3"
+                            FontFamily="Wingdings 2"
+                            Click="ButtonDelete_OnClick"
+                            ToolTip="Delete Task">
+                            <Button.Style>
+                                <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialToolbarButton}">
+                                    <Setter Property="IsEnabled" Value="True" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=ScheduledTaskDataGrid, Path=SelectedItem}" Value="{x:Null}">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding ElementName=ScheduledTaskDataGrid, Path=SelectedItem, Converter={StaticResource IsNewItemPlaceholderConverter}}" Value="True">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </Grid>
+                </Grid>
+            </Border>
+            <Border Name="TaskDetails" Grid.Column="2" Background="#FAFAFA" BorderThickness="0" CornerRadius="2" Effect="{DynamicResource z-depth2}" LostFocus="TaskUserControlGrid_OnLostFocus">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="60"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Background="{DynamicResource TaskBrush}"  >
+                        <Image Name="SignalImg" Source="../Images/send_signal.png" Height="15" Margin="0 0 10 0" VerticalAlignment="Center"
                                    HorizontalAlignment="Right" Opacity="0"></Image>
-                            <TextBlock FontSize="18" Foreground="White" Margin="10,0,40,0" TextTrimming="CharacterEllipsis"  
-                                       TextWrapping="Wrap" Text="{Binding Name, StringFormat={}{0} Details, FallbackValue=New Task}" VerticalAlignment="Center"/>
-                        </Grid>
-                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" >
-                            <StackPanel Orientation="Vertical" >
-                                <TextBlock Text="Task Frequency" Margin="10 15 0 0" FontSize="16" />
-                                <ComboBox Name="FrequencyCmbBx" ItemsSource="{Binding Source={StaticResource ScheduledTaskTypeEnum}}" Margin="10 5 0 0" 
+                        <TextBlock  FontSize="20" Margin="8 0 25 0" FontWeight="Medium"  Foreground="#FEFEFE" Padding="8" VerticalAlignment="Center" 
+                                            TextTrimming="CharacterEllipsis" TextWrapping="Wrap" Text="{Binding Name, StringFormat={}{0} Details, FallbackValue=New Task}"/>
+                    </Grid>
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" >
+                        <StackPanel Orientation="Vertical" >
+                            <TextBlock Text="Task Frequency" Margin="10 15 0 0" HorizontalAlignment="Left" FontSize="12" Foreground="#A2A2A2" />
+                            <ComboBox Name="FrequencyCmbBx" ItemsSource="{Binding Source={StaticResource ScheduledTaskTypeEnum}}" Margin="10 5 0 0" 
                                       HorizontalAlignment="Left" Width="176" SelectionChanged="FrequencyCmbBx_SelectionChanged" FontSize="14" 
                                        Background="#FFCCCCCC" ></ComboBox>
-                                <TextBlock Text="Command to Run" Margin="10 15 0 0" FontSize="16"/>
-                                <StackPanel Orientation="Horizontal" Margin="10 5 0 0">
-                                    <Button x:Name="AddUpdateCommand" HorizontalAlignment="Left" Content="Select Command..."  Click="AddUpdateCommand_Click" FontSize="14" FontWeight="Medium" Background="#FFCCCCCC" Padding="10 5"  BorderBrush="{x:Null}"  BorderThickness="0"/>
+                            <TextBlock Text="Command to Run" Margin="10 15 0 0" HorizontalAlignment="Left" FontSize="12" Foreground="#A2A2A2" />
+                            <StackPanel Orientation="Horizontal" Margin="10 5 0 0">
+                                <Button x:Name="AddUpdateCommand" HorizontalAlignment="Left" Content="SELECT COMMAND"  
+                                        Click="AddUpdateCommand_Click" Style="{DynamicResource MaterialFlatButton}"/>
 
-                                    <TextBlock FontSize="14" Margin="10 0 0 0" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" >
-                                        <TextBlock.Text>
-                                            <MultiBinding StringFormat="{}{0} {1}"  >
-                                                <Binding Path="Description" FallbackValue="Unknow" Mode="OneWay" UpdateSourceTrigger="PropertyChanged" />
-                                                <Binding Path="TargetObjectName" FallbackValue="Unknown" Mode="OneWay" UpdateSourceTrigger="PropertyChanged"/>
-                                            </MultiBinding>
-                                        </TextBlock.Text>
-                                    </TextBlock>
-                                </StackPanel>
-                                <Grid  Name="TaskUserControlGrid" LostFocus="TaskUserControlGrid_OnLostFocus" Margin="0 15 0 0" ></Grid>
+                                <TextBlock FontSize="14" Margin="10 0 0 0" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" >
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0} {1}"  >
+                                            <Binding Path="Description" FallbackValue="Unknow" Mode="OneWay" UpdateSourceTrigger="PropertyChanged" />
+                                            <Binding Path="TargetObjectName" FallbackValue="Unknown" Mode="OneWay" UpdateSourceTrigger="PropertyChanged"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
                             </StackPanel>
-                        </ScrollViewer>
+                            <Grid  Name="TaskUserControlGrid" LostFocus="TaskUserControlGrid_OnLostFocus" Margin="0 15 0 0" ></Grid>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
 
 
-                    </Grid>
-                </Border>
-            </Grid>
         </Grid>
     </Grid>
 </UserControl>

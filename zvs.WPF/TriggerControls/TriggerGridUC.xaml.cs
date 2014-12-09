@@ -1,14 +1,12 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Data.Entity;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
+using System.Windows.Data;
 using System.Windows.Media.Animation;
 using zvs.DataModel;
 using zvs.Processor;
-
 
 namespace zvs.WPF.TriggerControls
 {
@@ -81,14 +79,14 @@ namespace zvs.WPF.TriggerControls
             var sw = new Stopwatch();
             sw.Start();
 #endif
-            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+            if (!DesignerProperties.GetIsInDesignMode(this))
             {
                 await _context.DeviceValueTriggers
                     .Include(o => o.DeviceValue)
                     .ToListAsync();
 
                 //Load your data here and assign the result to the CollectionViewSource.
-                var myCollectionViewSource = (System.Windows.Data.CollectionViewSource)Resources["device_value_triggersViewSource"];
+                var myCollectionViewSource = (CollectionViewSource)Resources["DeviceValueTriggersViewSource"];
 
                 myCollectionViewSource.Source = _context.DeviceValueTriggers.Local;
             }
@@ -111,14 +109,6 @@ namespace zvs.WPF.TriggerControls
             NotifyEntityChangeContext.ChangeNotifications<DeviceValueTrigger>.OnEntityUpdated -= TriggerGridUC_onEntityUpdated;
         }
 
-        private async void TriggerGrid_RowEditEnding(object sender, DataGridRowEditEndingEventArgs e)
-        {
-            if (e.EditAction != DataGridEditAction.Commit) return;
-            //have to add , UpdateSourceTrigger=PropertyChanged to have the data updated in time for this event
-
-            await SaveChangesAsync();
-        }
-
         private void AddTriggerBtn_Click(object sender, RoutedEventArgs e)
         {
             var newWindow = new TriggerEditorWindow(0, _context) { Owner = _app.ZvsWindow, Title = "Add Trigger" };
@@ -134,10 +124,8 @@ namespace zvs.WPF.TriggerControls
 
         private void SettingBtn_Click_1(object sender, RoutedEventArgs e)
         {
-            var obj = ((FrameworkElement)sender).DataContext;
-            var valueTrigger = obj as DeviceValueTrigger;
-            if (valueTrigger == null) return;
-            var trigger = valueTrigger;
+            var trigger = TriggerGrid.SelectedItem as DeviceValueTrigger;
+            if (trigger == null) return;
             var newWindow = new TriggerEditorWindow(trigger.Id, _context)
             {
                 Owner = _app.ZvsWindow,
@@ -151,23 +139,6 @@ namespace zvs.WPF.TriggerControls
             };
         }
 
-        private async void Grid_PreviewKeyDown_1(object sender, KeyEventArgs e)
-        {
-            if (e.Key != Key.Delete) return;
-            var trigger = (DeviceValueTrigger)TriggerGrid.SelectedItem;
-            if (trigger != null)
-            {
-                if (MessageBox.Show(string.Format("Are you sure you want to delete the '{0}' trigger?", trigger.Name), "Are you sure?",
-                    MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-                {
-                    _context.DeviceValueTriggers.Local.Remove(trigger);
-                    await SaveChangesAsync();
-                }
-            }
-
-            e.Handled = true;
-        }
-
         private async Task SaveChangesAsync()
         {
             var result = await _context.TrySaveChangesAsync(_app.Cts.Token);
@@ -177,6 +148,19 @@ namespace zvs.WPF.TriggerControls
             SignalImg.Opacity = 1;
             var da = new DoubleAnimation { From = 1, To = 0, Duration = new Duration(TimeSpan.FromSeconds(.8)) };
             SignalImg.BeginAnimation(OpacityProperty, da);
+        }
+
+        private async void ButtonDelete_OnClick(object sender, RoutedEventArgs e)
+        {
+            var trigger = (DeviceValueTrigger)TriggerGrid.SelectedItem;
+            if (trigger == null) return;
+           
+            if (MessageBox.Show(string.Format("Are you sure you want to delete the '{0}' trigger?", trigger.Name),
+                "Are you sure?",
+                MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
+            _context.DeviceValueTriggers.Local.Remove(trigger);
+
+            await SaveChangesAsync();
         }
     }
 }

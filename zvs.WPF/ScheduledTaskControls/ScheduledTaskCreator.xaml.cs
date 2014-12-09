@@ -86,16 +86,14 @@ namespace zvs.WPF.ScheduledTaskControls
             var sw = new Stopwatch();
             sw.Start();
 #endif
-            if (!DesignerProperties.GetIsInDesignMode(this))
-            {
-                await _context.ZvsScheduledTasks
-                    .Include(o => o.ScheduledTask)
-                    .ToListAsync();
+            if (DesignerProperties.GetIsInDesignMode(this)) return;
+            await _context.ZvsScheduledTasks
+                .Include(o => o.ScheduledTask)
+                .ToListAsync();
 
-                //Load your data here and assign the result to the CollectionViewSource.
-                var myCollectionViewSource = (CollectionViewSource)Resources["ScheduledTaskViewSource"];
-                myCollectionViewSource.Source = _context.ZvsScheduledTasks.Local;
-            }
+            //Load your data here and assign the result to the CollectionViewSource.
+            var myCollectionViewSource = (CollectionViewSource)Resources["ScheduledTaskViewSource"];
+            myCollectionViewSource.Source = _context.ZvsScheduledTasks.Local;
 
 #if DEBUG
             sw.Stop();
@@ -133,41 +131,6 @@ namespace zvs.WPF.ScheduledTaskControls
 
             //have to add , UpdateSourceTrigger=PropertyChanged to have the data updated in time for this event
             await SaveChangesAsync();
-        }
-
-        private async void ScheduledTaskDataGrid_PreviewKeyDown_1(object sender, KeyEventArgs e)
-        {
-            var dg = sender as DataGrid;
-            if (dg != null)
-            {
-                DataGridRow dgr = (DataGridRow)(dg.ItemContainerGenerator.ContainerFromIndex(dg.SelectedIndex));
-                if (e.Key == Key.Delete && !dgr.IsEditing)
-                {
-                    e.Handled = true;
-
-                    if (dgr.Item is ZvsScheduledTask)
-                    {
-                        var task = (ZvsScheduledTask)dgr.Item;
-                        if (task != null)
-                        {
-                            e.Handled = !await DeleteTask(task);
-                        }
-                    }
-                }
-            }
-        }
-
-        private async Task<bool> DeleteTask(ZvsScheduledTask task)
-        {
-            if (MessageBox.Show(string.Format("Are you sure you want to delete the '{0}' scheduled task?", task.Name),
-                    "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
-                return false;
-            _context.ZvsScheduledTasks.Local.Remove(task);
-
-            await SaveChangesAsync();
-
-            ScheduledTaskDataGrid.Focus();
-            return true;
         }
 
         private void ScheduledTaskDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -252,7 +215,7 @@ namespace zvs.WPF.ScheduledTaskControls
                                 _context.ScheduledTasks.Remove(command.ScheduledTask);
                                 await SaveChangesAsync();
                             }
-                            command.ScheduledTask = new IntervalScheduledTask { StartTime = DateTime.Now, RepeatIntervalInSeconds = 120};
+                            command.ScheduledTask = new IntervalScheduledTask { StartTime = DateTime.Now, RepeatIntervalInSeconds = 120 };
                         }
                         break;
                     }
@@ -265,8 +228,8 @@ namespace zvs.WPF.ScheduledTaskControls
                                 _context.ScheduledTasks.Remove(command.ScheduledTask);
                                 await SaveChangesAsync();
                             }
-                         
-                            command.ScheduledTask = new DailyScheduledTask { StartTime = DateTime.Now, RepeatIntervalInDays = 2};
+
+                            command.ScheduledTask = new DailyScheduledTask { StartTime = DateTime.Now, RepeatIntervalInDays = 2 };
                         }
                         break;
                     }
@@ -311,17 +274,17 @@ namespace zvs.WPF.ScheduledTaskControls
 
             SignalImg.Opacity = 1;
             var da = new DoubleAnimation { From = 1, To = 0, Duration = new Duration(TimeSpan.FromSeconds(.8)) };
-            SignalImg.BeginAnimation(OpacityProperty, da);  
+            SignalImg.BeginAnimation(OpacityProperty, da);
         }
 
         private async void AddUpdateCommand_Click(object sender, RoutedEventArgs e)
         {
-            var command = ScheduledTaskDataGrid.SelectedItem as ZvsScheduledTask;
-            if (command == null)
+            var zvsScheduledTask = ScheduledTaskDataGrid.SelectedItem as ZvsScheduledTask;
+            if (zvsScheduledTask == null)
                 return;
 
             //Send it to the command builder to get filled with a command
-            var cbWindow = new CommandBuilder(_context, command)
+            var cbWindow = new CommandBuilder(_context, zvsScheduledTask)
             {
                 Owner = _app.ZvsWindow
             };
@@ -334,6 +297,28 @@ namespace zvs.WPF.ScheduledTaskControls
         private async void TaskUserControlGrid_OnLostFocus(object sender, RoutedEventArgs e)
         {
             await SaveChangesAsync();
+        }
+
+        private async Task<bool> DeleteTask(ZvsScheduledTask task)
+        {
+            if (MessageBox.Show(string.Format("Are you sure you want to delete the '{0}' scheduled task?", task.Name),
+                    "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                return false;
+            _context.ZvsScheduledTasks.Local.Remove(task);
+
+            await SaveChangesAsync();
+
+            ScheduledTaskDataGrid.Focus();
+            return true;
+        }
+
+        private async void ButtonDelete_OnClick(object sender, RoutedEventArgs e)
+        {
+            var zvsScheduledTask = ScheduledTaskDataGrid.SelectedItem as ZvsScheduledTask;
+            if (zvsScheduledTask == null)
+                return;
+
+            await DeleteTask(zvsScheduledTask);
         }
     }
 }

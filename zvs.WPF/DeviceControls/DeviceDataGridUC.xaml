@@ -14,268 +14,268 @@
         <CollectionViewSource x:Key="devicesViewSource" d:DesignSource="{d:DesignInstance my:Device, CreateList=True}"/>
         <converters:IsNewItemPlaceholderConverter x:Key="IsNewItemPlaceholderConverter"/>
     </UserControl.Resources>
-    <Grid DataContext="{StaticResource devicesViewSource}" Effect="{DynamicResource z-depth1}">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="60"/>
-        </Grid.RowDefinitions>
-        <DataGrid  x:Name="DeviceGrid" Background="#FAFAFA" RowBackground="#FAFAFA" AlternatingRowBackground="#FAFAFA" 
+    <Border Effect="{DynamicResource z-depth2}"  CornerRadius="2" DataContext="{StaticResource devicesViewSource}">
+        <Grid  >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="60"/>
+            </Grid.RowDefinitions>
+            <DataGrid  x:Name="DeviceGrid" Background="#FAFAFA" RowBackground="#FAFAFA" AlternatingRowBackground="#FAFAFA" 
                   CellStyle="{StaticResource BodyContentDataGridCentering}" CanUserDeleteRows="False"
                   HorizontalGridLinesBrush="{DynamicResource DeviceNoFocusBrush}"  
                    GridLinesVisibility="Horizontal" RowHeight="55" CanUserAddRows="False" AutoGenerateColumns="False" 
                   ItemsSource="{Binding}" PreviewMouseLeftButtonDown="DeviceGrid_PreviewMouseLeftButtonDown" 
                   RowEditEnding="DeviceGrid_RowEditEnding" 
                   RowHeaderWidth="0" AllowDrop="False" BorderThickness="0 0 0 0" FontFamily="flaticon">
-            <DataGrid.Resources>
-                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="{DynamicResource DeviceSelectedColor}"/>
-                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
-                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey }" Color="{DynamicResource DeviceNoFocusColor}" />
-                <Style x:Key="NoSelectionDataGridHeader" TargetType="{x:Type DataGridColumnHeader}">
-                    <Setter Property="Foreground"  Value="White" />
-                    <Setter Property="Background"  Value="{DynamicResource DeviceBrush}" />
-                    <Setter Property="BorderBrush"  Value="{DynamicResource DeviceSelectedBrush}" />
-                    <Setter Property="BorderThickness"  Value="0 0 0 1" />
-                    <Setter Property="FontSize"  Value="20" />
-                    <Setter Property="Padding"  Value="8" />
-                    <Setter Property="Height"  Value="60" />
-                </Style>
-                <Style x:Key="SelectionDataGridHeader" TargetType="{x:Type DataGridColumnHeader}">
-                    <Setter Property="Foreground"  Value="White" />
-                    <Setter Property="Background"  Value="{DynamicResource DeviceBrush}" />
-                    <Setter Property="BorderBrush"  Value="{DynamicResource DeviceSelectedBrush}" />
-                    <Setter Property="BorderThickness"  Value="0 0 0 1" />
-                    <Setter Property="FontSize"  Value="20" />
-                    <Setter Property="Cursor" Value="Hand" />
-                    <Setter Property="Padding"  Value="8" />
-                    <Setter Property="Height"  Value="60" />
-                    <Style.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background"  Value="{DynamicResource DeviceSelectedBrush}" />
-                        </Trigger>
-                        <Trigger Property="SortDirection" Value="Ascending">
-                            <Setter Property="FontWeight"  Value="Medium" />
-                        </Trigger>
-                        <Trigger Property="SortDirection" Value="Descending">
-                            <Setter Property="FontWeight"  Value="Medium" />
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </DataGrid.Resources>
-            <DataGrid.Columns>
-                <DataGridTemplateColumn HeaderStyle="{StaticResource NoSelectionDataGridHeader}" SortMemberPath="Type.Name"  MaxWidth="70" MinWidth="70" Width="70" 
+                <DataGrid.Resources>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="{DynamicResource DeviceSelectedColor}"/>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey }" Color="{DynamicResource DeviceNoFocusColor}" />
+                    <Style x:Key="NoSelectionDataGridHeader" TargetType="{x:Type DataGridColumnHeader}">
+                        <Setter Property="Foreground"  Value="#FEFEFE" />
+                        <Setter Property="Background"  Value="{DynamicResource DeviceBrush}" />
+                        <Setter Property="BorderBrush"  Value="{DynamicResource DeviceSelectedBrush}" />
+                        <Setter Property="BorderThickness"  Value="0 0 0 1" />
+                        <Setter Property="FontSize"  Value="20" />
+                        <Setter Property="FontWeight"  Value="Medium" />
+                        <Setter Property="Padding"  Value="8" />
+                        <Setter Property="Height"  Value="60" />
+                    </Style>
+                    <Style x:Key="SelectionDataGridHeader" TargetType="{x:Type DataGridColumnHeader}">
+                        <Setter Property="Foreground"  Value="#FEFEFE" />
+                        <Setter Property="Background"  Value="{DynamicResource DeviceBrush}" />
+                        <Setter Property="BorderBrush"  Value="{DynamicResource DeviceSelectedBrush}" />
+                        <Setter Property="BorderThickness"  Value="0 0 0 1" />
+                        <Setter Property="FontSize"  Value="20" />
+                        <Setter Property="FontWeight"  Value="Medium" />
+                        <Setter Property="Cursor" Value="Hand" />
+                        <Setter Property="Padding"  Value="8" />
+                        <Setter Property="Height"  Value="60" />
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background"  Value="{DynamicResource DeviceSelectedBrush}" />
+                            </Trigger>
+                            <Trigger Property="SortDirection" Value="Ascending">
+                                <Setter Property="FontWeight"  Value="Medium" />
+                            </Trigger>
+                            <Trigger Property="SortDirection" Value="Descending">
+                                <Setter Property="FontWeight"  Value="Medium" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.Resources>
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn HeaderStyle="{StaticResource NoSelectionDataGridHeader}" SortMemberPath="Type.Name"  MaxWidth="70" MinWidth="70" Width="70" 
                                         Header="" CanUserResize="False" CanUserReorder="False">
-                    <DataGridTemplateColumn.CellTemplate >
-                        <DataTemplate>
-                            <Grid Height="40" Width="40">
-                                <Ellipse  Name="Ellipse" Fill="#B2B2B2"/>
-                                <TextBlock Name="imgFont" Text="&#xe006;" Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" Foreground="White" 
+                        <DataGridTemplateColumn.CellTemplate >
+                            <DataTemplate>
+                                <Grid Height="40" Width="40">
+                                    <Ellipse  Name="Ellipse" Fill="#B2B2B2"/>
+                                    <TextBlock Name="imgFont" Text="&#xe006;" Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" Foreground="White" 
                                            FontSize="25" VerticalAlignment="Center" HorizontalAlignment="Center" />
-                            </Grid>
+                                </Grid>
 
-                            <DataTemplate.Triggers>
-                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="Unknown">
-                                    <Setter TargetName="imgFont" Property="Text" Value="&#xe006;"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="Thermostat">
-                                    <Setter TargetName="imgFont" Property="Text" Value="&#xe00a;"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="Dimmer">
-                                    <Setter TargetName="imgFont" Property="Text" Value="&#xe004;"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="Switch">
-                                    <Setter TargetName="imgFont" Property="Text" Value="&#xe009;"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="Controller">
-                                    <Setter TargetName="imgFont" Property="Text" Value="&#xe000;"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="Doorlock">
-                                    <Setter TargetName="imgFont" Property="Text" Value="&#xe003;"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="Sensor">
-                                    <Setter TargetName="imgFont" Property="Text" Value="&#xe007;"/>
-                                </DataTrigger>
-                            </DataTemplate.Triggers>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="Unknown">
+                                        <Setter TargetName="imgFont" Property="Text" Value="&#xe006;"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="Thermostat">
+                                        <Setter TargetName="imgFont" Property="Text" Value="&#xe00a;"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="Dimmer">
+                                        <Setter TargetName="imgFont" Property="Text" Value="&#xe004;"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="Switch">
+                                        <Setter TargetName="imgFont" Property="Text" Value="&#xe009;"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="Controller">
+                                        <Setter TargetName="imgFont" Property="Text" Value="&#xe000;"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="Doorlock">
+                                        <Setter TargetName="imgFont" Property="Text" Value="&#xe003;"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="Sensor">
+                                        <Setter TargetName="imgFont" Property="Text" Value="&#xe007;"/>
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
 
-                <DataGridTextColumn HeaderStyle="{StaticResource SelectionDataGridHeader}" FontSize="16" MinWidth="100" Width="*" Header="Name"
+                    <DataGridTextColumn HeaderStyle="{StaticResource SelectionDataGridHeader}" FontSize="16" MinWidth="100" Width="*" Header="Name"
                                     Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged, FallbackValue=Device Name}" IsReadOnly="False"  >
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
-                            <Setter Property="Padding" Value="8" />
-                            <Setter Property="Foreground" Value="#181818"/>
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                <Setter Property="Padding" Value="8" />
+                                <Setter Property="Foreground" Value="#181818"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
 
-                <DataGridTextColumn MinWidth="100" Width="*" HeaderStyle="{StaticResource SelectionDataGridHeader}" Header="Location" FontSize="16" 
+                    <DataGridTextColumn MinWidth="100" Width="*" HeaderStyle="{StaticResource SelectionDataGridHeader}" Header="Location" FontSize="16" 
                                     Binding="{Binding Location, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False"   >
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
-                            <Setter Property="Padding" Value="8" />
-                            <Setter Property="Foreground" Value="#181818"/>
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                <Setter Property="Padding" Value="8" />
+                                <Setter Property="Foreground" Value="#181818"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
 
-                <DataGridTextColumn  HeaderStyle="{StaticResource SelectionDataGridHeader}" x:Name="DeviceTypeCol" CellStyle="{StaticResource BodyContentDataGridCentering}" 
+                    <DataGridTextColumn  HeaderStyle="{StaticResource SelectionDataGridHeader}" x:Name="DeviceTypeCol" CellStyle="{StaticResource BodyContentDataGridCentering}" 
                                      Width="200" MinWidth="50" Header="Type"
                                     Binding="{Binding Path=Type.Name}" FontSize="16" IsReadOnly="True" FontFamily="flaticon" >
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
-                            <Setter Property="Padding" Value="8" />
-                            <Setter Property="Foreground" Value="#B2B2B2"/>
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                <Setter Property="Padding" Value="8" />
+                                <Setter Property="Foreground" Value="#B2B2B2"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
 
-                <DataGridTemplateColumn x:Name="GroupCol" HeaderStyle="{StaticResource NoSelectionDataGridHeader}" MinWidth="100" Header="Groups" 
+                    <DataGridTemplateColumn x:Name="GroupCol" HeaderStyle="{StaticResource NoSelectionDataGridHeader}" MinWidth="100" Header="Groups" 
                                         CanUserResize="True">
 
-                    <DataGridTemplateColumn.CellTemplate >
+                        <DataGridTemplateColumn.CellTemplate >
 
-                        <DataTemplate>
+                            <DataTemplate>
 
-                            <ComboBox x:Name="GroupsCmbBox" Foreground="#181818" FontSize="16" Padding="8" ItemsSource="{Binding Path=Groups}" SelectedIndex="0" Margin="5,0" FontFamily="flaticon">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding Path=Name}"/>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ComboBox>
+                                <ComboBox x:Name="GroupsCmbBox" Foreground="#181818" FontSize="16" Padding="8" ItemsSource="{Binding Path=Groups}" SelectedIndex="0" Margin="5,0" FontFamily="flaticon">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Path=Name}"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ComboBox>
 
-                            <DataTemplate.Triggers>
+                                <DataTemplate.Triggers>
 
-                                <DataTrigger Binding="{Binding Path=Groups.Count}" Value="0">
-                                    <Setter TargetName="GroupsCmbBox" Property="Visibility" Value="Hidden"/>
-                                </DataTrigger>
-                            </DataTemplate.Triggers>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
+                                    <DataTrigger Binding="{Binding Path=Groups.Count}" Value="0">
+                                        <Setter TargetName="GroupsCmbBox" Property="Visibility" Value="Hidden"/>
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
 
-                </DataGridTemplateColumn>
+                    </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn HeaderStyle="{StaticResource SelectionDataGridHeader}"   x:Name="LevelCol" Header="Status" Width="170" CanUserResize="True" 
+                    <DataGridTemplateColumn HeaderStyle="{StaticResource SelectionDataGridHeader}"   x:Name="LevelCol" Header="Status" Width="170" CanUserResize="True" 
                                         CanUserSort="True" SortMemberPath="CurrentLevelInt" IsReadOnly="True" >
-                    <DataGridTemplateColumn.CellTemplate >
-                        <DataTemplate>
-                            <Grid Margin="5,0" HorizontalAlignment="Left">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="50"></ColumnDefinition>
-                                    <ColumnDefinition Width="90"></ColumnDefinition>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Name="LevelTxtBlock" Text="{Binding CurrentLevelText, NotifyOnTargetUpdated=True}" Background="Transparent"
+                        <DataGridTemplateColumn.CellTemplate >
+                            <DataTemplate>
+                                <Grid Margin="5,0" HorizontalAlignment="Left">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="50"></ColumnDefinition>
+                                        <ColumnDefinition Width="90"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Name="LevelTxtBlock" Text="{Binding CurrentLevelText, NotifyOnTargetUpdated=True}" Background="Transparent"
                                            Foreground="#B2B2B2" FontSize="16" VerticalAlignment="Center" TextAlignment="Center" >
-                                    <TextBlock.Triggers>
-                                        <EventTrigger RoutedEvent="Binding.TargetUpdated">
-                                            <BeginStoryboard>
-                                                <Storyboard>
-                                                    <ColorAnimation Storyboard.TargetProperty="(TextBlock.Background).(SolidColorBrush.Color)" Duration="0:0:0" To="LightBlue" />
-                                                    <ColorAnimation Storyboard.TargetProperty="(TextBlock.Background).(SolidColorBrush.Color)" Duration="0:0:0.5" From="LightBlue" To="Transparent" BeginTime="0:0:0.3" />
-                                                </Storyboard>
-                                            </BeginStoryboard>
-                                        </EventTrigger>
-                                    </TextBlock.Triggers>
-                                </TextBlock>
-                                <ProgressBar  Name="LevelProgressBr" Foreground="#757575" Value="{Binding CurrentLevelInt}" Grid.Column="1" Height="10" Opacity="6" Margin="5,0,0,0" />
-                            </Grid>
-                            <DataTemplate.Triggers>
-                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier}" Value="Thermostat">
-                                    <Setter TargetName="LevelProgressBr" Property="Foreground" Value="#448AFF"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier}" Value="Controller">
-                                    <Setter TargetName="LevelProgressBr" Property="Visibility" Value="Collapsed"></Setter>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier}" Value="Doorlock">
-                                    <Setter TargetName="LevelProgressBr" Property="Visibility" Value="Collapsed"></Setter>
-                                </DataTrigger>
-                            </DataTemplate.Triggers>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                                        <TextBlock.Triggers>
+                                            <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <ColorAnimation Storyboard.TargetProperty="(TextBlock.Background).(SolidColorBrush.Color)" Duration="0:0:0" To="LightBlue" />
+                                                        <ColorAnimation Storyboard.TargetProperty="(TextBlock.Background).(SolidColorBrush.Color)" Duration="0:0:0.5" From="LightBlue" To="Transparent" BeginTime="0:0:0.3" />
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </EventTrigger>
+                                        </TextBlock.Triggers>
+                                    </TextBlock>
+                                    <ProgressBar  Name="LevelProgressBr" Foreground="#757575" Value="{Binding CurrentLevelInt}" Grid.Column="1" Height="10" Opacity="6" Margin="5,0,0,0" />
+                                </Grid>
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier}" Value="Thermostat">
+                                        <Setter TargetName="LevelProgressBr" Property="Foreground" Value="#448AFF"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier}" Value="Controller">
+                                        <Setter TargetName="LevelProgressBr" Property="Visibility" Value="Collapsed"></Setter>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier}" Value="Doorlock">
+                                        <Setter TargetName="LevelProgressBr" Property="Visibility" Value="Collapsed"></Setter>
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
 
-                <DataGridTextColumn x:Name="NodeID" HeaderStyle="{StaticResource SelectionDataGridHeader}"   CellStyle="{StaticResource BodyHozCenter}"  MinWidth="50"  Width="25" Header="Id" Binding="{Binding NodeNumber}" IsReadOnly="True" 
+                    <DataGridTextColumn x:Name="NodeID" HeaderStyle="{StaticResource SelectionDataGridHeader}"   CellStyle="{StaticResource BodyHozCenter}"  MinWidth="50"  Width="25" Header="Id" Binding="{Binding NodeNumber}" IsReadOnly="True" 
                                     CanUserResize="False" CanUserReorder="True"  FontSize="14" Foreground="#B2B2B2"/>
-            </DataGrid.Columns>
-        </DataGrid>
-        <Border Grid.Row="1" Margin="0">
-            <Grid Background="#EEEEEE" >
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="1*"  />
-                    <ColumnDefinition Width="1*"/>
-                </Grid.ColumnDefinitions>
-                <StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center">
-                    <TextBlock Text="Filter"  HorizontalAlignment="Left" Margin="10 0 0 0" FontSize="12" Foreground="#A2A2A2" />
-                    <TextBox Style="{DynamicResource TextBoxMaterial}" Name="Filter" HorizontalAlignment="Left" 
+                </DataGrid.Columns>
+            </DataGrid>
+            <Border Grid.Row="1" Margin="0">
+                <Grid Background="#EEEEEE" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"  />
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center">
+                        <TextBlock Text="Filter"  HorizontalAlignment="Left" Margin="10 0 0 0" FontSize="12" Foreground="#A2A2A2" />
+                        <TextBox Style="{DynamicResource TextBoxMaterial}" Name="Filter" HorizontalAlignment="Left" 
                               Width="150" 
                              TextChanged="Filter_TextChanged_1" 
                              Margin="10 0 0 0" FontSize="16"  ></TextBox>
-                </StackPanel>
+                    </StackPanel>
 
-                <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center" >
-                    <TextBlock Text="Show More"  HorizontalAlignment="Left" Margin="10 0 0 0" FontSize="12" Foreground="#A2A2A2" />
-                    <ToggleButton Cursor="Hand"  Style="{StaticResource AnimatedSwitch}" Height="25" Name="ShowMoreBtn" HorizontalAlignment="Left"  
+                    <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center" >
+                        <TextBlock Text="Show More"  HorizontalAlignment="Left" Margin="10 0 0 0" FontSize="12" Foreground="#A2A2A2" />
+                        <ToggleButton Cursor="Hand"  Style="{StaticResource AnimatedSwitch}" Height="25" Name="ShowMoreBtn" HorizontalAlignment="Left"  
                               VerticalAlignment="Center" Checked="ShowMoreBtn_Checked_1" Foreground="#B2B2B2"  FontSize="16"  
                           Unchecked="ShowMoreBtn_Unchecked_1"  IsChecked="False" Content="More Details"  Margin="10,5,0,0" />
-                </StackPanel>
-                <Grid Grid.Column="2"  HorizontalAlignment="Right" Margin="0 0 25 0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <Button Grid.Column="0" 
-                            Height="40" 
-                            Width="40"
+                    </StackPanel>
+                    <Grid Grid.Column="2"  HorizontalAlignment="Right" Margin="0 0 25 0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" 
                             Content="3"
                             FontFamily="Wingdings 2"
                             Click="ButtonDeleteDevice_OnClick"
                             ToolTip="Delete Device">
-                        <Button.Style>
-                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialToolbarButton}">
-                                <Setter Property="IsEnabled" Value="True" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ElementName=DeviceGrid, Path=SelectedItem}" Value="{x:Null}">
-                                        <!--Comment the following line out to view in editor {x:Null}-->
-                                        <Setter Property="IsEnabled" Value="False" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding ElementName=DeviceGrid, Path=SelectedItem, Converter={StaticResource IsNewItemPlaceholderConverter}}" Value="True">
-                                        <Setter Property="IsEnabled" Value="False" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
-                    <Button  Grid.Column="1" Margin="10 0 0 0" 
-                            Height="40" 
-                            Width="40"
+                            <Button.Style>
+                                <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialToolbarButton}">
+                                    <Setter Property="IsEnabled" Value="True" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=DeviceGrid, Path=SelectedItem}" Value="{x:Null}">
+                                            <!--Comment the following line out to view in editor {x:Null}-->
+                                            <Setter Property="IsEnabled" Value="False" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding ElementName=DeviceGrid, Path=SelectedItem, Converter={StaticResource IsNewItemPlaceholderConverter}}" Value="True">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                        <Button  Grid.Column="1" Margin="10 0 0 0" 
                             Content="&#xe00B;"
                             FontFamily="flaticon"
                             Click="SettingBtn_Click_1" 
                             ToolTip="Device Settings">
-                        <Button.Style>
-                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialToolbarButton}">
-                                <Setter Property="IsEnabled" Value="True" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ElementName=DeviceGrid, Path=SelectedItem}" Value="{x:Null}">
-                                        <!--Comment the following line out to view in editor {x:Null}-->
-                                        <Setter Property="IsEnabled" Value="False" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding ElementName=DeviceGrid, Path=SelectedItem, Converter={StaticResource IsNewItemPlaceholderConverter}}" Value="True">
-                                        <Setter Property="IsEnabled" Value="False" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
-                </Grid>
+                            <Button.Style>
+                                <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialToolbarButton}">
+                                    <Setter Property="IsEnabled" Value="True" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=DeviceGrid, Path=SelectedItem}" Value="{x:Null}">
+                                            <!--Comment the following line out to view in editor {x:Null}-->
+                                            <Setter Property="IsEnabled" Value="False" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding ElementName=DeviceGrid, Path=SelectedItem, Converter={StaticResource IsNewItemPlaceholderConverter}}" Value="True">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </Grid>
 
-            </Grid>
-        </Border>
-    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
 </UserControl>
 
