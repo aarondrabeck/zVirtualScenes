@@ -135,32 +135,22 @@ namespace zvs.WPF.ScheduledTaskControls
 
         private void ScheduledTaskDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (ScheduledTaskDataGrid.SelectedItem == null || ScheduledTaskDataGrid.SelectedItem.ToString().Equals("{NewItemPlaceholder}"))
-            {
-                TaskDetails.Visibility = Visibility.Collapsed;
-                TaskDetails.Visibility = Visibility.Collapsed;
-            }
-            else
-            {
-                var command = ScheduledTaskDataGrid.SelectedItem as ZvsScheduledTask;
-                if (command == null)
-                    return;
+            var command = ScheduledTaskDataGrid.SelectedItem as ZvsScheduledTask;
+            if (command == null)
+                return;
 
-                TaskDetails.Visibility = Visibility.Visible;
+            if (command.ScheduledTask is OneTimeScheduledTask)
+                FrequencyCmbBx.SelectedItem = ScheduledTaskType.OneTime;
+            else if (command.ScheduledTask is DailyScheduledTask)
+                FrequencyCmbBx.SelectedItem = ScheduledTaskType.Daily;
+            else if (command.ScheduledTask is IntervalScheduledTask)
+                FrequencyCmbBx.SelectedItem = ScheduledTaskType.Interval;
+            else if (command.ScheduledTask is WeeklyScheduledTask)
+                FrequencyCmbBx.SelectedItem = ScheduledTaskType.Weekly;
+            else if (command.ScheduledTask is MonthlyScheduledTask)
+                FrequencyCmbBx.SelectedItem = ScheduledTaskType.Monthly;
 
-                if (command.ScheduledTask is OneTimeScheduledTask)
-                    FrequencyCmbBx.SelectedItem = ScheduledTaskType.OneTime;
-                else if (command.ScheduledTask is DailyScheduledTask)
-                    FrequencyCmbBx.SelectedItem = ScheduledTaskType.Daily;
-                else if (command.ScheduledTask is IntervalScheduledTask)
-                    FrequencyCmbBx.SelectedItem = ScheduledTaskType.Interval;
-                else if (command.ScheduledTask is WeeklyScheduledTask)
-                    FrequencyCmbBx.SelectedItem = ScheduledTaskType.Weekly;
-                else if (command.ScheduledTask is MonthlyScheduledTask)
-                    FrequencyCmbBx.SelectedItem = ScheduledTaskType.Monthly;
-
-                InsertScheduledTaskUserControl();
-            }
+            InsertScheduledTaskUserControl();
         }
 
         private void InsertScheduledTaskUserControl()

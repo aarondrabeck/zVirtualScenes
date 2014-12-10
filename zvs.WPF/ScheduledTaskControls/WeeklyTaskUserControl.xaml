@@ -8,25 +8,20 @@
              xmlns:wpf="clr-namespace:zvs.WPF"
              x:Class="zvs.WPF.ScheduledTaskControls.WeeklyTaskUserControl"
              x:Name="This"
-             mc:Ignorable="d" 
+             mc:Ignorable="d" FontFamily="Roboto"
              d:DesignHeight="300" d:DesignWidth="500">
     <UserControl.Resources>
         <wpf:DaysOfWeekValueConverter x:Key="DaysOfWeekConverter" />
     </UserControl.Resources>
     <StackPanel Orientation="Vertical">
-        <TextBlock Text="Start Time" Margin="10,0,0,0" FontSize="16" />
+        <TextBlock Text="Start Time" Margin="10,0,0,0" FontSize="12" Foreground="#A2A2A2"/>
         <xctk:DateTimePicker Value="{Binding WeeklyScheduledTask.StartTime, ElementName=This, UpdateSourceTrigger=PropertyChanged}" Width="300" HorizontalAlignment="Left" FontSize="14"  Margin="10
                              5 10 0"/>
 
-        <TextBlock Text="Interval" Margin="10,15,0,0" FontSize="16" />
-        <StackPanel Orientation="Horizontal" Margin="10
-                    5 10 0" >
-            <TextBlock Text="Repeat every" FontSize="14" VerticalAlignment="Center"/>
-            <TextBox    Margin="10,0,10,0"    Width="76" Text="{Binding WeeklyScheduledTask.RepeatIntervalInWeeks, ElementName=This, UpdateSourceTrigger=PropertyChanged}"/>
-            <TextBlock Text="weeks" FontSize="14" VerticalAlignment="Center" />
-        </StackPanel>
+        <TextBlock Text="Repeat Interval (weeks)" Margin="10,15,0,0" FontSize="12" Foreground="#A2A2A2"/>
+            <TextBox HorizontalAlignment="Left"   Margin="10,0,10,0"  Style="{DynamicResource TextBoxMaterial}"   Width="76" Text="{Binding WeeklyScheduledTask.RepeatIntervalInWeeks, ElementName=This, UpdateSourceTrigger=PropertyChanged}"/>
 
-        <TextBlock Text="Days to Activate" Margin="10,15,0,0" FontSize="16" />
+        <TextBlock Text="Days to Activate" Margin="10,15,0,0" FontSize="12" Foreground="#A2A2A2" />
 
         <Grid Margin="0 5 10 0">
             <CheckBox Content="Monday" IsChecked="{Binding Path=WeeklyScheduledTask.DaysOfWeekToActivate,  ElementName=This,Converter={StaticResource DaysOfWeekConverter}, ConverterParameter={x:Static tasks:DaysOfWeek.Monday}}" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,8,0,0" />

@@ -18,7 +18,6 @@
                 <d:SortDescription PropertyName="SortOrder"/>
             </CollectionViewSource.SortDescriptions>
         </CollectionViewSource>
-
         <CollectionViewSource x:Key="ScenesceneCommandsViewSource" Source="{Binding Commands, Source={StaticResource sceneViewSource}}" >
             <CollectionViewSource.SortDescriptions>
                 <d:SortDescription PropertyName="SortOrder" Direction="Acending"/>
@@ -26,10 +25,13 @@
         </CollectionViewSource>
         <converters:IsNewItemPlaceholderConverter x:Key="IsNewItemPlaceholderConverter"/>
     </UserControl.Resources>
-
-    <Grid DataContext="{StaticResource sceneViewSource}" >
-
-        <Border Width="400" Background="#EEEEEE" HorizontalAlignment="Left" BorderThickness="0" CornerRadius="2"
+    <Grid DataContext="{StaticResource sceneViewSource}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="400"/>
+            <ColumnDefinition Width="15"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Border Background="#EEEEEE" HorizontalAlignment="Left" BorderThickness="0" CornerRadius="2"
                 Effect="{DynamicResource z-depth2}" BorderBrush="{DynamicResource SceneBrush}" >
             <Grid>
                 <Grid.RowDefinitions>
@@ -240,7 +242,20 @@
             </Grid>
         </Border>
 
-        <Border Name="SceneCommandGrid"  Margin="415,0,0,0" Background="#EEEEEE" CornerRadius="2" Effect="{DynamicResource z-depth2}"  >
+        <Border Grid.Column="2" Name="SceneCommandGrid"  Background="#EEEEEE" CornerRadius="2" Effect="{DynamicResource z-depth2}"  >
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Visibility" Value="Visible" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding SelectedItem, ElementName=SceneCmdsGrid, Converter={StaticResource IsNewItemPlaceholderConverter}}" Value="True">
+                            <Setter Property="Visibility" Value="Hidden" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding SelectedItems.Count, ElementName=SceneCmdsGrid}" Value="0">
+                            <Setter Property="Visibility" Value="Hidden" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="60"></RowDefinition>
@@ -399,8 +414,6 @@
                             </Style>
                         </Button.Style>
                     </Button>
-
-
                 </Grid>
 
             </Grid>

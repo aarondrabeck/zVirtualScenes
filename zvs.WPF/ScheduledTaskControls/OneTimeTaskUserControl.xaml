@@ -6,9 +6,9 @@
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              Name="This"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="500">
+             d:DesignHeight="300" d:DesignWidth="500" FontFamily="Roboto">
     <StackPanel Orientation="Vertical">
-        <TextBlock Text="Start Time" Margin="10 0 0 0" FontSize="16" />
+        <TextBlock Text="Start Time" Margin="10 0 0 0" FontSize="12" Foreground="#A2A2A2"  />
         <xctk:DateTimePicker Value="{Binding OneTimeScheduledTask.StartTime, ElementName=This, UpdateSourceTrigger=PropertyChanged}" Width="300" HorizontalAlignment="Left" FontSize="14"   Margin="10 5 10 10"/>
     </StackPanel>
 </UserControl>

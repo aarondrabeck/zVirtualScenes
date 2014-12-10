@@ -61,6 +61,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Border Grid.Column="0"  Background="#EEEEEE" BorderThickness="0" CornerRadius="2" Effect="{DynamicResource z-depth2}">
+               
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
@@ -129,6 +130,19 @@
                 </Grid>
             </Border>
             <Border Name="TaskDetails" Grid.Column="2" Background="#FAFAFA" BorderThickness="0" CornerRadius="2" Effect="{DynamicResource z-depth2}" LostFocus="TaskUserControlGrid_OnLostFocus">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Visibility" Value="Visible" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding SelectedItem, ElementName=ScheduledTaskDataGrid, Converter={StaticResource IsNewItemPlaceholderConverter}}" Value="True">
+                                <Setter Property="Visibility" Value="Hidden" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding SelectedItems.Count, ElementName=ScheduledTaskDataGrid}" Value="0">
+                                <Setter Property="Visibility" Value="Hidden" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="60"/>

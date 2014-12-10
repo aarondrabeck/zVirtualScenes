@@ -9,22 +9,18 @@
              x:Class="zvs.WPF.ScheduledTaskControls.MonthlyTaskUserControl"
              x:Name="This"
              mc:Ignorable="d" 
-             d:DesignHeight="500" d:DesignWidth="500">
+             d:DesignHeight="500" d:DesignWidth="500" FontFamily="Roboto">
     <UserControl.Resources>
         <wpf:DaysOfMonthValueConverter x:Key="DaysOfMonthConverter" />
     </UserControl.Resources>
     <StackPanel Orientation="Vertical">
-        <TextBlock Text="Start Time" Margin="10 0 0 0" FontSize="16" />
+        <TextBlock Text="Start Time" Margin="10 0 0 0" FontSize="12" Foreground="#A2A2A2"  />
         <xctk:DateTimePicker Value="{Binding MonthlyScheduledTask.StartTime, ElementName=This, UpdateSourceTrigger=PropertyChanged}" Width="300" HorizontalAlignment="Left" FontSize="14"  Margin="10 5 10 0"/>
 
-        <TextBlock Text="Interval" Margin="10 15 0 0" FontSize="16" />
-        <StackPanel Orientation="Horizontal" Margin="10 5 10 0" >
-            <TextBlock Text="Repeat every" FontSize="14" VerticalAlignment="Center"/>
-            <TextBox    Margin="10,0,10,0"  Width="76" Text="{Binding MonthlyScheduledTask.RepeatIntervalInMonths, ElementName=This, UpdateSourceTrigger=PropertyChanged}"/>
-            <TextBlock Text="months" FontSize="14" VerticalAlignment="Center" />
-        </StackPanel>
+        <TextBlock Text="Interval Interval (months)" Margin="10 15 0 0" FontSize="12" Foreground="#A2A2A2" />
+        <TextBox HorizontalAlignment="Left"   Margin="10,0,10,0"  Style="{DynamicResource TextBoxMaterial}" Width="76" Text="{Binding MonthlyScheduledTask.RepeatIntervalInMonths, ElementName=This, UpdateSourceTrigger=PropertyChanged}"/>
 
-        <TextBlock Text="Days to Activate" Margin="10 15 0 0" FontSize="16" />
+        <TextBlock Text="Days to Activate" Margin="10 15 0 0" FontSize="12" Foreground="#A2A2A2"  />
         <Grid Margin="1 0 0 0">
             <CheckBox Name="FirstChkBx" Content="1st" IsChecked="{Binding Path=MonthlyScheduledTask.DaysOfMonthToActivate,  ElementName=This,Converter={StaticResource DaysOfMonthConverter}, ConverterParameter={x:Static tasks:DaysOfMonth.First}}" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="9,6,0,0"/>
             <CheckBox Name="SecondChkBx" Content="2nd" IsChecked="{Binding Path=MonthlyScheduledTask.DaysOfMonthToActivate,  ElementName=This,Converter={StaticResource DaysOfMonthConverter}, ConverterParameter={x:Static tasks:DaysOfMonth.Second}}" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="9,26,0,0"/>

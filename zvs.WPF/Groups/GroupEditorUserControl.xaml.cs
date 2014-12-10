@@ -55,8 +55,7 @@ namespace zvs.WPF.Groups
             }
         }
 
-        private void GroupEditor_onEntityAdded(object sender,
-            NotifyEntityChangeContext.ChangeNotifications<Device>.EntityAddedArgs e)
+        private void GroupEditor_onEntityAdded(object sender, NotifyEntityChangeContext.ChangeNotifications<Device>.EntityAddedArgs e)
         {
             if (Context == null)
                 return;
@@ -74,87 +73,6 @@ namespace zvs.WPF.Groups
             Context.Dispose();
         }
 
-
-        private async Task RemoveSelectedGroupDevicesAsync()
-        {
-            var selectedGroup = GroupsDataGrid.SelectedItem as Group;
-            if (selectedGroup != null && GroupsDevicesLstVw.SelectedItems.Count > 0)
-            {
-                if (MessageBox.Show(
-                    string.Format("Are you sure you want to remove the {0} selected devices from this group?",
-                        GroupsDevicesLstVw.SelectedItems.Count),
-                    "Remove Devices?",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Error) == MessageBoxResult.Yes)
-                {
-                    var devicesToRemove = new Device[GroupsDevicesLstVw.SelectedItems.Count];
-                    GroupsDevicesLstVw.SelectedItems.CopyTo(devicesToRemove, 0);
-
-                    foreach (var gd in devicesToRemove)
-                        selectedGroup.Devices.Remove(gd);
-
-                    await SaveChangesAsync();
-                }
-            }
-        }
-
-        private async void groupsDevicesLstVw_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Delete)
-            {
-                await RemoveSelectedGroupDevicesAsync();
-            }
-        }
-
-        private async void RemoveSelected_OnClick(object sender, RoutedEventArgs e)
-        {
-            await RemoveSelectedGroupDevicesAsync();
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposing) return;
-            if (Context == null)
-            {
-                return;
-            }
-
-            Context.Dispose();
-        }
-
-        private async void GroupsDataGrid_OnPreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            var dg = sender as DataGrid;
-            if (dg == null) return;
-            var dgr = (DataGridRow)(dg.ItemContainerGenerator.ContainerFromIndex(dg.SelectedIndex));
-            if (e.Key != Key.Delete || dgr.IsEditing) return;
-            e.Handled = true;
-
-            if (!(dgr.Item is Group)) return;
-            var @group = (Group)dgr.Item;
-            if (@group != null)
-            {
-                e.Handled = !await DeleteTask(@group);
-            }
-        }
-
-        private async Task<bool> DeleteTask(Group group)
-        {
-            if (MessageBox.Show(string.Format("Are you sure you want to delete the '{0}' group?", group.Name),
-                "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
-                return false;
-            Context.Groups.Local.Remove(group);
-            await SaveChangesAsync();
-            GroupsDataGrid.Focus();
-            return true;
-        }
-
         private async void GroupsDataGrid_OnRowEditEnding(object sender, DataGridRowEditEndingEventArgs e)
         {
             if (e.EditAction != DataGridEditAction.Commit) return;
@@ -168,39 +86,6 @@ namespace zvs.WPF.Groups
             }
 
             //have to add , UpdateSourceTrigger=PropertyChanged to have the data updated in time for this event
-            await SaveChangesAsync();
-        }
-
-        private async Task SaveChangesAsync()
-        {
-            var result = await Context.TrySaveChangesAsync(_app.Cts.Token);
-            if (result.HasError)
-                await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving group. {0}", result.Message);
-
-            SignalImg.Opacity = 1;
-            var da = new DoubleAnimation { From = 1, To = 0, Duration = new Duration(TimeSpan.FromSeconds(.8)) };
-            SignalImg.BeginAnimation(OpacityProperty, da);
-        }
-
-        private async void AddDeviceButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            var group = GroupsDataGrid.SelectedItem as Group;
-            if (group == null) return;
-
-            var deviceWindow = new DeviceMultiselectWindow(new ZvsEntityContextConnection(), group.Devices.Select(o => o.Id).ToList())
-            {
-                Owner = Window.GetWindow(this)
-            };
-            var result = deviceWindow.ShowDialog();
-            if (!result.HasValue || !result.Value) return;
-
-            var selectDeviceIds = deviceWindow.SelectedDevices.Select(o => o.Id);
-            var devicesToAdd = await Context.Devices.Where(o => selectDeviceIds.Contains(o.Id) && o.Groups.All(p => p.Id != group.Id)).ToListAsync();
-
-            foreach (var device in devicesToAdd)
-            {
-                group.Devices.Add(device);
-            }
             await SaveChangesAsync();
         }
 
@@ -232,6 +117,89 @@ namespace zvs.WPF.Groups
                     await
                         _app.ZvsEngine.RunCommandAsync(groupOffCmd.Id, g.Id.ToString(CultureInfo.InvariantCulture),
                             String.Empty, _app.Cts.Token), _app.Cts.Token);
+        }
+
+        private async void ButtonRemoveDevice_OnClick(object sender, RoutedEventArgs e)
+        {
+            var selectedGroup = GroupsDataGrid.SelectedItem as Group;
+            if (selectedGroup == null || GroupsDevicesLstVw.SelectedItems.Count <= 0) return;
+            if (MessageBox.Show(
+                string.Format("Are you sure you want to remove the {0} selected devices from this group?",
+                    GroupsDevicesLstVw.SelectedItems.Count),
+                "Remove Devices?",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Error) != MessageBoxResult.Yes)
+                return;
+
+            var devicesToRemove = new Device[GroupsDevicesLstVw.SelectedItems.Count];
+            GroupsDevicesLstVw.SelectedItems.CopyTo(devicesToRemove, 0);
+
+            foreach (var gd in devicesToRemove)
+                selectedGroup.Devices.Remove(gd);
+
+            await SaveChangesAsync();
+        }
+
+        private async void ButtonAddDevice_OnClick(object sender, RoutedEventArgs e)
+        {
+            var group = GroupsDataGrid.SelectedItem as Group;
+            if (group == null) return;
+
+            var deviceWindow = new DeviceMultiselectWindow(new ZvsEntityContextConnection(), group.Devices.Select(o => o.Id).ToList())
+            {
+                Owner = Window.GetWindow(this)
+            };
+            var result = deviceWindow.ShowDialog();
+            if (!result.HasValue || !result.Value) return;
+
+            var selectDeviceIds = deviceWindow.SelectedDevices.Select(o => o.Id);
+            var devicesToAdd = await Context.Devices.Where(o => selectDeviceIds.Contains(o.Id) && o.Groups.All(p => p.Id != group.Id)).ToListAsync();
+
+            foreach (var device in devicesToAdd)
+            {
+                group.Devices.Add(device);
+            }
+            await SaveChangesAsync();
+        }
+
+        private async void ButtonDelete_OnClick(object sender, RoutedEventArgs e)
+        {
+            var group = GroupsDataGrid.SelectedItem as Group;
+            if (group == null) return;
+
+            if (MessageBox.Show(string.Format("Are you sure you want to delete the '{0}' group?", group.Name),
+                "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                return;
+            Context.Groups.Local.Remove(group);
+            await SaveChangesAsync();
+            GroupsDataGrid.Focus();
+        }
+
+        private async Task SaveChangesAsync()
+        {
+            var result = await Context.TrySaveChangesAsync(_app.Cts.Token);
+            if (result.HasError)
+                await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving group. {0}", result.Message);
+
+            SignalImg.Opacity = 1;
+            var da = new DoubleAnimation { From = 1, To = 0, Duration = new Duration(TimeSpan.FromSeconds(.8)) };
+            SignalImg.BeginAnimation(OpacityProperty, da);
+        }
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposing) return;
+            if (Context == null)
+            {
+                return;
+            }
+
+            Context.Dispose();
         }
     }
 }

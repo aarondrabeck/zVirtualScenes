@@ -7,16 +7,12 @@
              x:Class="zvs.WPF.ScheduledTaskControls.DailyTaskUserControl"
              x:Name="This"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="500">
+             d:DesignHeight="300" d:DesignWidth="500" FontFamily="Roboto">
     <StackPanel Orientation="Vertical">
-        <TextBlock Text="Start Time" Margin="10 0 0 0" FontSize="16" />
+        <TextBlock Text="Start Time" Margin="10 0 0 0" FontSize="12" Foreground="#A2A2A2" />
         <xctk:DateTimePicker Value="{Binding DailyScheduledTask.StartTime, ElementName=This, UpdateSourceTrigger=PropertyChanged}" Width="300" HorizontalAlignment="Left" FontSize="14"  Margin="10 5 10 0"/>
 
-        <TextBlock Text="Interval" Margin="10 10 0 0" FontSize="16" />
-        <StackPanel Orientation="Horizontal" Margin="10 5 10 10" >
-            <TextBlock Text="Repeat every" FontSize="14" VerticalAlignment="Center"/>
-            <TextBox  Margin="10,0,10,0"  Padding="10 5" FontSize="14"  Width="76" Text="{Binding DailyScheduledTask.RepeatIntervalInDays, ElementName=This, UpdateSourceTrigger=PropertyChanged}"/>
-            <TextBlock Text="days" FontSize="14" VerticalAlignment="Center" />
-        </StackPanel>
+        <TextBlock Text="Repeat Interval (days)" Margin="10 10 0 0" FontSize="12" Foreground="#A2A2A2" />
+            <TextBox  Margin="10,0,10,0" HorizontalAlignment="Left"  Style="{DynamicResource TextBoxMaterial}"  Width="76" Text="{Binding DailyScheduledTask.RepeatIntervalInDays, ElementName=This, UpdateSourceTrigger=PropertyChanged}"/>
     </StackPanel>
 </UserControl>

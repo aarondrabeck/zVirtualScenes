@@ -158,7 +158,6 @@
     <Compile Include="Groups\GroupEditorUserControl.xaml.cs">
       <DependentUpon>GroupEditorUserControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="IsPlaceholderConverter.cs" />
     <Compile Include="LogUserControl.xaml.cs">
       <DependentUpon>LogUserControl.xaml</DependentUpon>
     </Compile>
