@@ -172,7 +172,7 @@
                         <DataTrigger Binding="{Binding SelectedItem, ElementName=GroupsDataGrid, Converter={StaticResource IsNewItemPlaceholderConverter}}" Value="True">
                             <Setter Property="Visibility" Value="Hidden" />
                         </DataTrigger>
-                        <DataTrigger Binding="{Binding SelectedItems.Count, ElementName=GroupsDataGrid}" Value="1">
+                        <DataTrigger Binding="{Binding SelectedItems.Count, ElementName=GroupsDataGrid}" Value="0">
                             <Setter Property="Visibility" Value="Hidden" />
                         </DataTrigger>
                     </Style.Triggers>

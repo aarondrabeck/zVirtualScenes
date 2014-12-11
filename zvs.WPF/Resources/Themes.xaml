@@ -342,7 +342,7 @@
     <Color x:Key="LogNoFocusColor">#E0F2F1</Color>
     <SolidColorBrush x:Key="LogBrush" Color="{DynamicResource LogColor}" />
     <SolidColorBrush x:Key="LogSelectedBrush" Color="{DynamicResource LogSelectedColor}" />
-
+    <SolidColorBrush x:Key="LogNoFocusBrush" Color="{DynamicResource LogNoFocusColor}" />
 
 
     <!--Settings-->

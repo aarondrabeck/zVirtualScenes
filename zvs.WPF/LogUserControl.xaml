@@ -5,24 +5,19 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:DataModel="clr-namespace:zvs.DataModel;assembly=zvs.DataModel" x:Class="zvs.WPF.LogUserControl" 
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" Loaded="UserControl_Loaded" Initialized="LogUserControl_OnInitialized" Unloaded="LogUserControl_OnUnloaded">
+             d:DesignHeight="300" d:DesignWidth="600" Loaded="UserControl_Loaded" Initialized="LogUserControl_OnInitialized" 
+            Unloaded="LogUserControl_OnUnloaded" FontFamily="Roboto">
     <UserControl.Resources>
-        <Style x:Key="NoSelectionDataGridHeader" TargetType="{x:Type DataGridColumnHeader}">
-            <Setter Property="Foreground"  Value="White" />
-            <Setter Property="Background"  Value="{DynamicResource LogBrush}" />
-            <Setter Property="BorderBrush"  Value="{DynamicResource LogSelectedBrush}" />
-            <Setter Property="BorderThickness"  Value="0 0 0 1" />
-            <Setter Property="FontSize"  Value="18" />
-            <Setter Property="Padding"  Value="5" />
-        </Style>
         <Style x:Key="SelectionDataGridHeader" TargetType="{x:Type DataGridColumnHeader}">
             <Setter Property="Foreground"  Value="White" />
             <Setter Property="Background"  Value="{DynamicResource LogBrush}" />
             <Setter Property="BorderBrush"  Value="{DynamicResource LogSelectedBrush}" />
             <Setter Property="BorderThickness"  Value="0 0 0 1" />
-            <Setter Property="FontSize"  Value="18" />
+            <Setter Property="FontSize"  Value="20" />
+            <Setter Property="FontWeight"  Value="Medium" />
             <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Padding"  Value="5" />
+            <Setter Property="Padding"  Value="8" />
+            <Setter Property="Height"  Value="60" />
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background"  Value="{DynamicResource DeviceSelectedBrush}" />
@@ -37,38 +32,87 @@
         </Style>
         <CollectionViewSource x:Key="LogEntryViewSource" d:DesignSource="{d:DesignInstance {x:Type DataModel:LogEntry}, CreateList=True}"/>
     </UserControl.Resources>
-    <Grid >
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="*"></RowDefinition>
-            <RowDefinition Height="Auto"></RowDefinition>
-        </Grid.RowDefinitions>
-        <DataGrid Grid.Row="1" CellStyle="{DynamicResource NoSelectDataGridCell}" x:Name="LogDataGrid"  VerticalAlignment="Stretch" Background="White" RowHeaderWidth="0" SelectionUnit="FullRow" SelectionMode="Extended"
-                                   HorizontalAlignment="Stretch" AutoGenerateColumns="False" HorizontalGridLinesBrush="{DynamicResource LogNoFocusBrush}" 
-                  AlternatingRowBackground="#FFFFFF" GridLinesVisibility="Horizontal" 
-                                   ItemsSource="{Binding Source={StaticResource LogEntryViewSource}}"  
-                  CanUserAddRows="False" BorderThickness="0" >
-           
-            <DataGrid.Resources>
-                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="{DynamicResource LogSelectedColor}"/>
-                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
-                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey }" Color="{DynamicResource LogNoFocusColor}" />
-            </DataGrid.Resources>
-            <DataGrid.Columns>
-                <DataGridTextColumn HeaderStyle="{StaticResource SelectionDataGridHeader}" Width="140"  Header="Date" Binding="{Binding Datetime}" IsReadOnly="True" SortDirection="Descending" />
-                <DataGridTextColumn HeaderStyle="{StaticResource SelectionDataGridHeader}"  Width="75" Header="Level" Binding="{Binding Level}" IsReadOnly="True"/>
-                <DataGridTextColumn HeaderStyle="{StaticResource SelectionDataGridHeader}"  Width="150"  Header="Source" Binding="{Binding Source}" IsReadOnly="True"/>
-                <DataGridTextColumn  HeaderStyle="{StaticResource SelectionDataGridHeader}" Width="*"  Header="Message" Binding="{Binding Message}" IsReadOnly="True"/>
-            </DataGrid.Columns>
-        </DataGrid>
-        
-        <Border Grid.Row="2" DockPanel.Dock="Bottom" Background="White"  BorderThickness="0 1 0 0" BorderBrush="#FFD5CFC4">
-            <Grid >
-                <Button Name="PurgeButton" Content="Purge Log" FontSize="14" FontWeight="Medium" Background="#FFCCCCCC" Padding="10 5"  BorderBrush="{x:Null}"  BorderThickness="0" Margin="5" VerticalAlignment="Bottom" HorizontalAlignment="Left" Click="PurgeButton_Click" ></Button>
-                <Button Name="ClearButton" Content="Clear Log" FontSize="14" FontWeight="Medium" Background="#FFCCCCCC" Padding="10 5"  BorderBrush="{x:Null}"  BorderThickness="0" Margin="100 5 5 5" VerticalAlignment="Bottom" HorizontalAlignment="Left" Click="ClearButton_OnClick" ></Button>
-                <Button Name="NextButton" Content="Previous 200" FontSize="14" FontWeight="Medium" Background="#FFCCCCCC" Padding="10 5"  BorderBrush="{x:Null}"  BorderThickness="0" Margin="5" VerticalAlignment="Bottom" HorizontalAlignment="Right" Click="NextButton_Click"></Button>
-            </Grid>
-        </Border>
-    </Grid>
+    <Border Background="#EEEEEE" BorderThickness="0" CornerRadius="2" Effect="{DynamicResource z-depth2}">
+        <Grid >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="60"></RowDefinition>
+            </Grid.RowDefinitions>
+            <DataGrid Grid.Row="1" CellStyle="{DynamicResource NoSelectDataGridCell}" x:Name="LogDataGrid"   BorderThickness="0" Background="#FAFAFA" 
+                  CanUserDeleteRows="False" RowBackground="#FAFAFA" AlternatingRowBackground="#FAFAFA" AllowDrop="False" RowHeaderWidth="0" FontWeight="Normal"
+                  SelectionUnit="FullRow" SelectionMode="Extended"  AutoGenerateColumns="False" RowHeight="45" FontSize="14"
+                  HorizontalGridLinesBrush="{DynamicResource LogNoFocusBrush}" GridLinesVisibility="Horizontal" 
+                  ItemsSource="{Binding Source={StaticResource LogEntryViewSource}}" CanUserAddRows="False">
+                <DataGrid.Resources>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="{DynamicResource LogSelectedColor}"/>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey }" Color="{DynamicResource LogNoFocusColor}" />
+                </DataGrid.Resources>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Foreground="#B0B0B0" HeaderStyle="{StaticResource SelectionDataGridHeader}" Width="170" Header="Date" Binding="{Binding Datetime}" IsReadOnly="True" SortDirection="Descending" >
+                        <DataGridTextColumn.ElementStyle>
+                            <Style>
+                                <Setter Property="FrameworkElement.VerticalAlignment" Value="Center"/>
+                                <Setter Property="FrameworkElement.Margin" Value="10 0"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Foreground="#B0B0B0" HeaderStyle="{StaticResource SelectionDataGridHeader}"  Width="100" Header="Level" Binding="{Binding Level}" IsReadOnly="True">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style>
+                                <Setter Property="FrameworkElement.VerticalAlignment" Value="Center"/>
+                                <Setter Property="FrameworkElement.Margin" Value="10 0"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Foreground="#B0B0B0" HeaderStyle="{StaticResource SelectionDataGridHeader}"  Width="160"  Header="Source" Binding="{Binding Source}" IsReadOnly="True">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style>
+                                <Setter Property="FrameworkElement.VerticalAlignment" Value="Center"/>
+                                <Setter Property="FrameworkElement.Margin" Value="10 0"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn  HeaderStyle="{StaticResource SelectionDataGridHeader}" Width="*"  Header="Message" Binding="{Binding Message}" IsReadOnly="True">
+                    <DataGridTextColumn.ElementStyle>
+                            <Style>
+                                <Setter Property="FrameworkElement.VerticalAlignment" Value="Center"/>
+                                <Setter Property="FrameworkElement.Margin" Value="10 0"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>    
+                    </DataGridTextColumn>
+                </DataGrid.Columns>
+            </DataGrid>
 
+            <Border Grid.Row="2"  Background="#EEEEEE">
+                <Grid HorizontalAlignment="Right" Margin="0 0 25 0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Name="PurgeButton" Grid.Column="0" Style="{StaticResource MaterialToolbarButton}" 
+                            Content="3"
+                            FontFamily="Wingdings 2"
+                            Click="PurgeButton_Click"
+                            ToolTip="Purge Log">
+                    </Button>
+                    <Button Name="ClearButton" Style="{StaticResource MaterialToolbarButton}"  Grid.Column="1" Margin="10 0 0 0" 
+                            Content="&#xe00B;"
+                            FontFamily="flaticon"
+                            Click="ClearButton_OnClick" 
+                            ToolTip="Clear">
+
+                    </Button>
+                    <Button Name="NextButton" Style="{StaticResource MaterialToolbarButton}"  Grid.Column="2" Margin="10 0 0 0" 
+                            Content="&#xe00B;"
+                            FontFamily="flaticon"
+                            Click="NextButton_Click" 
+                            ToolTip="Next 200">
+                    </Button>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
 </UserControl>

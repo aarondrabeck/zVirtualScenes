@@ -4,10 +4,10 @@
                     x:Class="zvs.WPF.ChromeStyledWindow"
                     >
 
-    <SolidColorBrush Color="#FF86B0DB" x:Key="MetroColor"/>
-    <SolidColorBrush Color="#FF707070" x:Key="HeaderTitleColor"/>
-    <SolidColorBrush Color="#FF1E1E1E" x:Key="HeaderButtonColor"/>
-    <SolidColorBrush Color="#FFFCFCFC" x:Key="HeaderButtonBGMouseOverColor"/>
+    <SolidColorBrush Color="#FAFAFA" x:Key="MetroColor"/>
+    <SolidColorBrush Color="#BDBDBD" x:Key="HeaderTitleColor"/>
+    <SolidColorBrush Color="#BDBDBD" x:Key="HeaderButtonColor"/>
+    <SolidColorBrush Color="#9E9E9E" x:Key="HeaderButtonBGMouseOverColor"/>
 
     <!-- Border defining the frame of the Window -->
     <Style x:Key="ChromewindowBorder" TargetType="Border">
@@ -25,13 +25,13 @@
     <ControlTemplate x:Key="ChromeWindowTemplate" TargetType="{x:Type zvsWPF:ChromeWindow}">
         <Grid>
             <Border Name="ChromeWindowFrame" Style="{StaticResource ChromewindowBorder}">
-                <DockPanel >
+                <DockPanel  >
                     <!-- The title bar. -->
-                    <DockPanel Name="TitleBar" DockPanel.Dock="Top"  Background="#FAFAFA" LastChildFill="True">
+                    <DockPanel Name="TitleBar" DockPanel.Dock="Top" Height="25" Background="{DynamicResource MetroColor}" LastChildFill="True">
                         <Image Name="TitleBarIcon"
                             DockPanel.Dock="Left"
-                            Width="25" 
-                            Height="25" 
+                            Width="22" 
+                            Height="22" 
                             Margin="5 3 0 0"
                             Source="{Binding Icon, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}">
                             <Image.Style>
@@ -134,6 +134,8 @@
                         <TextBlock Text="{Binding Title, RelativeSource={RelativeSource TemplatedParent}, FallbackValue='Chrome Styled Window'}" 
                                VerticalAlignment="Center" 
                                FontSize="16" 
+                               FontFamily="Roboto"
+                               Visibility="Hidden" 
                                HorizontalAlignment="Center"
                                TextTrimming="CharacterEllipsis"
                                Foreground="{StaticResource HeaderTitleColor}" 
