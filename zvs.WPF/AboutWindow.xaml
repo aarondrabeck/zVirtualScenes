@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:Processor="clr-namespace:zvs.Processor;assembly=zvs.zVirtualScenes"
         xmlns:system="clr-namespace:System;assembly=mscorlib"
-        x:Class="zvs.WPF.AboutWindow" SizeToContent="Height"
+        x:Class="zvs.WPF.AboutWindow" SizeToContent="Height" FontFamily="Roboto"
         Title="About zVirtualScenes" Loaded="AboutWindow_Loaded_1" Width="520" Icon="/zVirtualScenes;component/Images/zvs-icon.ico" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" WindowStyle="ToolWindow"
     ShowInTaskbar="False">
     <Grid>
@@ -22,7 +22,7 @@
             <TextBlock x:Name="WebsiteLink"  HorizontalAlignment="Right" Margin="0,134,10,0" TextWrapping="Wrap" Text="zVirtualScenes Official Website" FontWeight="Bold" Foreground="#F57F17" Cursor="Hand" MouseDown="WebsiteLink_MouseDown_1"  VerticalAlignment="Top" />
         </Grid>
 
-        <Button Grid.Row="1" Content="OK" HorizontalAlignment="Right" Margin="0,0,10,0" VerticalAlignment="Center" FontSize="14" Padding="10 5" FontWeight="Medium" Background="#FFCCCCCC" BorderBrush="{x:Null}"  BorderThickness="0"  Click="Button_Click_1"/>
+        <Button Grid.Row="1" Content="OK" HorizontalAlignment="Right" Margin="0,0,10,0" VerticalAlignment="Center"   Click="Button_Click_1" Style="{DynamicResource MaterialFlatButton}"/>
 
 
     </Grid>

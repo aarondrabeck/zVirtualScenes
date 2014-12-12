@@ -6,7 +6,7 @@
         xmlns:zVirtualScenesModel="clr-namespace:zvs.DataModel;assembly=zvs.DataModel" 
         mc:Ignorable="d" x:Class="zvs.WPF.JavaScript.JavaScriptEditorWindow"
         Title="JavaScript Editor" MinHeight="600" MinWidth="500" WindowStartupLocation="CenterOwner" ResizeMode="CanResize" 
-       Loaded="Window_Loaded_1" Icon="/zVirtualScenes;component/Images/zvs-icon.ico">
+       Loaded="Window_Loaded_1" Icon="/zVirtualScenes;component/Images/zvs-icon.ico" >
     <Window.Resources>
 
         <CollectionViewSource x:Key="jSResultViewSource" d:DesignSource="{d:DesignInstance {x:Type Editor:JSResult}, CreateList=True}"/>

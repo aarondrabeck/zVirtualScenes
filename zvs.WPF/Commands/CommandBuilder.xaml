@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
          xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-        xmlns:my="clr-namespace:zvs.DataModel;assembly=zvs.DataModel" mc:Ignorable="d" 
+        xmlns:my="clr-namespace:zvs.DataModel;assembly=zvs.DataModel" mc:Ignorable="d"  FontFamily="Roboto"
         Title="Command Builder" Height="350" Width="600" WindowStyle="ToolWindow" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" Loaded="Window_Loaded_1">
     <Window.Resources>
         <CollectionViewSource x:Key="JSCmdsViewSource" d:DesignSource="{d:DesignInstance my:JavaScriptCommand, CreateList=True}" />
@@ -67,7 +67,7 @@
                 </Grid>
             </TabItem>
         </TabControl>
-        <Button Name="CloseBtn" Content="Close" Click="Close_Click_1"  HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,9" FontSize="14" Padding="10 5" FontWeight="Medium" Background="#FFCCCCCC" BorderBrush="{x:Null}"  BorderThickness="0"></Button>
-        <Button x:Name="OKBtn"  Content="OK" HorizontalAlignment="Right" Margin="0,0,73,9" VerticalAlignment="Bottom"  Click="OKBtn_Click" FontSize="14" Padding="10 5" FontWeight="Medium" Background="#FFCCCCCC" BorderBrush="{x:Null}"  BorderThickness="0"/>
+        <Button Name="CloseBtn" Content="CLOSE" Click="Close_Click_1"  HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,5" Style="{DynamicResource MaterialFlatButton}"></Button>
+        <Button x:Name="OkBtn"  Content="OK" HorizontalAlignment="Right" Margin="0,0,87,5" VerticalAlignment="Bottom"  Click="OKBtn_Click" Style="{DynamicResource MaterialFlatButton}"/>
     </Grid>
 </Window>

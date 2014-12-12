@@ -9,6 +9,7 @@
         ShowInTaskbar="False" 
         WindowStartupLocation="CenterScreen" 
         ResizeMode="CanResize" 
+        FontFamily="Roboto"
         Width="520" Height="320">
     <Border  >
         <Border.Effect>

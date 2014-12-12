@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" x:Class="zvs.WPF.DeviceDetailsWindow"
          Height="500" Width="800" MinHeight="200" MinWidth="300" Loaded="Window_Loaded_1" Closed="DeviceDetailsWindow_Closed_1" Icon="/zVirtualScenes;component/Images/zvs-icon.ico" WindowStartupLocation="CenterOwner" 
-    WindowStyle="ToolWindow"   Name="This" SizeToContent="Height">
+    WindowStyle="ToolWindow"   Name="This" SizeToContent="Height" FontFamily="Roboto">
     <Window.Title>
         <MultiBinding StringFormat="{}{0} {1} Details" FallbackValue="Home Automation Device Details" >
             <Binding Path="Device.Location" ElementName="This" />
@@ -85,6 +85,6 @@
             </Border>
         </Grid>
 
-        <Button Grid.Row="2" Content="Done" Margin="0 0 10 0"  Click="Button_Click_1" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="14" Padding="10 5" FontWeight="Medium" Background="#FFCCCCCC" BorderBrush="{x:Null}"  BorderThickness="0"/>
+        <Button Grid.Row="2" Content="DONE" Margin="0 0 10 0"  Click="Button_Click_1" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{DynamicResource MaterialFlatButton}"/>
     </Grid>
 </Window>
