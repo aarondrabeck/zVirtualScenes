@@ -163,8 +163,7 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <Button Grid.Column="0" Margin="0 0 10 0" 
-                            Content="3"
-                            FontFamily="Wingdings 2"
+                            Content="&#xe00b;" FontFamily="ZvsExtended"
                             Click="ButtonDelete_OnClick"
                             ToolTip="Delete Trigger">
                         <Button.Style>
@@ -183,8 +182,7 @@
                         </Button.Style>
                     </Button>
                     <Button  Grid.Column="1" Margin="0 0 20 0" 
-                            Content="&#xe00B;"
-                            FontFamily="flaticon"
+                            Content="&#xe00f;" FontFamily="ZvsExtended"
                             Click="SettingBtn_Click_1" 
                             ToolTip="Trigger Settings">
                         <Button.Style>
@@ -204,7 +202,7 @@
                     </Button>
                     <Button Grid.Column="2" HorizontalAlignment="Right" 
                             Margin="0 0 0 0" 
-                            Content="+"
+                            Content="&#xe000;" FontFamily="ZvsExtended"
                             Click="AddTriggerBtn_Click" 
                             ToolTip="Add Trigger">
                         <Button.Style>

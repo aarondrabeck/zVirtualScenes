@@ -138,8 +138,7 @@
                     </Button>
                     <Button Grid.Column="1" Name="SortUp"
                             Margin="0 0 10 0" 
-                            Content="é"
-                            FontFamily="Wingdings"
+                               Content="&#xe010;" FontFamily="ZvsExtended"
                             Click="SortUp_Click_1" 
                             ToolTip="Move Up">
                         <Button.Style>
@@ -158,9 +157,7 @@
                         </Button.Style>
                     </Button>
                     <Button Grid.Column="2" Name="SortDown" Margin="0 0 10 0" 
-                           
-                            Content="ê"
-                            FontFamily="Wingdings"
+                             Content="&#xe004;" FontFamily="ZvsExtended"
                             Click="SortDown_Click_1" 
                             ToolTip="Move Down">
                         <Button.Style>
@@ -179,9 +176,8 @@
                         </Button.Style>
                     </Button>
                     <Button Grid.Column="3" Margin="0 0 10 0"  
-                            Content="4"
                             Click="ButtonDuplicate_OnClick"
-                            FontFamily="Wingdings"
+                            Content="&#xe008;" FontFamily="ZvsExtended"
                             ToolTip="Dulpicate Scene">
                         <Button.Style>
                             <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialToolbarButton}">
@@ -199,8 +195,7 @@
                         </Button.Style>
                     </Button>
                     <Button Grid.Column="4" Margin="0 0 10 0" 
-                            Content="3"
-                            FontFamily="Wingdings 2"
+                             Content="&#xe00b;" FontFamily="ZvsExtended"
                             Click="ButtonDelete_OnClick"
                             ToolTip="Delete Scene">
                         <Button.Style>
@@ -219,8 +214,7 @@
                         </Button.Style>
                     </Button>
                     <Button Grid.Column="5" Margin="0 0 10 0" 
-                            Content="&#xe00B;"
-                            FontFamily="flaticon"
+                            Content="&#xe00f;" FontFamily="ZvsExtended"
                             Click="SceneSettingBtn_Click_1" 
                             ToolTip="Scene Settings">
                         <Button.Style>
@@ -328,8 +322,7 @@
                     </Grid.ColumnDefinitions>
                     <Button Grid.Column="0"
                             Margin="0 0 10 0" 
-                            Content="é"
-                            FontFamily="Wingdings"
+                             Content="&#xe010;" FontFamily="ZvsExtended"
                             Click="SortUpSceneCmd_Click_1" 
                             ToolTip="Move Up">
                         <Button.Style>
@@ -345,8 +338,7 @@
                         </Button.Style>
                     </Button>
                     <Button Grid.Column="1"   Margin="0 0 10 0" 
-                            Content="ê"
-                            FontFamily="Wingdings"
+                             Content="&#xe004;" FontFamily="ZvsExtended"
                             Click="SortDownSceneCmd_Click_1" 
                             ToolTip="Move Down">
                         <Button.Style>
@@ -362,8 +354,7 @@
                         </Button.Style>
                     </Button>
                     <Button Grid.Column="2"   Margin="0 0 10 0" 
-                            Content="3"
-                            FontFamily="Wingdings 2"
+                             Content="&#xe00b;" FontFamily="ZvsExtended"
                             Click="ButtonBase_OnClick"
                             ToolTip="Delete Command">
                         <Button.Style>
@@ -379,9 +370,7 @@
                         </Button.Style>
                     </Button>
                     <Button Grid.Column="3"    Margin="0 0 10 0" 
-                           
-                            Content="&#xe00B;"
-                            FontFamily="flaticon"
+                            Content="&#xe00f;" FontFamily="ZvsExtended"
                             Click="SettingBtn_Click_1" 
                             ToolTip="Command Settings">
                         <Button.Style>
@@ -398,8 +387,7 @@
                     </Button>
                     <Button Grid.Column="4"
                               Margin="0 0 10 0" 
-                            Content="+"
-                            FontFamily="Roboto"
+                            Content="&#xe000;" FontFamily="ZvsExtended"
                             Click="AddCommand_Click" 
                             ToolTip="Add Command">
                         <Button.Style>

@@ -31,30 +31,7 @@
         <CommandBinding Command="{x:Static zvsWpf:ChromeWindow.onMaximizeCommand }" Executed="onMaximizeCommandExecuted" />
         <CommandBinding Command="{x:Static zvsWpf:ChromeWindow.onCloseCommand }" Executed="onCloseCommandExecuted" />
     </zvsWpf:ChromeWindow.CommandBindings>
-
-    <zvsWpf:ChromeWindow.Resources>
-        <zvsWpf:ContentToPathConverter x:Key="content2PathConverter"/>
-        <zvsWpf:ContentToMarginConverter x:Key="content2MarginConverter"/>
-
-        <SolidColorBrush x:Key="BorderBrush" Color="#FFEBEBEB"/>
-        <SolidColorBrush x:Key="TabControlBackgroundBrush"  Color="White"/>
-        <LinearGradientBrush x:Key="HoverBrush" StartPoint="0,0" EndPoint="0,1">
-            <GradientStop Color="#FFF7F7F7" Offset="0"/>
-            <GradientStop Color="#FFFBFFFF" Offset="1"/>
-        </LinearGradientBrush>
-        <LinearGradientBrush x:Key="SelectedBrush" StartPoint="0,0" EndPoint="0,1">
-            <GradientStop Color="White" Offset="0"/>
-            <GradientStop Color="#FFF9F9F9" Offset="1"/>
-        </LinearGradientBrush>
-        <LinearGradientBrush x:Key="TabItemPathBrush" StartPoint="0,0" EndPoint="0,1">
-            <GradientStop Color="#FFF2F3F5" Offset="0"/>
-            <GradientStop Color="White" Offset="1"/>
-        </LinearGradientBrush>
-
-
-    </zvsWpf:ChromeWindow.Resources>
     <DockPanel Background="#EAEAEA">
-
         <Grid >
             <TabControl Style="{DynamicResource MaterialTabControl}">
                 <TabItem Style="{StaticResource MaterialTabItem}">
@@ -95,53 +72,39 @@
                 </TabItem>
 
             </TabControl>
-            <Button  Content="&#xe00B;" FontFamily="flaticon" 
-                     VerticalAlignment="Top" HorizontalAlignment="Right" Margin="5 10">
-                <Button.Style>
-                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialFloatingAction}">
-                        <Style.Triggers>
-                            <EventTrigger RoutedEvent="Click">
-                                <EventTrigger.Actions>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <BooleanAnimationUsingKeyFrames Storyboard.TargetProperty="ContextMenu.IsOpen">
-                                                <DiscreteBooleanKeyFrame KeyTime="0:0:0" Value="True"/>
-                                            </BooleanAnimationUsingKeyFrames>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </EventTrigger.Actions>
-                            </EventTrigger>
-                        </Style.Triggers>
-                        <Setter Property="ContextMenu">
-                            <Setter.Value>
-                                <ContextMenu>
-                                    <MenuItem Header="_File"  >
-                                        <MenuItem Header="Backup and Restore..." x:Name="BackupRestoreMi" Click="BackupRestoreMI_Click" />
-                                        <Separator />
-                                        <MenuItem Name="ExitMI" Header="Exit zVirtualScenes" Click="ExitMI_Click_1" />
+            <Menu VerticalAlignment="Top" Cursor="Hand" HorizontalAlignment="Right" Margin="5 10" Background="Transparent">
+                <MenuItem>
+                    <MenuItem.Header>
+                        <DockPanel>
+                            <Ellipse Height="48" Width="48" Name="Ellipse" Fill="#2196F3" Effect="{StaticResource z-depth1}"  />
+                            <TextBlock Foreground="White" FontSize="30" FontWeight="Medium" VerticalAlignment="Center" HorizontalAlignment="Center"  
+                                       Text="&#xe00a;" FontFamily="ZvsExtended" Margin="-48 0 0 0">
+                            </TextBlock>
+                        </DockPanel>
+                    </MenuItem.Header>
+                    <MenuItem Header="_File"  >
+                        <MenuItem Header="Backup and Restore..." x:Name="BackupRestoreMi" Click="BackupRestoreMI_Click" />
+                        <Separator />
+                        <MenuItem Name="ExitMI" Header="Exit zVirtualScenes" Click="ExitMI_Click_1" />
 
-                                    </MenuItem>
-                                    <MenuItem Header="Commands">
-                                        <MenuItem Name="AddEditJSCmds" Header="Add / Edit JavaScript Commands..." Click="AddEditJSCmds_Click_1" />
-                                        <Separator />
-                                        <MenuItem Name="RepollAllMI" Header="Repoll All" Click="RepollAllMI_Click_1" />
-                                    </MenuItem>
-                                    <MenuItem Header="Tools">
-                                        <MenuItem Header="Manage Adapters..." Click="MenuItem_Click_1" />
-                                        <MenuItem Header="Manage Plug-ins..." Click="ManagePluginsMi" />
-                                        <MenuItem Name="SettingMI" Header="Settings..." Click="SettingMI_Click_1" />
-                                        <Separator />
-                                        <MenuItem Header="View Database" Name="ViewDBMI"   Click="ViewDBMI_Click_1" />
-                                    </MenuItem>
-                                    <MenuItem Header="Help">
-                                        <MenuItem Name="AboutMI" Header="About zVirtualScenes" Click="AboutMI_Click_1" />
-                                    </MenuItem>
-                                </ContextMenu>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </Button.Style>
-            </Button>
+                    </MenuItem>
+                    <MenuItem Header="Commands">
+                        <MenuItem Name="AddEditJSCmds" Header="Add / Edit JavaScript Commands..." Click="AddEditJSCmds_Click_1" />
+                        <Separator />
+                        <MenuItem Name="RepollAllMI" Header="Repoll All" Click="RepollAllMI_Click_1" />
+                    </MenuItem>
+                    <MenuItem Header="Tools">
+                        <MenuItem Header="Manage Adapters..." Click="MenuItem_Click_1" />
+                        <MenuItem Header="Manage Plug-ins..." Click="ManagePluginsMi" />
+                        <MenuItem Name="SettingMI" Header="Settings..." Click="SettingMI_Click_1" />
+                        <Separator />
+                        <MenuItem Header="View Database" Name="ViewDBMI"   Click="ViewDBMI_Click_1" />
+                    </MenuItem>
+                    <MenuItem Header="Help">
+                        <MenuItem Name="AboutMI" Header="About zVirtualScenes" Click="AboutMI_Click_1" />
+                    </MenuItem>
+                </MenuItem>
+            </Menu>
         </Grid>
     </DockPanel>
 </zvsWpf:ChromeWindow>

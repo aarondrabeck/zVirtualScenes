@@ -10,7 +10,7 @@
     </Window.Resources>
     <Grid>
         <TabControl Style="{StaticResource VerticalTabControl}" Margin="2,2,2,46">
-            <TabItem Name="DeviceTab" Style="{StaticResource VerticalTabItem}" >
+            <TabItem Name="DeviceTab" Style="{StaticResource VerticalTabItem}" FontFamily="flaticon" >
                 <TabItem.Header >
                     <StackPanel HorizontalAlignment="Center"  >
                         <TextBlock  TextAlignment="Center" Text="&#xe004;" Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="35" />

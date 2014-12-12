@@ -429,6 +429,7 @@
     <None Include="fonts\flaticon4.eot" />
     <Resource Include="fonts\flaticon4.ttf" />
     <None Include="fonts\flaticon4.woff" />
+    <Resource Include="fonts\ZvsExtended.ttf" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>

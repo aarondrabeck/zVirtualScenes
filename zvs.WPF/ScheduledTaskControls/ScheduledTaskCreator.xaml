@@ -108,8 +108,7 @@
                         <Button Grid.Column="0" Margin="10 0 10 0" HorizontalAlignment="Right" 
                             Height="40" 
                             Width="40"
-                            Content="3"
-                            FontFamily="Wingdings 2"
+                           Content="&#xe00b;" FontFamily="ZvsExtended"
                             Click="ButtonDelete_OnClick"
                             ToolTip="Delete Task">
                             <Button.Style>

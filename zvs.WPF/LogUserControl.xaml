@@ -93,21 +93,18 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <Button Name="PurgeButton" Grid.Column="0" Style="{StaticResource MaterialToolbarButton}" 
-                            Content="3"
-                            FontFamily="Wingdings 2"
+                            Content="&#xe00b;" FontFamily="ZvsExtended"
                             Click="PurgeButton_Click"
                             ToolTip="Purge Log">
                     </Button>
                     <Button Name="ClearButton" Style="{StaticResource MaterialToolbarButton}"  Grid.Column="1" Margin="10 0 0 0" 
-                            Content="&#xe00B;"
-                            FontFamily="flaticon"
+                            Content="&#xe003;" FontFamily="ZvsExtended"
                             Click="ClearButton_OnClick" 
                             ToolTip="Clear">
 
                     </Button>
                     <Button Name="NextButton" Style="{StaticResource MaterialToolbarButton}"  Grid.Column="2" Margin="10 0 0 0" 
-                            Content="&#xe00B;"
-                            FontFamily="flaticon"
+                           Content="&#xe004;" FontFamily="ZvsExtended"
                             Click="NextButton_Click" 
                             ToolTip="Next 200">
                     </Button>

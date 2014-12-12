@@ -232,8 +232,7 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <Button Grid.Column="0" 
-                            Content="3"
-                            FontFamily="Wingdings 2"
+                            Content="&#xe00b;" FontFamily="ZvsExtended"
                             Click="ButtonDeleteDevice_OnClick"
                             ToolTip="Delete Device">
                             <Button.Style>
@@ -252,8 +251,7 @@
                             </Button.Style>
                         </Button>
                         <Button  Grid.Column="1" Margin="10 0 0 0" 
-                            Content="&#xe00B;"
-                            FontFamily="flaticon"
+                           Content="&#xe00f;" FontFamily="ZvsExtended"
                             Click="SettingBtn_Click_1" 
                             ToolTip="Device Settings">
                             <Button.Style>

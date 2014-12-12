@@ -98,8 +98,7 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <Button Margin="0 0 10 0"  
-                            Content="On"
-                            FontFamily="flaticon"
+                             Content="&#xe00d;" FontFamily="ZvsExtended"
                              Click="TurnOnButton_OnClick"
                             ToolTip="Turn-on Group"> 
                         <Button.Style>
@@ -120,8 +119,7 @@
                         </Button.Style>
                     </Button>
                     <Button Grid.Column="1" Margin="0 0 10 0"  
-                            Content="Off"
-                            FontFamily="flaticon"
+                               Content="&#xe00e;" FontFamily="ZvsExtended"
                             Click="TurnOffButton_OnClick"
                             ToolTip="Turn-off Group">
                         <Button.Style>
@@ -142,8 +140,7 @@
                         </Button.Style>
                     </Button>
                     <Button Grid.Column="2" Margin="0 0 10 0" 
-                            Content="3"
-                            FontFamily="Wingdings 2"
+                            Content="&#xe00b;" FontFamily="ZvsExtended"
                             Click="ButtonDelete_OnClick"
                             ToolTip="Delete Group">
                         <Button.Style>
