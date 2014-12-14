@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using zvs.DataModel;
 using zvs.Fakes;
@@ -474,10 +473,10 @@ f1();";
         public async Task RunBadDeviceCommandTest()
         {
             //Arrange
-            var logEntries = new List<LogEntry>();
             var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "JavaScriptRunner-RunBadDeviceCommandTest" };
             Database.SetInitializer(new CreateFreshDbInitializer());
 
+            var logEntries = new List<LogEntry>();
             var commandProcessor = new StubICommandProcessor();
             var log = new StubIFeedback<LogEntry>
             {
@@ -501,13 +500,13 @@ f1();";
 
             //Assert
             Assert.IsFalse(result.HasError, result.Message);
+            Assert.IsTrue(logEntries.Any(o => o.Message.Contains("Cannot find")));
         }
 
         [TestMethod]
         public async Task RunDeviceCommandTest()
         {
             //Arrange
-            var logEntries = new List<LogEntry>();
             var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "JavaScriptRunner-RunDeviceCommandTest" };
             Database.SetInitializer(new CreateFreshDbInitializer());
 
@@ -530,7 +529,6 @@ f1();";
                 ReportAsyncT0CancellationToken = (e, c) =>
                 {
                     Console.WriteLine(e);
-                    logEntries.Add(e);
                     return Task.FromResult(0);
                 }
             };
@@ -566,6 +564,69 @@ f1();";
             }
         }
 
+        [TestMethod]
+        public async Task RunCommandTest()
+        {
+            //Arrange
+            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "JavaScriptRunner-RunCommandTest" };
+            Database.SetInitializer(new CreateFreshDbInitializer());
+
+            int? commandIdRan = 0;
+            var arg1Ran = "";
+            var arg2Ran = "";
+
+            var commandProcessor = new StubICommandProcessor
+            {
+                RunCommandAsyncNullableOfInt32StringStringCancellationToken = (commandId, argument, argument2, cancellationToken) =>
+                {
+                    commandIdRan = commandId;
+                    arg1Ran = argument;
+                    arg2Ran = argument2;
+                    return Task.FromResult(Result.ReportSuccess());
+                }
+            };
+            var log = new StubIFeedback<LogEntry>
+            {
+                ReportAsyncT0CancellationToken = (e, c) =>
+                {
+                    Console.WriteLine(e);
+                    return Task.FromResult(0);
+                }
+            };
+
+            var device0 = UnitTesting.CreateFakeDevice();
+            var device = UnitTesting.CreateFakeDevice();
+
+            using (var context = new ZvsContext(dbConnection))
+            {
+                var deviceCommand = new DeviceCommand
+                {
+                    Name = "Turn On"
+                };
+                device.Commands.Add(deviceCommand);
+                context.Devices.Add(device0);
+                context.Devices.Add(device);
+                await context.SaveChangesAsync(CancellationToken.None);
+
+                var cts = new CancellationTokenSource();
+                var runner = new JavaScriptRunner(log, commandProcessor, dbConnection);
+                var script = string.Format(@"
+function f1() {{ 
+       var result = runCommand({0},'98', '0'); 
+       logInfo(result.Message);
+}};
+f1();", deviceCommand.Id);
+
+                //Act
+                var result = await runner.ExecuteScriptAsync(script, cts.Token);
+
+                //Assert
+                Assert.IsFalse(result.HasError, result.Message);
+                Assert.IsTrue(deviceCommand.Id == commandIdRan, "Wrong command ran!");
+                Assert.IsTrue("98" == arg1Ran, "command argument1 not passed in correctly.");
+                Assert.IsTrue("0" == arg2Ran, "command argument2 not passed in correctly.");
+            }
+        }
 
 
     }

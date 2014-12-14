@@ -31,7 +31,6 @@ namespace zvs.Processor
             EntityContextConnection = entityContextConnection;
             log.Source = "JavaScript Runner";
 
-
             JintEngine = new Jint.Engine(cfg =>
             {
                 cfg.AllowClr();
@@ -57,15 +56,10 @@ namespace zvs.Processor
                 JintEngine.SetValue("logError", new Action<object>(LogError));
                 JintEngine.SetValue("setTimeout", new Action<string, double>(SetTimeout));
                 JintEngine.SetValue("shell", new Func<string, string, System.Diagnostics.Process>(Shell));
-
-                //JintEngine.SetFunction("runScene", new Action<double>(RunSceneJS));
-                //JintEngine.SetFunction("runScene", new Action<string>(RunSceneJS));
+                
                 JintEngine.SetValue("runDeviceNameCommandName", new Func<string, string, string, Result>(RunDeviceNameCommandName));
-                // JintEngine.SetFunction("runDeviceNameCommandId", new Action<string, double, string>(RunDeviceNameCommandId));
-                //  JintEngine.SetFunction("runDeviceIdCommandId", new Action<double, double, string>(RunDeviceIdCommandId));
-
-                //  JintEngine.SetFunction("error", new Action<object>(Error));
-
+                JintEngine.SetValue("runCommand", new Func<int, string, string, Result>(RunCommand));
+                
                 JintEngine.SetValue("require", new Action<string>(Require));
 
                 JintEngine.SetValue("mappath", new Func<string, string>(MapPath));
@@ -163,98 +157,12 @@ namespace zvs.Processor
                     CommandProcessor.RunCommandAsync(command.Id, value, string.Empty, CancellationToken.None).Result;
             }
         }
-        //public async void RunDeviceNameCommandId(string DeviceName, double CommandId, string Value)
-        //{
-        //    Device d = null;
-        //    using (var context = new ZvsContext())
-        //        d = await context.Devices.FirstOrDefaultAsync(o => o.Name == DeviceName);
 
-        //    if (d == null)
-        //    {
-        //        ReportProgress("JSE{0} Warning cannot find device {1}", id, DeviceName);
-        //        return;
-        //    }
-
-        //    RunDeviceCommand(d.Id, CommandId, Value);//TODO: ReportProgress here
-        //}
-
-
-        //private async void RunDeviceIdCommandId(double DeviceId, double CommandID, string Value)
-        //{
-        //    RunDeviceCommand(DeviceId, CommandID, Value);
-        //}
-
-        //private async void RunDeviceCommand(double DeviceId, double CommandID, string Value)
-        //{
-        //    var did = Convert.ToInt32(DeviceId);
-        //    var cid = Convert.ToInt32(CommandID);
-        //    using (var context = new ZvsContext())
-        //    {
-        //        var dc = await context.DeviceCommands.FirstOrDefaultAsync(o => o.Id == cid && o.DeviceId == did);
-        //        if (dc == null)
-        //        {
-        //            ReportProgress("Cannot find device command '{0}'", CommandID);
-        //            return;
-        //        }
-
-        //        var cp = new CommandProcessor(ZvsEngine);
-        //        // invoked on the ThreadPool, where there won’t be a SynchronizationContext
-        //        var result = await cp.RunCommandAsync(this, dc, Value);
-        //    }
-        //}
-
-        //private async void RunDeviceCommand(double DeviceId, string CommandName, string Value)
-        //{
-        //    var dId = Convert.ToInt32(DeviceId);
-        //    using (var context = new ZvsContext())
-        //    {
-        //        var dc = await context.DeviceCommands.FirstOrDefaultAsync(o => o.Name == CommandName && o.DeviceId == dId);
-        //        if (dc == null)
-        //        {
-        //            ReportProgress("Cannot find device command '{0}'", CommandName);
-        //            return;
-        //        }
-
-        //        var cp = new CommandProcessor(ZvsEngine);
-        //        // invoked on the ThreadPool, where there won’t be a SynchronizationContext
-        //        var result = await cp.RunCommandAsync(this, dc, Value);
-        //    }
-        //}
-
-
-        ////RunScene("Energy Save");
-        //public async void RunSceneJS(string SceneName)
-        //{
-        //    Scene s = null;
-        //    using (var context = new ZvsContext())
-        //        s = await context.Scenes.FirstOrDefaultAsync(o => o.Name == SceneName);
-
-        //    if (s == null)
-        //    {
-        //        ReportProgress("JSE{0} Warning cannot find scene {1}", id, SceneName);
-        //        return;
-        //    }
-
-        //    // invoked on the ThreadPool, where there won’t be a SynchronizationContext
-        //    var result = await RunSceneAsync(s.Id);
-        //}
-
-        ////RunScene(1);
-        //public async void RunSceneJS(double SceneID)
-        //{
-        //    // invoked on the ThreadPool, where there won’t be a SynchronizationContext
-        //    var result = await RunSceneAsync(SceneID);
-        //}
-
-        //public async Task<Result> RunSceneAsync(double SceneID)
-        //{
-        //    using (var context = new ZvsContext())
-        //    {
-        //        var cmd = context.BuiltinCommands.Single(c => c.UniqueIdentifier == "RUN_SCENE");
-        //        var cp = new CommandProcessor(ZvsEngine);
-        //        return await cp.RunCommandAsync(this, cmd, SceneID.ToString());
-        //    }
-        //}
+        //RunCommand(2, 1, '99');
+        public Result RunCommand(int commandId, string arg1, string arg2)
+        {
+            return CommandProcessor.RunCommandAsync(commandId, arg1, arg2, CancellationToken.None).Result;
+        }
     }
 }
 
