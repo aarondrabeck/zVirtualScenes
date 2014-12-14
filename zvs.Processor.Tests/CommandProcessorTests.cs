@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -1075,17 +1076,26 @@ namespace zvs.Processor.Tests
                     ProcessDeviceTypeCommandAsyncDeviceTypeDeviceDeviceTypeCommandString = (adapterDevice, command, argument, argument2) => Task.FromResult(0)
                 }
             };
-            var log = new StubIFeedback<LogEntry>();
+            var logEntries = new List<LogEntry>();
+            var log = new StubIFeedback<LogEntry>
+            {
+                ReportAsyncT0CancellationToken = (e, c) =>
+                {
+                    Console.WriteLine(e);
+                    logEntries.Add(e);
+                    return Task.FromResult(0);
+                }
+            };
 
             var cts = new CancellationTokenSource();
             var commmandProcessor = new CommandProcessor(adapterManager, dbConnection, log);
 
             using (var context = new ZvsContext(dbConnection))
             {
-                var jsCommand = new JavaScriptCommand();
+                var jsCommand = new JavaScriptCommand()
                 {
-
-                }
+                    Script = "logInfo('test');"
+                };
                 context.Commands.Add(jsCommand);
                 await context.SaveChangesAsync(new CancellationToken());
 
@@ -1094,7 +1104,8 @@ namespace zvs.Processor.Tests
                 Console.WriteLine(result.Message);
 
                 //Assert
-                Assert.IsTrue(result.HasError);
+                Assert.IsFalse(result.HasError, result.Message);
+                Assert.IsTrue(logEntries.Any(o=> o.Message == "test"));
             }
         }
     }

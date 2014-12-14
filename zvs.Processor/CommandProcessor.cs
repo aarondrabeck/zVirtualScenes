@@ -165,7 +165,7 @@ namespace zvs.Processor
                         {
                             int gId = int.TryParse(argument, out gId) ? gId : 0;
                             var group = await context.Groups
-                                .Include(o=> o.Devices)
+                                .Include(o => o.Devices)
                                 .FirstOrDefaultAsync(o => o.Id == gId, cancellationToken);
 
                             if (group == null)
@@ -219,28 +219,12 @@ namespace zvs.Processor
             }
         }
 
-        internal async Task<Result> ExecuteJavaScriptCommandAsync(JavaScriptCommand command,
-            string argument, string argument2, CancellationToken cancellationToken)
+        internal async Task<Result> ExecuteJavaScriptCommandAsync(JavaScriptCommand command, string argument, string argument2, CancellationToken cancellationToken)
         {
-            //var javaScriptCommand = (JavaScriptCommand)command;
-
-            //var je = new JavaScriptRunner(sender, ZvsEngine);
-            //je.onReportProgress += (s, args) =>
-            //{
-            //    ZvsEngine.log.Info(args.Progress);
-            //};
-
-            //var jsResult = await je.ExecuteScriptAsync(javaScriptCommand.Script, context);
-
-            //var details = string.Format("{0}. JavaScript cmd '{1}' processed.",
-            //                jsResult.Details,
-            //                command.Name);
-
-            //return new CommandProcessorResult(false, details);
-            return Result.ReportError("Not Implemented");
+            var javaScriptRunner = new JavaScriptRunner(Log, this, EntityContextConnection);
+            return await javaScriptRunner.ExecuteScriptAsync(command.Script, cancellationToken);
         }
 
-        //private Methods
         public async Task<Result> RunCommandAsync(int? commandId, string argument, string argument2, CancellationToken cancellationToken)
         {
             using (var context = new ZvsContext(EntityContextConnection))
