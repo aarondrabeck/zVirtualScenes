@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{9EDBAA9B-7C45-493F-9147-6A40D35DC3C2}"
 EndProject
@@ -12,22 +12,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NOAAPlugin", "Plugins\NOAAPlugin\NOAAPlugin.csproj", "{87DAEF88-428E-4BCA-8DFC-56889C7C30A7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpAPI", "Plugins\HttpAPI\HttpAPI.csproj", "{F8B3CD45-0712-4388-B576-EBA5267E636C}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Googlewiki", "Googlewiki", "{70C1BD75-B8D8-4296-99BC-12E162C43D04}"
-	ProjectSection(SolutionItems) = preProject
-		..\wiki\Requirements1x.wiki = ..\wiki\Requirements1x.wiki
-		..\wiki\Requirements2x.wiki = ..\wiki\Requirements2x.wiki
-		..\wiki\Requirements3x.wiki = ..\wiki\Requirements3x.wiki
-		..\wiki\ScreenShot20.wiki = ..\wiki\ScreenShot20.wiki
-		..\wiki\ScreenShots1420.wiki = ..\wiki\ScreenShots1420.wiki
-		..\wiki\ScreenShotsv1300.wiki = ..\wiki\ScreenShotsv1300.wiki
-		..\wiki\ScreenShotsv1400.wiki = ..\wiki\ScreenShotsv1400.wiki
-		..\wiki\v2ToDo.wiki = ..\wiki\v2ToDo.wiki
-		..\wiki\XML_Socket_Interface.wiki = ..\wiki\XML_Socket_Interface.wiki
-		..\wiki\zVirtualScenes2xReleaseNotes.wiki = ..\wiki\zVirtualScenes2xReleaseNotes.wiki
-		..\wiki\zVirtualScenes3xReleaseNotes.wiki = ..\wiki\zVirtualScenes3xReleaseNotes.wiki
-		..\wiki\ZVS_Plugins.wiki = ..\wiki\ZVS_Plugins.wiki
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zvs.DataModel", "zvs.Entities\zvs.DataModel.csproj", "{E1758D0B-5A3A-4A1B-B5DE-ACD1302F23A7}"
 EndProject

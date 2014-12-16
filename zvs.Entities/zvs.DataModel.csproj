@@ -83,6 +83,7 @@
     <Compile Include="CommandOption.cs" />
     <Compile Include="ConfidentialDataAttribute.cs" />
     <Compile Include="DatabaseFeedback.cs" />
+    <Compile Include="InMemoryFeedback.cs" />
     <Compile Include="Tasks\ScheduledTaskType.cs" />
     <Compile Include="Tasks\DailyScheduledTask.cs" />
     <Compile Include="Tasks\DaysOfMonth.cs" />

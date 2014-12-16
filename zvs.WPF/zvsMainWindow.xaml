@@ -1,4 +1,4 @@
-﻿<zvsWpf:ChromeWindow
+﻿<Window
     xmlns:zvsWpf="clr-namespace:zvs.WPF"
     x:Class="zvs.WPF.ZvsMainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -10,8 +10,8 @@
     xmlns:triggerControl="clr-namespace:zvs.WPF.TriggerControls"
     xmlns:scheduledTaskControls="clr-namespace:zvs.WPF.ScheduledTaskControls"
     xmlns:groups="clr-namespace:zvs.WPF.Groups"
-    Title="MainWindow" 
-    MinWidth="800" 
+    xmlns:javaScript="clr-namespace:zvs.WPF.JavaScript"
+    MinWidth="1000" 
     MinHeight="570" 
     Closed="MainWindow_Closed_1" 
     Unloaded="Window_Unloaded" 
@@ -22,15 +22,8 @@
     Closing="Window_Closing_1" 
     StateChanged="Window_StateChanged_1" 
     WindowStartupLocation="CenterScreen"
-   
-    Style="{StaticResource ChromeWindowStyle}" d:DesignHeight="1000" ShowWindowIcon="False">
-
-    <zvsWpf:ChromeWindow.CommandBindings>
-        <CommandBinding Command="{x:Static zvsWpf:ChromeWindow.onMinimizeCommand }" Executed="onMinimizeCommandExecuted" />
-        <CommandBinding Command="{x:Static zvsWpf:ChromeWindow.onRestoreCommand }" Executed="onRestoreCommandExecuted" />
-        <CommandBinding Command="{x:Static zvsWpf:ChromeWindow.onMaximizeCommand }" Executed="onMaximizeCommandExecuted" />
-        <CommandBinding Command="{x:Static zvsWpf:ChromeWindow.onCloseCommand }" Executed="onCloseCommandExecuted" />
-    </zvsWpf:ChromeWindow.CommandBindings>
+    WindowStyle="ToolWindow"
+    d:DesignHeight="1200" >
     <DockPanel Background="#EAEAEA">
         <Grid >
             <TabControl Style="{DynamicResource MaterialTabControl}">
@@ -64,6 +57,12 @@
                         <groups:GroupEditorUserControl/>
                     </Border>
                 </TabItem>
+                <TabItem Style="{StaticResource MaterialTabItem}">
+                    <TabItem.Header>SCRIPTING</TabItem.Header>
+                    <Border  Padding="10" >
+                        <javaScript:JavaScriptEditor/>
+                    </Border>
+                </TabItem>
                 <TabItem  Style="{StaticResource MaterialTabItem}">
                     <TabItem.Header>LOG</TabItem.Header>
                     <Border  Padding="10" >
@@ -89,8 +88,6 @@
 
                     </MenuItem>
                     <MenuItem Header="Commands">
-                        <MenuItem Name="AddEditJSCmds" Header="Add / Edit JavaScript Commands..." Click="AddEditJSCmds_Click_1" />
-                        <Separator />
                         <MenuItem Name="RepollAllMI" Header="Repoll All" Click="RepollAllMI_Click_1" />
                     </MenuItem>
                     <MenuItem Header="Tools">
@@ -107,4 +104,4 @@
             </Menu>
         </Grid>
     </DockPanel>
-</zvsWpf:ChromeWindow>
+</Window>

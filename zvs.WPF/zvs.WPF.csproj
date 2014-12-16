@@ -130,6 +130,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="JavaScript\JavaScriptEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="LogUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -158,6 +162,9 @@
     <Compile Include="Groups\GroupEditorUserControl.xaml.cs">
       <DependentUpon>GroupEditorUserControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="JavaScript\JavaScriptEditor.xaml.cs">
+      <DependentUpon>JavaScriptEditor.xaml</DependentUpon>
+    </Compile>
     <Compile Include="LogUserControl.xaml.cs">
       <DependentUpon>LogUserControl.xaml</DependentUpon>
     </Compile>
@@ -173,9 +180,6 @@
       <DependentUpon>CommandBuilder.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\NullableIntConverter.cs" />
-    <Compile Include="JavaScript\JavaScriptAddRemove.xaml.cs">
-      <DependentUpon>JavaScriptAddRemove.xaml</DependentUpon>
-    </Compile>
     <Compile Include="JavaScript\JSEditor.xaml.cs">
       <DependentUpon>JSEditor.xaml</DependentUpon>
     </Compile>
@@ -215,9 +219,6 @@
       <DependentUpon>SettingWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="SingleInstance.cs" />
-    <Compile Include="JavaScript\JavaScriptEditorWindow.xaml.cs">
-      <DependentUpon>JavaScriptEditorWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="SplashScreen.xaml.cs">
       <DependentUpon>SplashScreen.xaml</DependentUpon>
     </Compile>
@@ -275,10 +276,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="JavaScript\JavaScriptAddRemove.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="JavaScript\JSEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -314,10 +311,6 @@
     <Page Include="SettingWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="JavaScript\JavaScriptEditorWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="SplashScreen.xaml">
       <SubType>Designer</SubType>

@@ -1,20 +1,22 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows.Forms;
+using ScintillaNET;
 
 namespace zvs.WPF.JavaScript
 {
     /// <summary>
     /// Interaction logic for JSEditor.xaml
     /// </summary>
-    public partial class JSEditor : UserControl
+    public partial class JsEditor
     {
-        public JSEditor()
+        public JsEditor()
         {
             InitializeComponent();
 
             SCEditor.ConfigurationManager.Language = "js";
-            SCEditor.Margins[0].Width = 20;            
-            this.Editor = SCEditor;
+            SCEditor.Margins[0].Width = 20;
+            SCEditor.BorderStyle = BorderStyle.None;      
+            Editor = SCEditor;
         }
-        public ScintillaNET.Scintilla Editor { get; set; }
+        public Scintilla Editor { get; set; }
     }
 }

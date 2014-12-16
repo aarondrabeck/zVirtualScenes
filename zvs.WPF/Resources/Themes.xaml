@@ -347,6 +347,14 @@
     <SolidColorBrush x:Key="LogSelectedBrush" Color="{DynamicResource LogSelectedColor}" />
     <SolidColorBrush x:Key="LogNoFocusBrush" Color="{DynamicResource LogNoFocusColor}" />
 
+    <!--Javascript-->
+    <Color x:Key="JavascriptColor">#FDD835</Color>
+    <Color x:Key="JavascriptSelectedColor">#FFF9C4</Color>
+    <Color x:Key="JavascriptNoFocusColor">#FFFDE7</Color>
+    <SolidColorBrush x:Key="JavascriptBrush" Color="{DynamicResource JavascriptColor}" />
+    <SolidColorBrush x:Key="JavascriptSelectedBrush" Color="{DynamicResource JavascriptSelectedColor}" />
+    <SolidColorBrush x:Key="JavascriptNoFocusBrush" Color="{DynamicResource JavascriptNoFocusColor}" />
+
 
     <!--Settings-->
     <Color x:Key="SettingColor">#D4E157</Color>

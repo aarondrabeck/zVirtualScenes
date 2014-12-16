@@ -174,7 +174,7 @@
 
         <!--<Setter Property="Opacity" Value="0.95" />-->
         <Setter Property="AllowsTransparency" Value="True" />
-        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Background" Value="White" />
         <Setter Property="WindowStyle" Value="None" />
         <Setter Property="Template" Value="{StaticResource ChromeWindowTemplate}" />
     </Style>

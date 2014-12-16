@@ -10,20 +10,18 @@
         WindowStartupLocation="CenterScreen" 
         ResizeMode="CanResize" 
         FontFamily="Roboto"
-        Width="520" Height="320">
-    <Border  >
-        <Border.Effect>
-            <DropShadowEffect BlurRadius="10" ShadowDepth="0" Opacity=".4" />
-        </Border.Effect>
-        <Border BorderThickness="1" BorderBrush="#FF117DBB" Background="#FFFFFF" Width="500" Height="300">
+       SizeToContent="WidthAndHeight">
+    <Border   >
+    
+        <Border Margin="30" Background="#EAEAEA" Width="500" Height="300" Effect="{DynamicResource z-depth4}">
             <Grid>
-                <Image HorizontalAlignment="Left" Height="128" Width="128"  VerticalAlignment="Top"  Source="Images/zvs-icon.ico" Margin="17,17,0,0" />
-                <TextBlock FontSize="48" Foreground="#333333" Margin="175,29,0,0" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Left"  
-                           FontFamily="Segoe UI" Text="{Binding Source={x:Static zvsProc:Utils.ApplicationName}}" />
-                <TextBlock FontSize="35" Foreground="#8D8D8D" Margin="0,86,20,0" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Right"
-                           FontFamily="Segoe UI" Text="{Binding Source={x:Static zvsProc:Utils.ApplicationVersionLong}}" Height="61" />
+                <Image HorizontalAlignment="Left" Height="128" Width="128"  VerticalAlignment="Top"  Source="Images/zvs-icon.ico" Margin="18,17,0,0" />
+                <TextBlock FontSize="48" Foreground="#181818" FontWeight="Bold" Margin="164,24,0,0" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Left"  
+                           Text="{Binding Source={x:Static zvsProc:Utils.ApplicationName}}" />
+                <TextBlock FontSize="35" Foreground="#B2B2B2" Margin="0,84,20,0" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Right"
+                           Text="{Binding Source={x:Static zvsProc:Utils.ApplicationVersionLong}}" Height="61" />
 
-                <TextBlock TextTrimming="CharacterEllipsis"  FontSize="14" Foreground="#FF707070" HorizontalAlignment="Right" Margin="0,0,113,6" Name="txtLoading" VerticalAlignment="Bottom" Width="375">Loading plugin SXXXG ...</TextBlock>
+                <TextBlock TextTrimming="CharacterEllipsis" FontSize="14" Foreground="#B2B2B2"  Margin="10" Name="txtLoading" VerticalAlignment="Bottom" >Loading plugin SXXXG ...</TextBlock>
 
             </Grid>
         </Border>
