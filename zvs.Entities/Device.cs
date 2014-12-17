@@ -188,7 +188,7 @@ namespace zvs.DataModel
         }
 
         [NotMapped]
-        public DateTimeOffset? EdmLastHeardFrom
+        public DateTimeOffset? LastHeardFromOffset
         {
             // Assume the CreateOn property stores UTC time.
             get

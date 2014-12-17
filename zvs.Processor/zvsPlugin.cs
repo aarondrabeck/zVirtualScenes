@@ -14,7 +14,7 @@ namespace zvs.Processor
         public abstract string Name { get; }
         public abstract string Description { get; }
         protected IFeedback<LogEntry> Log { get; private set; }
-        protected IEntityContextConnection EntityContextConnection { get; set; }
+        public IEntityContextConnection EntityContextConnection { get; set; }
         protected CancellationToken CancellationToken { get; set; }
 
         private IAdapterManager AdapterManager { get; set; }
@@ -53,7 +53,7 @@ namespace zvs.Processor
             return Task.FromResult(0);
         }
 
-        protected async Task<Result> RunCommandAsync(int? commandId, string argument, string argument2,
+        public async Task<Result> RunCommandAsync(int? commandId, string argument, string argument2,
             CancellationToken cancellationToken)
         {
             var commandProcessor = new CommandProcessor(AdapterManager, EntityContextConnection, Log);

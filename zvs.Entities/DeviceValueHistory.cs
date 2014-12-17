@@ -28,7 +28,7 @@ namespace zvs.DataModel
         public DateTime DateTime { get; set; }
 
         [NotMapped]
-        public DateTimeOffset EdmDateTime
+        public DateTimeOffset DateTimeOffset
         {
             get { return new DateTimeOffset(DateTime, TimeSpan.FromHours(0)); }
             set { DateTime = value.UtcDateTime; }

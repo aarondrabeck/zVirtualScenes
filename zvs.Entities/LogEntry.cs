@@ -21,9 +21,8 @@ namespace zvs.DataModel
         public DateTime Datetime { get; set; }
 
         [NotMapped]
-        public DateTimeOffset StartTimeOffset
+        public DateTimeOffset DateTimeOffset
         {
-            // Assume the CreateOn property stores UTC time.
             get { return new DateTimeOffset(Datetime, TimeSpan.FromHours(0)); }
             set { Datetime = value.UtcDateTime; }
         }
