@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>OpenZWaveAdapter</RootNamespace>
     <AssemblyName>OpenZWaveAdapter</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
@@ -83,20 +83,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\zvs.Entities\zvs.DataModel.csproj">
-      <Project>{e1758d0b-5a3a-4a1b-b5de-acd1302f23a7}</Project>
-      <Name>zvs.DataModel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\zvs.Processor\zvs.Processor.csproj">
-      <Project>{10cd1de3-4e83-4bb0-a7ca-c774c298be27}</Project>
-      <Name>zvs.Processor</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\zvs\zvs.csproj">
-      <Project>{26f2b6c6-0325-415c-bb0f-314c69f44d5a}</Project>
-      <Name>zvs</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
     <None Include="Properties\DataSources\zVirtualScenesModel.builtin_commands.datasource" />
@@ -146,9 +132,23 @@
     <None Include="Properties\DataSources\zVirtualScenesModel.scheduled_tasks.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.zvsLocalDBEntities.datasource" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\zvs.Entities\zvs.DataModel.csproj">
+      <Project>{e1758d0b-5a3a-4a1b-b5de-acd1302f23a7}</Project>
+      <Name>zvs.DataModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\zvs.Processor\zvs.Processor.csproj">
+      <Project>{10cd1de3-4e83-4bb0-a7ca-c774c298be27}</Project>
+      <Name>zvs.Processor</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\zvs\zvs.csproj">
+      <Project>{26f2b6c6-0325-415c-bb0f-314c69f44d5a}</Project>
+      <Name>zvs</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>"$(ProjectDir)build\postbuild.bat" "$(ProjectDir)$(OutDir)"</PostBuildEvent>
+    <PostBuildEvent>"$(ProjectDir)\postbuild.bat" "$(ProjectDir)$(OutDir)"</PostBuildEvent>
   </PropertyGroup>
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
