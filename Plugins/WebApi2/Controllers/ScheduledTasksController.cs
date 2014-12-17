@@ -5,6 +5,7 @@ using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
 using zvs.DataModel;
+using zvs.DataModel.Tasks;
 
 namespace zvsWebapi2Plugin.Controllers
 {

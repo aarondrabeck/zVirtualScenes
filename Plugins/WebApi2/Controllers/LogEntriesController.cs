@@ -1,25 +1,22 @@
-﻿using System.Data.Entity.Infrastructure;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
 using zvs.DataModel;
-using zvs.Processor.Logging;
 
 namespace zvsWebapi2Plugin.Controllers
 {
-    [ODataRoutePrefix("LogItems")]
+    [ODataRoutePrefix("LogEntries")]
     [Authorize(Roles = "All Access")]
-    public class LogItemsController : WebApi2PuginController
+    public class LogEntriesController : WebApi2PuginController
     {
-        public LogItemsController(WebApi2Plugin webApi2Plugin) : base(webApi2Plugin) { }
+        public LogEntriesController(WebApi2Plugin webApi2Plugin) : base(webApi2Plugin) { }
 
         [ODataRoute]
         [EnableQuery(PageSize = 50)]
-        public IQueryable<LogItem> Get()
+        public IQueryable<LogEntry> Get()
         {
-            return EventedLog.Items.AsQueryable();
+            return Context.LogEntries;
         }
 
         protected override void Dispose(bool disposing)
@@ -29,7 +26,7 @@ namespace zvsWebapi2Plugin.Controllers
         }
 
         [EnableQuery]
-        public SingleResult<LogItem> Get([FromODataUri] long key)
+        public SingleResult<LogEntry> Get([FromODataUri] long key)
         {
             var result = Get().Where(p => p.Id == key);
             return SingleResult.Create(result);

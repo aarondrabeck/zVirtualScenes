@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.OData;
@@ -50,16 +51,15 @@ namespace zvsWebapi2Plugin.Controllers
 
             try
             {
-                using (var context = new ZvsContext())
+                using (var context = new ZvsContext(WebApi2Plugin.EntityContextConnection))
                 {
                     var command = await context.Commands.FirstOrDefaultAsync(o => o.Id == key);
 
                     if (command == null)
                         return NotFound();
 
-                    var cp = new CommandProcessor(WebApi2Plugin.ZvsEngine);
-                    var result = await cp.RunCommandAsync(this, command, arg1, arg2);
-                    if (result.HasErrors)
+                    var result = await WebApi2Plugin.RunCommandAsync(command.Id, arg1, arg2, CancellationToken.None);
+                    if (result.HasError)
                         return BadRequest(result.Message); 
 
                     return Ok(result.Message);

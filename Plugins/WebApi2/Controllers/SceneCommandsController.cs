@@ -16,7 +16,7 @@ namespace zvsWebapi2Plugin.Controllers
         [EnableQuery(PageSize = 50)]
         public IQueryable<SceneStoredCommand> Get()
         {
-            return Context.SceneCommands;
+            return Context.SceneStoredCommands;
         }
 
         protected override void Dispose(bool disposing)

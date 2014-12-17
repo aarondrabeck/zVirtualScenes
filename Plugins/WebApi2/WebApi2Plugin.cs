@@ -9,13 +9,14 @@ using System.Web.OData.Extensions;
 using zvs.DataModel;
 using zvs.Processor;
 using System.ComponentModel.Composition;
+using zvs.DataModel.Tasks;
+using zvs;
 
 namespace zvsWebapi2Plugin
 {
-    [Export(typeof(zvsPlugin))]
-    public class WebApi2Plugin : zvsPlugin
+    [Export(typeof(ZvsPlugin))]
+    public class WebApi2Plugin : ZvsPlugin
     {
-        readonly zvs.Processor.Logging.ILog _log = zvs.Processor.Logging.LogManager.GetLogger<zvsPlugin>();
         private HttpSelfHostServer HttpSelfHostServer { get; set; }
 
         public override Guid PluginGuid
@@ -139,7 +140,7 @@ namespace zvsWebapi2Plugin
                     Description = "If enabled this device will show in applications that use the Web API",
                     ValueType = DataType.BOOL,
                     Value = Cache.ShowInWebapiDefaultValue.ToString()
-                });
+                }, CancellationToken);
         }
 
         public enum SceneSettingUids
@@ -156,7 +157,7 @@ namespace zvsWebapi2Plugin
                     Description = "If enabled this scene will show in applications that use the Web API",
                     Value = Cache.ShowInWebapiDefaultValue.ToString(),
                     ValueType = DataType.BOOL
-                });
+                }, CancellationToken);
         }
 
         #endregion
@@ -211,17 +212,21 @@ namespace zvsWebapi2Plugin
                 //);
 
                 var builder = new ODataConventionModelBuilder();
-                var deviceType = builder.EntityType<Device>();
-                deviceType.Ignore(t => t.LastHeardFrom);
-                deviceType.Property(t => t.EdmLastHeardFrom).Name = "LastHeardFrom";
-
                 var scheduledTaskType = builder.EntityType<ScheduledTask>();
                 scheduledTaskType.Ignore(t => t.StartTime);
-                scheduledTaskType.Property(t => t.EdmStartTime).Name = "StartTime";
+                scheduledTaskType.Property(t => t.StartTimeOffset).Name = "StartTime";
+
+                var deviceType = builder.EntityType<Device>();
+                deviceType.Ignore(t => t.LastHeardFrom);
+                deviceType.Property(t => t.LastHeardFromOffset).Name = "LastHeardFrom";
 
                 var deviceValueHistoryTaskType = builder.EntityType<DeviceValueHistory>();
                 deviceValueHistoryTaskType.Ignore(t => t.DateTime);
-                deviceValueHistoryTaskType.Property(t => t.EdmDateTime).Name = "DateTime";
+                deviceValueHistoryTaskType.Property(t => t.DateTimeOffset).Name = "DateTime";
+                
+                var logEntryType = builder.EntityType<LogEntry>();
+                logEntryType.Ignore(t => t.Datetime);
+                logEntryType.Property(t => t.DateTimeOffset).Name = "Datetime";
 
                 builder.EntitySet<Command>("Commands");
                 var cExecute = builder.EntityType<Command>().Action("Execute");
@@ -238,8 +243,7 @@ namespace zvsWebapi2Plugin
                 builder.EntitySet<Scene>("Scenes");
                 builder.EntitySet<Scene>("SceneCommands");
                 builder.EntitySet<ScheduledTask>("ScheduledTasks");
-
-                builder.EntitySet<zvs.Processor.Logging.LogItem>("LogItems");
+                builder.EntitySet<LogEntry>("LogEntries");
 
                 builder.Namespace = "Actions";
                 config.MapODataServiceRoute("ODataRoute", "odata4", builder.GetEdmModel());
@@ -260,20 +264,15 @@ namespace zvsWebapi2Plugin
                 Console.WriteLine("Could not start server: {0}", e.GetBaseException().Message);
             }
 
-            _log.InfoFormat("WebApi2 Server Online on port {0} {1} SSL", baseAddress, UseSslSetting ? "using" : "not using");
+            await Log.ReportInfoFormatAsync(CancellationToken, "WebApi2 Server Online on port {0} {1} SSL", baseAddress, UseSslSetting ? "using" : "not using");
         }
 
         private async void StopHttp()
         {
-            // if (HttpSelfHostServer == null) return;
+            if (HttpSelfHostServer == null) return;
 
-            //  await HttpSelfHostServer.CloseAsync();
-            // _log.Info("WebApi2 Server Offline");
-        }
-
-        public override Task DeviceValueChangedAsync(long deviceValueId, string newValue, string oldValue)
-        {
-            return Task.FromResult(0);
+            await HttpSelfHostServer.CloseAsync();
+            await Log.ReportInfoAsync("WebApi2 Server Offline", CancellationToken);
         }
     }
 }
