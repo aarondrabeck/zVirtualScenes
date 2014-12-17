@@ -77,7 +77,7 @@
                         <DockPanel>
                             <Ellipse Height="48" Width="48" Name="Ellipse" Fill="#2196F3" Effect="{StaticResource z-depth1}"  />
                             <TextBlock Foreground="White" FontSize="30" FontWeight="Medium" VerticalAlignment="Center" HorizontalAlignment="Center"  
-                                       Text="&#xe00a;" FontFamily="ZvsExtended" Margin="-48 0 0 0">
+                                       Text="&#xe019;" FontFamily="/zVirtualScenes;component/fonts/#zVirtualScenes" Margin="-48 0 0 0">
                             </TextBlock>
                         </DockPanel>
                     </MenuItem.Header>

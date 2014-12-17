@@ -10,10 +10,10 @@
     </Window.Resources>
     <Grid>
         <TabControl Style="{StaticResource VerticalTabControl}" Margin="2,2,2,46">
-            <TabItem Name="DeviceTab" Style="{StaticResource VerticalTabItem}" FontFamily="flaticon" >
+            <TabItem Name="DeviceTab" Style="{StaticResource VerticalTabItem}"  Height="60"  >
                 <TabItem.Header >
                     <StackPanel HorizontalAlignment="Center"  >
-                        <TextBlock  TextAlignment="Center" Text="&#xe004;" Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="35" />
+                        <TextBlock  TextAlignment="Center" Text="&#xe004;" Style="{DynamicResource ZvsFont}"  FontFamily="zVirtualScenes" FontSize="35" />
                         <TextBlock  Text="Device"/>
                     </StackPanel>
                 </TabItem.Header>
@@ -42,8 +42,8 @@
             </TabItem>
             <TabItem Name="BuiltinTab" Style="{StaticResource VerticalTabItem}" >
                 <TabItem.Header>
-                    <StackPanel HorizontalAlignment="Center"  >
-                        <TextBlock  TextAlignment="Center" Text="&#xe000;" Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="35" />
+                    <StackPanel HorizontalAlignment="Center" >
+                        <TextBlock  TextAlignment="Center" Text="&#xe000;" Style="{DynamicResource ZvsFont}"  FontFamily="zVirtualScenes" FontSize="35" />
                         <TextBlock  Text="Built-in"/>
                     </StackPanel>
                 </TabItem.Header>
@@ -56,8 +56,8 @@
             </TabItem>
             <TabItem Name="JavaScriptTab" Style="{StaticResource VerticalTabItem}">
                 <TabItem.Header>
-                    <StackPanel HorizontalAlignment="Center"  >
-                        <TextBlock  TextAlignment="Center" Text="&#xe00b;" Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="35" />
+                    <StackPanel HorizontalAlignment="Center" Height="50"   >
+                        <TextBlock  TextAlignment="Center" FontFamily="zVirtualScenes" Text="&#xe010;"  FontSize="35" />
                         <TextBlock  Text="Javascript"/>
                     </StackPanel>
                 </TabItem.Header>

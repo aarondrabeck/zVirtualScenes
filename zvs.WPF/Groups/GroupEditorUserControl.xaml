@@ -76,7 +76,7 @@
                                 <DataTemplate>
                                     <Grid Height="40" Width="40">
                                         <Ellipse  Name="Ellipse" Fill="#B2B2B2"/>
-                                        <TextBlock Name="imgFont" Text="&#xe00c;" FontFamily="flaticon" Foreground="White" FontSize="22" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                                        <TextBlock Name="imgFont" Text="&#xe00c;" FontFamily="zVirtualScenes" Foreground="White" FontSize="22" VerticalAlignment="Center" HorizontalAlignment="Center" />
                                     </Grid>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
@@ -98,7 +98,7 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <Button Margin="0 0 10 0"  
-                             Content="&#xe00d;" FontFamily="ZvsExtended"
+                             Content="&#xe01d;" FontFamily="zVirtualScenes"
                              Click="TurnOnButton_OnClick"
                             ToolTip="Turn-on Group"> 
                         <Button.Style>
@@ -119,7 +119,7 @@
                         </Button.Style>
                     </Button>
                     <Button Grid.Column="1" Margin="0 0 10 0"  
-                               Content="&#xe00e;" FontFamily="ZvsExtended"
+                               Content="&#xe01e;" FontFamily="zVirtualScenes"
                             Click="TurnOffButton_OnClick"
                             ToolTip="Turn-off Group">
                         <Button.Style>
@@ -140,7 +140,7 @@
                         </Button.Style>
                     </Button>
                     <Button Grid.Column="2" Margin="0 0 10 0" 
-                            Content="&#xe00b;" FontFamily="ZvsExtended"
+                            Content="&#xe01a;" FontFamily="zVirtualScenes"
                             Click="ButtonDelete_OnClick"
                             ToolTip="Delete Group">
                         <Button.Style>
@@ -207,8 +207,7 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <Button Grid.Column="0" Margin="0 0 10 0" 
-                            Content="-"
-                            FontFamily="Roboto"
+                              Content="&#xe01a;" FontFamily="zVirtualScenes"
                             Click="ButtonRemoveDevice_OnClick"
                             ToolTip="Remove Device">
                         <Button.Style>
@@ -224,8 +223,8 @@
                         </Button.Style>
                     </Button>
                     <Button Grid.Column="1" Margin="0 0 10 0" 
-                            Content="+"
-                            FontFamily="Roboto"
+                            Content="&#xe001;"
+                            FontFamily="zVirtualScenes"
                             Click="ButtonAddDevice_OnClick" 
                             ToolTip="Add Command">
                         <Button.Style>

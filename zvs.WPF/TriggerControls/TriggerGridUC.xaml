@@ -101,7 +101,7 @@
                             <DataTemplate>
                                 <Grid Height="40" Width="40">
                                     <Ellipse  Name="Ellipse" Fill="#B2B2B2"/>
-                                    <TextBlock Name="imgFont" Text="&#xe002;" FontFamily="flaticon" Foreground="White" 
+                                    <TextBlock Name="imgFont" Text="&#xe002;" FontFamily="zVirtualScenes" Foreground="White" 
                                            FontSize="22" VerticalAlignment="Center" HorizontalAlignment="Center" />
                                 </Grid>
                             </DataTemplate>
@@ -162,8 +162,18 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <Button Grid.Column="0" Margin="0 0 10 0" 
-                            Content="&#xe00b;" FontFamily="ZvsExtended"
+                    <Button Grid.Column="0" HorizontalAlignment="Right" 
+                            Margin="0 0 0 0" 
+                            Content="&#xe001;" FontFamily="zVirtualScenes"
+                            Click="AddTriggerBtn_Click" 
+                            ToolTip="Add Trigger">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialToolbarButton}">
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Button Grid.Column="1" Margin="0 0 10 0" 
+                            Content="&#xe01a;" FontFamily="zVirtualScenes"
                             Click="ButtonDelete_OnClick"
                             ToolTip="Delete Trigger">
                         <Button.Style>
@@ -181,8 +191,8 @@
                             </Style>
                         </Button.Style>
                     </Button>
-                    <Button  Grid.Column="1" Margin="0 0 20 0" 
-                            Content="&#xe00f;" FontFamily="ZvsExtended"
+                    <Button  Grid.Column="2" Margin="0 0 0 0" 
+                            Content="&#xe01f;" FontFamily="zVirtualScenes"
                             Click="SettingBtn_Click_1" 
                             ToolTip="Trigger Settings">
                         <Button.Style>
@@ -200,16 +210,7 @@
                             </Style>
                         </Button.Style>
                     </Button>
-                    <Button Grid.Column="2" HorizontalAlignment="Right" 
-                            Margin="0 0 0 0" 
-                            Content="&#xe000;" FontFamily="ZvsExtended"
-                            Click="AddTriggerBtn_Click" 
-                            ToolTip="Add Trigger">
-                        <Button.Style>
-                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialToolbarButton}">
-                            </Style>
-                        </Button.Style>
-                    </Button>
+                   
                 </Grid>
 
 

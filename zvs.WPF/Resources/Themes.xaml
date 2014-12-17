@@ -234,10 +234,7 @@
         </Setter>
     </Style>
     <Style x:Key="ZvsFont" TargetType="{x:Type TextBlock}">
-        <Setter Property="FontFamily" Value="pack://application:,,,/fonts/flaticon" />
-    </Style>
-    <Style x:Key="ZvsExtendedFont" TargetType="{x:Type TextBlock}">
-        <Setter Property="FontFamily" Value="pack://application:,,,/fonts/ZvsExtended.ttf" />
+        <Setter Property="FontFamily" Value="pack://application:,,,/fonts/zVirtualScenes.ttf" />
     </Style>
     <!--Devices-->
     <Color x:Key="DeviceColor">#42A5F5</Color>

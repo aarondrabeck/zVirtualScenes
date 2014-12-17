@@ -84,7 +84,7 @@
                                     <DataTemplate>
                                         <Grid Height="40" Width="40">
                                             <Ellipse  Name="Ellipse" Fill="#B2B2B2"/>
-                                            <TextBlock Name="imgFont" Text="&#xe008;" FontFamily="flaticon" Foreground="White" 
+                                            <TextBlock Name="imgFont" Text="&#xe008;" FontFamily="zVirtualScenes" Foreground="White" 
                                            FontSize="22" VerticalAlignment="Center" HorizontalAlignment="Center" />
                                         </Grid>
                                     </DataTemplate>
@@ -108,7 +108,7 @@
                         <Button Grid.Column="0" Margin="10 0 10 0" HorizontalAlignment="Right" 
                             Height="40" 
                             Width="40"
-                           Content="&#xe00b;" FontFamily="ZvsExtended"
+                           Content="&#xe01a;" FontFamily="zVirtualScenes"
                             Click="ButtonDelete_OnClick"
                             ToolTip="Delete Task">
                             <Button.Style>

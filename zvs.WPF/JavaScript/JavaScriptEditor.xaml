@@ -50,7 +50,7 @@
                                 <DataTemplate>
                                     <Grid Height="40" Width="40">
                                         <Ellipse  Name="Ellipse" Fill="#B2B2B2"/>
-                                        <TextBlock Name="imgFont" Text="JS" FontWeight="Black"  Foreground="White" 
+                                        <TextBlock FontFamily="zVirtualScenes" Text="&#xe010;" Foreground="White" 
                                            FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center"  />
                                     </Grid>
                                 </DataTemplate>
@@ -73,7 +73,7 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <Button Grid.Column="0" Margin="0 0 10 0" 
-                             Content="&#xe00b;" FontFamily="ZvsExtended"
+                              Content="&#xe01a;" FontFamily="zVirtualScenes"
                             Click="ButtonDeleteCommand_OnClick"
                             ToolTip="Delete Javascript Command">
                         <Button.Style>
@@ -104,7 +104,7 @@
                         <DataTrigger Binding="{Binding SelectedItem, ElementName=JavascriptGrid, Converter={StaticResource IsNewItemPlaceholderConverter}}" Value="True">
                             <Setter Property="Visibility" Value="Hidden" />
                         </DataTrigger>
-                        <DataTrigger Binding="{Binding SelectedItems.Count, ElementName=JavascriptGrid}" Value="2" >
+                        <DataTrigger Binding="{Binding SelectedItems.Count, ElementName=JavascriptGrid}" Value="0" >
                             <Setter Property="Visibility" Value="Hidden" />
                         </DataTrigger>
                     </Style.Triggers>
@@ -171,10 +171,13 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <Menu Margin="0 0 10 0"  >
+                    <Menu Margin="0 0 0 0"  >
                         <MenuItem >
                             <MenuItem.Header>
-                                <Button Content="a" Style="{StaticResource MaterialToolbarButton}"/>
+                                <Border Margin="0 15 0 0" Cursor="Hand" Effect="{DynamicResource z-depth1}" 
+                                Height="36" CornerRadius="2" Padding="12 0" BorderThickness="0">
+                                    <TextBlock  FontSize="30" Text="&#xe011;" FontFamily="zVirtualScenes"></TextBlock>
+                                </Border>
                             </MenuItem.Header>
                             <MenuItem Header="Run Device Command" x:Name="RunDeviceCommandMI" Click="RunDeviceCommandMI_Click" />
                             <MenuItem Header="Add Delay (setTimeout)" x:Name="AddDelayMI" Click="AddDelayMI_Click" />
@@ -187,12 +190,12 @@
                         </MenuItem>
                     </Menu>
                     <Button Grid.Column="1" Margin="0 0 10 0" Name="TestButton" Style="{StaticResource MaterialToolbarButton}"
-                             Content="&#xe005;" FontFamily="flaticon" 
+                             Content="&#xe103;" FontFamily="zVirtualScenes"
                             Click="ButtonTestScript_OnClick"
                             ToolTip="Test Script (F5)">
                     </Button>
                     <Button Grid.Column="2" Name="SaveButton" Margin="0 0 10 0"  Style="{StaticResource MaterialToolbarButton}"
-                             Content="&#xe002;" FontFamily="ZvsExtended"
+                              Content="&#xe01b;" FontFamily="zVirtualScenes"
                             Click="ButtonSave_OnClick"
                             ToolTip="Save Script (Ctrl+S)">
                     </Button>

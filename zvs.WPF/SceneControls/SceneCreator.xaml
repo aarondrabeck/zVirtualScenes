@@ -83,7 +83,7 @@
                                                 </Style>
                                             </Ellipse.Style>
                                         </Ellipse>
-                                        <TextBlock Name="imgFont" Text="&#xe005;" FontFamily="flaticon" Foreground="White" 
+                                        <TextBlock Name="imgFont" Text="&#xe005;" FontFamily="zVirtualScenes" Foreground="White" 
                                            FontSize="22" VerticalAlignment="Center" HorizontalAlignment="Center" />
                                     </Grid>
                                 </DataTemplate>
@@ -113,7 +113,7 @@
                     <Button Name="ActivateScene"  
                            Margin="0 0 10 0"  
                             Content="&#xe005;"
-                            FontFamily="flaticon"
+                            FontFamily="zVirtualScenes"
                             Click="ActivateScene_Click_1" 
                             ToolTip="Play scene">
                         <Button.Style>
@@ -136,9 +136,28 @@
                             </Style>
                         </Button.Style>
                     </Button>
-                    <Button Grid.Column="1" Name="SortUp"
+                    <Button Grid.Column="1" Margin="0 0 10 0"  
+                            Click="ButtonDuplicate_OnClick"
+                            Content="&#xe017;" FontFamily="zVirtualScenes"
+                            ToolTip="Dulpicate Scene">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialToolbarButton}">
+                                <Setter Property="IsEnabled" Value="True" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=SceneGrid, Path=SelectedItem}" Value="{x:Null}">
+                                        <!--Comment the following line out to view in editor {x:Null}-->
+                                        <Setter Property="IsEnabled" Value="False" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding ElementName=SceneGrid, Path=SelectedItem, Converter={StaticResource IsNewItemPlaceholderConverter}}" Value="True">
+                                        <Setter Property="IsEnabled" Value="False" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Button Grid.Column="2" Name="SortUp"
                             Margin="0 0 10 0" 
-                               Content="&#xe010;" FontFamily="ZvsExtended"
+                               Content="&#xe014;" FontFamily="zVirtualScenes"
                             Click="SortUp_Click_1" 
                             ToolTip="Move Up">
                         <Button.Style>
@@ -156,8 +175,8 @@
                             </Style>
                         </Button.Style>
                     </Button>
-                    <Button Grid.Column="2" Name="SortDown" Margin="0 0 10 0" 
-                             Content="&#xe004;" FontFamily="ZvsExtended"
+                    <Button Grid.Column="3" Name="SortDown" Margin="0 0 10 0" 
+                             Content="&#xe013;" FontFamily="zVirtualScenes"
                             Click="SortDown_Click_1" 
                             ToolTip="Move Down">
                         <Button.Style>
@@ -175,27 +194,9 @@
                             </Style>
                         </Button.Style>
                     </Button>
-                    <Button Grid.Column="3" Margin="0 0 10 0"  
-                            Click="ButtonDuplicate_OnClick"
-                            Content="&#xe008;" FontFamily="ZvsExtended"
-                            ToolTip="Dulpicate Scene">
-                        <Button.Style>
-                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialToolbarButton}">
-                                <Setter Property="IsEnabled" Value="True" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ElementName=SceneGrid, Path=SelectedItem}" Value="{x:Null}">
-                                        <!--Comment the following line out to view in editor {x:Null}-->
-                                        <Setter Property="IsEnabled" Value="False" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding ElementName=SceneGrid, Path=SelectedItem, Converter={StaticResource IsNewItemPlaceholderConverter}}" Value="True">
-                                        <Setter Property="IsEnabled" Value="False" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
+                    
                     <Button Grid.Column="4" Margin="0 0 10 0" 
-                             Content="&#xe00b;" FontFamily="ZvsExtended"
+                             Content="&#xe01a;" FontFamily="zVirtualScenes"
                             Click="ButtonDelete_OnClick"
                             ToolTip="Delete Scene">
                         <Button.Style>
@@ -214,7 +215,7 @@
                         </Button.Style>
                     </Button>
                     <Button Grid.Column="5" Margin="0 0 10 0" 
-                            Content="&#xe00f;" FontFamily="ZvsExtended"
+                            Content="&#xe01f;" FontFamily="zVirtualScenes"
                             Click="SceneSettingBtn_Click_1" 
                             ToolTip="Scene Settings">
                         <Button.Style>
@@ -321,73 +322,8 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <Button Grid.Column="0"
-                            Margin="0 0 10 0" 
-                             Content="&#xe010;" FontFamily="ZvsExtended"
-                            Click="SortUpSceneCmd_Click_1" 
-                            ToolTip="Move Up">
-                        <Button.Style>
-                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialToolbarButton}">
-                                <Setter Property="IsEnabled" Value="True" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ElementName=SceneCmdsGrid, Path=SelectedItem}" Value="{x:Null}">
-                                        <!--Comment the following line out to view in editor {x:Null}-->
-                                        <Setter Property="IsEnabled" Value="False" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
-                    <Button Grid.Column="1"   Margin="0 0 10 0" 
-                             Content="&#xe004;" FontFamily="ZvsExtended"
-                            Click="SortDownSceneCmd_Click_1" 
-                            ToolTip="Move Down">
-                        <Button.Style>
-                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialToolbarButton}">
-                                <Setter Property="IsEnabled" Value="True" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ElementName=SceneCmdsGrid, Path=SelectedItem}" Value="{x:Null}">
-                                        <!--Comment the following line out to view in editor {x:Null}-->
-                                        <Setter Property="IsEnabled" Value="False" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
-                    <Button Grid.Column="2"   Margin="0 0 10 0" 
-                             Content="&#xe00b;" FontFamily="ZvsExtended"
-                            Click="ButtonBase_OnClick"
-                            ToolTip="Delete Command">
-                        <Button.Style>
-                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialToolbarButton}">
-                                <Setter Property="IsEnabled" Value="True" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ElementName=SceneCmdsGrid, Path=SelectedItem}" Value="{x:Null}">
-                                        <!--Comment the following line out to view in editor {x:Null}-->
-                                        <Setter Property="IsEnabled" Value="False" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
-                    <Button Grid.Column="3"    Margin="0 0 10 0" 
-                            Content="&#xe00f;" FontFamily="ZvsExtended"
-                            Click="SettingBtn_Click_1" 
-                            ToolTip="Command Settings">
-                        <Button.Style>
-                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialToolbarButton}">
-                                <Setter Property="IsEnabled" Value="True" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ElementName=SceneCmdsGrid, Path=SelectedItem}" Value="{x:Null}">
-                                        <!--Comment the following line out to view in editor {x:Null}-->
-                                        <Setter Property="IsEnabled" Value="False" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
-                    <Button Grid.Column="4"
                               Margin="0 0 10 0" 
-                            Content="&#xe000;" FontFamily="ZvsExtended"
+                            Content="&#xe001;" FontFamily="zVirtualScenes"
                             Click="AddCommand_Click" 
                             ToolTip="Add Command">
                         <Button.Style>
@@ -402,6 +338,73 @@
                             </Style>
                         </Button.Style>
                     </Button>
+                    
+                    <Button Grid.Column="1"
+                            Margin="0 0 10 0" 
+                             Content="&#xe014;" FontFamily="zVirtualScenes"
+                            Click="SortUpSceneCmd_Click_1" 
+                            ToolTip="Move Up">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialToolbarButton}">
+                                <Setter Property="IsEnabled" Value="True" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=SceneCmdsGrid, Path=SelectedItem}" Value="{x:Null}">
+                                        <!--Comment the following line out to view in editor {x:Null}-->
+                                        <Setter Property="IsEnabled" Value="False" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Button Grid.Column="2"   Margin="0 0 10 0" 
+                             Content="&#xe013;" FontFamily="zVirtualScenes"
+                            Click="SortDownSceneCmd_Click_1" 
+                            ToolTip="Move Down">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialToolbarButton}">
+                                <Setter Property="IsEnabled" Value="True" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=SceneCmdsGrid, Path=SelectedItem}" Value="{x:Null}">
+                                        <!--Comment the following line out to view in editor {x:Null}-->
+                                        <Setter Property="IsEnabled" Value="False" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Button Grid.Column="3"   Margin="0 0 10 0" 
+                             Content="&#xe01a;" FontFamily="zVirtualScenes"
+                            Click="ButtonBase_OnClick"
+                            ToolTip="Delete Command">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialToolbarButton}">
+                                <Setter Property="IsEnabled" Value="True" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=SceneCmdsGrid, Path=SelectedItem}" Value="{x:Null}">
+                                        <!--Comment the following line out to view in editor {x:Null}-->
+                                        <Setter Property="IsEnabled" Value="False" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Button Grid.Column="4"    Margin="0 0 10 0" 
+                            Content="&#xe01f;" FontFamily="zVirtualScenes"
+                            Click="SettingBtn_Click_1" 
+                            ToolTip="Command Settings">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialToolbarButton}">
+                                <Setter Property="IsEnabled" Value="True" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=SceneCmdsGrid, Path=SelectedItem}" Value="{x:Null}">
+                                        <!--Comment the following line out to view in editor {x:Null}-->
+                                        <Setter Property="IsEnabled" Value="False" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+              
                 </Grid>
 
             </Grid>

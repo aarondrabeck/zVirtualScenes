@@ -26,7 +26,7 @@
                    GridLinesVisibility="Horizontal" RowHeight="55" CanUserAddRows="False" AutoGenerateColumns="False" 
                   ItemsSource="{Binding}" PreviewMouseLeftButtonDown="DeviceGrid_PreviewMouseLeftButtonDown" 
                   RowEditEnding="DeviceGrid_RowEditEnding" 
-                  RowHeaderWidth="0" AllowDrop="False" BorderThickness="0 0 0 0" FontFamily="flaticon">
+                  RowHeaderWidth="0" AllowDrop="False" BorderThickness="0 0 0 0" FontFamily="zVirtualScenes">
                 <DataGrid.Resources>
                     <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="{DynamicResource DeviceSelectedColor}"/>
                     <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
@@ -71,7 +71,7 @@
                             <DataTemplate>
                                 <Grid Height="40" Width="40">
                                     <Ellipse  Name="Ellipse" Fill="#B2B2B2"/>
-                                    <TextBlock Name="imgFont" Text="&#xe006;" Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" Foreground="White" 
+                                    <TextBlock Name="imgFont" Text="&#xe006;" Style="{DynamicResource ZvsFont}"  FontFamily="zVirtualScenes" Foreground="White" 
                                            FontSize="25" VerticalAlignment="Center" HorizontalAlignment="Center" />
                                 </Grid>
 
@@ -95,7 +95,7 @@
                                         <Setter TargetName="imgFont" Property="Text" Value="&#xe003;"/>
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="Sensor">
-                                        <Setter TargetName="imgFont" Property="Text" Value="&#xe007;"/>
+                                        <Setter TargetName="imgFont" Property="Text" Value="&#xe1a0;"/>
                                     </DataTrigger>
                                 </DataTemplate.Triggers>
                             </DataTemplate>
@@ -126,7 +126,7 @@
 
                     <DataGridTextColumn  HeaderStyle="{StaticResource SelectionDataGridHeader}" x:Name="DeviceTypeCol" CellStyle="{StaticResource BodyContentDataGridCentering}" 
                                      Width="200" MinWidth="50" Header="Type"
-                                    Binding="{Binding Path=Type.Name}" FontSize="16" IsReadOnly="True" FontFamily="flaticon" >
+                                    Binding="{Binding Path=Type.Name}" FontSize="16" IsReadOnly="True" FontFamily="zVirtualScenes" >
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
                                 <Setter Property="TextTrimming" Value="CharacterEllipsis" />
@@ -143,7 +143,7 @@
 
                             <DataTemplate>
 
-                                <ComboBox x:Name="GroupsCmbBox" Foreground="#181818" FontSize="16" Padding="8" ItemsSource="{Binding Path=Groups}" SelectedIndex="0" Margin="5,0" FontFamily="flaticon">
+                                <ComboBox x:Name="GroupsCmbBox" Foreground="#181818" FontSize="16" Padding="8" ItemsSource="{Binding Path=Groups}" SelectedIndex="0" Margin="5,0" FontFamily="zVirtualScenes">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <TextBlock Text="{Binding Path=Name}"/>
@@ -232,7 +232,7 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <Button Grid.Column="0" 
-                            Content="&#xe00b;" FontFamily="ZvsExtended"
+                            Content="&#xe01a;" FontFamily="zVirtualScenes"
                             Click="ButtonDeleteDevice_OnClick"
                             ToolTip="Delete Device">
                             <Button.Style>
@@ -251,7 +251,7 @@
                             </Button.Style>
                         </Button>
                         <Button  Grid.Column="1" Margin="10 0 0 0" 
-                           Content="&#xe00f;" FontFamily="ZvsExtended"
+                           Content="&#xe01f;" FontFamily="zVirtualScenes"
                             Click="SettingBtn_Click_1" 
                             ToolTip="Device Settings">
                             <Button.Style>

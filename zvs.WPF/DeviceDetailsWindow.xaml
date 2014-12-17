@@ -38,7 +38,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <TextBlock  Grid.Row="0" Name="DeviceImage" HorizontalAlignment="Center" FontFamily="flaticon" FontSize="80" >
+                <TextBlock  Grid.Row="0" Name="DeviceImage" HorizontalAlignment="Center" FontFamily="zVirtualScenes" FontSize="80" >
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
                             <Setter  Property="Text" Value="&#xe004;"/>
@@ -62,7 +62,7 @@
                                     <Setter   Property="Text" Value="&#xe003;"/>
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding ElementName=This, Path=Device.Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="Sensor">
-                                    <Setter   Property="Text" Value="&#xe007;"/>
+                                    <Setter   Property="Text" Value="&#xe1a0;"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
