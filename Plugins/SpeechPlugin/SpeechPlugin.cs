@@ -1,19 +1,17 @@
 ﻿using System;
 using System.ComponentModel.Composition;
-using System.Speech.Synthesis;
-using zvs.Processor;
 using System.Data.Entity;
-using System.ComponentModel;
-using zvs.DataModel;
+using System.Speech.Synthesis;
 using System.Threading.Tasks;
+using zvs.DataModel;
+using zvs.Processor;
 
 namespace SpeechPlugin
 {
-    [Export(typeof(zvsPlugin))]
-    public class SpeechPlugin : zvsPlugin, INotifyPropertyChanged, IDisposable
+    [Export(typeof(ZvsPlugin))]
+    public class SpeechPlugin : ZvsPlugin, IDisposable
     {
         private SpeechSynthesizer _synth;
-        zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<SpeechPlugin>();
 
         public override Guid PluginGuid
         {
@@ -30,37 +28,33 @@ namespace SpeechPlugin
             get { return "This plug-in will announce when zVirtualScene devices change values. It can be customized to announce only desired value changes."; }
         }
 
-        private string _AnnounceOptionSetting = "";
+        private string _announceOptionSetting = "";
         public string AnnounceOptionSetting
         {
-            get { return _AnnounceOptionSetting; }
+            get { return _announceOptionSetting; }
             set
             {
-                if (value != _AnnounceOptionSetting)
-                {
-                    _AnnounceOptionSetting = value;
-                    NotifyPropertyChanged();
-                }
+                if (value == _announceOptionSetting) return;
+                _announceOptionSetting = value;
+                NotifyPropertyChanged();
             }
         }
 
-        private string _CustomAnnounceSetting = "";
+        private string _customAnnounceSetting = "";
         public string CustomAnnounceSetting
         {
-            get { return _CustomAnnounceSetting; }
+            get { return _customAnnounceSetting; }
             set
             {
-                if (value != _CustomAnnounceSetting)
-                {
-                    _CustomAnnounceSetting = value;
-                    NotifyPropertyChanged();
-                }
+                if (value == _customAnnounceSetting) return;
+                _customAnnounceSetting = value;
+                NotifyPropertyChanged();
             }
         }
 
         public override async Task OnSettingsCreating(PluginSettingBuilder settingBuilder)
         {
-            PluginSetting annouceoptionssetting = new PluginSetting
+            var annouceoptionssetting = new PluginSetting
             {
                 Name = "Announce options",
                 Value = "Level",
@@ -78,7 +72,7 @@ namespace SpeechPlugin
             var customsetting = new PluginSetting
            {
                Name = "Announce on custom values",
-               Value = "DIMMER:Basic, THERMOSTAT:Temperature, SWITCH:Basic, THERMOSTAT:Operating State",
+               Value = "dimmer:Basic, thermostat:Temperature, switch:Basic, thermostat:Operating State",
                ValueType = DataType.STRING,
                Description = "Include all values you would like announced. (DEVICE_TYPE_NAME:VALUE_LABEL_NAME) Comma Separated."
            };
@@ -86,32 +80,38 @@ namespace SpeechPlugin
             await settingBuilder.Plugin(this).RegisterPluginSettingAsync(customsetting, o => o.CustomAnnounceSetting);
         }
 
-        public override Task StartAsync()
+        public override async Task StartAsync()
         {
             _synth = new SpeechSynthesizer();
-            log.Info(this.Name + " started");
+            await Log.ReportInfoFormatAsync(CancellationToken, "{0} started", Name);
+            NotifyEntityChangeContext.ChangeNotifications<DeviceValue>.OnEntityUpdated += SpeechPlugin_OnEntityUpdated;
             _synth.SpeakAsync("Speech Started!");
-            return Task.FromResult(0);
         }
 
-        public override Task StopAsync()
+
+        public override async Task StopAsync()
         {
-            log.Info(this.Name + " stopped");
+            await Log.ReportInfoFormatAsync(CancellationToken, "{0} stopped", Name);
+            NotifyEntityChangeContext.ChangeNotifications<DeviceValue>.OnEntityUpdated -= SpeechPlugin_OnEntityUpdated;
             _synth.Dispose();
-            return Task.FromResult(0);
         }
 
-        public override async Task DeviceValueChangedAsync(Int64 deviceValueId, string newValue, string oldValue)
+        async void SpeechPlugin_OnEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<DeviceValue>.EntityUpdatedArgs e)
         {
-            using (ZvsContext context = new ZvsContext())
+            using (var context = new ZvsContext(EntityContextConnection))
             {
-                DeviceValue dv = await context.DeviceValues.FirstOrDefaultAsync(v => v.Id == deviceValueId);
+                var dv = await context.DeviceValues
+                    .Include(o => o.Device.Type)
+                    .FirstOrDefaultAsync(v => v.Id == e.NewEntity.Id, CancellationToken);
+
                 if (dv == null)
                     return;
 
+                var deviceTypeUId = dv.Device.Type.UniqueIdentifier;
+
                 if (AnnounceOptionSetting == "Switch Level" || AnnounceOptionSetting == "All of the above")
                 {
-                    if (dv.Device.Type.UniqueIdentifier == "SWITCH" && dv.Name == "Basic")
+                    if (deviceTypeUId == "SWITCH" && dv.Name == "Basic")
                     {
                         _synth.SpeakAsync(dv.Device.Name + " switched " + (dv.Value == "255" ? "On" : "Off") + ".");
                     }
@@ -119,7 +119,7 @@ namespace SpeechPlugin
 
                 if (AnnounceOptionSetting == "Dimmer Level" || AnnounceOptionSetting == "All of the above")
                 {
-                    if (dv.Device.Type.UniqueIdentifier == "DIMMER" && dv.Name == "Level")
+                    if (deviceTypeUId == "DIMMER" && dv.Name == "Level")
                     {
                         _synth.SpeakAsync(dv.Device.Name + " " + dv.Name + " changed to " + dv.Value + ".");
                     }
@@ -127,27 +127,25 @@ namespace SpeechPlugin
 
                 if (AnnounceOptionSetting == "Thermostat Operating State and Temp" || AnnounceOptionSetting == "All of the above")
                 {
-                    if (dv.Device.Type.UniqueIdentifier == "THERMOSTAT" && dv.Name == "Temperature")
+                    if (deviceTypeUId == "THERMOSTAT" && dv.Name == "Temperature")
                     {
                         _synth.SpeakAsync(dv.Device.Name + " " + dv.Name + " changed to " + dv.Value + ".");
                     }
 
-                    if (dv.Device.Type.UniqueIdentifier == "THERMOSTAT" && dv.Name == "Operating State")
+                    if (deviceTypeUId == "THERMOSTAT" && dv.Name == "Operating State")
                     {
                         _synth.SpeakAsync(dv.Device.Name + " " + dv.Name + " changed to " + dv.Value + ".");
                     }
                 }
-                if (AnnounceOptionSetting == "Custom")
+                if (AnnounceOptionSetting != "Custom") return;
+                var objTypeValuespairs = CustomAnnounceSetting.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (var objTypeValuespair in objTypeValuespairs)
                 {
-                    string[] objTypeValuespairs = CustomAnnounceSetting.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    var thisEvent = string.Format("{0}:{1}", deviceTypeUId, dv.Name);
 
-                    foreach (string objTypeValuespair in objTypeValuespairs)
-                    {
-                        string thisEvent = dv.Device.Type.UniqueIdentifier + ":" + dv.Name;
-
-                        if (thisEvent.Equals(objTypeValuespair.Trim()))
-                            _synth.SpeakAsync(dv.Device.Name + " " + dv.Name + " changed to " + dv.Value + ".");
-                    }
+                    if (thisEvent.Equals(objTypeValuespair.Trim()))
+                        _synth.SpeakAsync(string.Format("{0} {1}  changed to {2}.", dv.Device.Name, dv.Name, dv.Value));
                 }
             }
         }
@@ -159,21 +157,19 @@ namespace SpeechPlugin
 
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)
         {
-            if (disposing)
+            if (!disposing) return;
+            if (_synth == null)
             {
-                if (this._synth == null)
-                {
-                    return;
-                }
-
-                _synth.Dispose();
+                return;
             }
+
+            _synth.Dispose();
         }
     }
 }
