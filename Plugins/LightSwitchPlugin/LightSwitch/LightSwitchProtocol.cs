@@ -14,33 +14,33 @@ namespace LightSwitchPlugin.LightSwitch
             string[] commandSegments = cmd.Split('~');
 
             if (commandSegments[0].Equals("IPHONE"))
-                protocol.onIphone();
+                protocol.OnIphone();
             else if (commandSegments[0].Equals("PASSWORD") && commandSegments.Length == 2)
-                protocol.onPassword(commandSegments[1]);
+                protocol.OnPassword(commandSegments[1]);
             else if (commandSegments[0].Equals("VERSION"))
-                protocol.onVersion();
+                protocol.OnVersion();
             else if (commandSegments[0].Equals("SERVER"))
-                protocol.onServer();
+                protocol.OnServer();
             else if (commandSegments[0].Equals("TERMINATE"))
-                protocol.onTerminate();
+                protocol.OnTerminate();
             else if (commandSegments[0].Equals("ALIST"))  //DEVICES, SCENES AND ZONES.
-                protocol.onAList();
+                protocol.OnAList();
             else if (commandSegments[0].Equals("LIST")) //DEVICES
-                protocol.onList();
+                protocol.OnList();
             else if (commandSegments[0].Equals("SLIST"))  //SCENES
-                protocol.onSList();
+                protocol.OnSList();
             else if (commandSegments[0].Equals("ZLIST")) //ZONES
-                protocol.onZList();
+                protocol.OnZList();
             else if (commandSegments[0].Equals("DEVICE") && commandSegments.Length == 4)
-                protocol.onDevice(commandSegments[1], commandSegments[2], commandSegments[3]);
+                protocol.OnDevice(commandSegments[1], commandSegments[2], commandSegments[3]);
             else if (commandSegments[0].Equals("SCENE") && commandSegments.Length == 2)
-                protocol.onScene(commandSegments[1]);
+                protocol.OnScene(commandSegments[1]);
             else if (commandSegments[0].Equals("ZONE") && commandSegments.Length == 3)
-                protocol.onZone(commandSegments[1], commandSegments[2]);
+                protocol.OnZone(commandSegments[1], commandSegments[2]);
             else if (commandSegments[0].Equals("THERMMODE") && commandSegments.Length == 4)
-                protocol.onThermMode(commandSegments[1], commandSegments[2], commandSegments[3]);
+                protocol.OnThermMode(commandSegments[1], commandSegments[2], commandSegments[3]);
             else if (commandSegments[0].Equals("THERMTEMP") && commandSegments.Length == 5)
-                protocol.onThermTemp(commandSegments[1], commandSegments[2], commandSegments[3], commandSegments[4]);
+                protocol.OnThermTemp(commandSegments[1], commandSegments[2], commandSegments[3], commandSegments[4]);
         }
 
         internal static LightSwitchCommand CreateMsgCmd(string msg)
@@ -55,7 +55,7 @@ namespace LightSwitchPlugin.LightSwitch
 
         internal static LightSwitchCommand CreateMsgCmdFormat(string msg, params object[] parameters)
         {
-            return LightSwitchProtocol.CreateMsgCmd(string.Format(msg, parameters));
+            return CreateMsgCmd(string.Format(msg, parameters));
         }
 
         internal static LightSwitchCommand CreateInfoCmd(string msg)
@@ -65,7 +65,7 @@ namespace LightSwitchPlugin.LightSwitch
 
         internal static LightSwitchCommand CreateInfoCmdFormat(string msg, params object[] parameters)
         {
-            return LightSwitchProtocol.CreateInfoCmd(string.Format(msg, parameters));
+            return CreateInfoCmd(string.Format(msg, parameters));
         }
 
         internal static LightSwitchCommand CreateCookieCmd(string nonce)
@@ -73,9 +73,9 @@ namespace LightSwitchPlugin.LightSwitch
             return new LightSwitchCommand(string.Format("COOKIE~{0}{1}", nonce, Environment.NewLine));
         }
 
-        internal static LightSwitchCommand CreateVersionCmd(string AppNameAndVersion)
+        internal static LightSwitchCommand CreateVersionCmd(string appNameAndVersion)
         {
-            return new LightSwitchCommand(string.Format("VER~{0}{1}", AppNameAndVersion, Environment.NewLine));
+            return new LightSwitchCommand(string.Format("VER~{0}{1}", appNameAndVersion, Environment.NewLine));
         }
 
         internal static LightSwitchCommand CreateDeviceCmd(string name, string id, string level, DeviceTypes type)
@@ -141,7 +141,7 @@ namespace LightSwitchPlugin.LightSwitch
 
         public byte[] ToBytes()
         {
-            return Encoding.UTF8.GetBytes(this.RawCommand);
+            return Encoding.UTF8.GetBytes(RawCommand);
         }
     }
 

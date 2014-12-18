@@ -1,79 +1,81 @@
-﻿using LightSwitchPlugin.LightSwitch;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using zvs;
+using zvs.DataModel;
 
-namespace LightSwitchPlugin
+namespace LightSwitchPlugin.LightSwitch
 {
     public class LightSwitchClient : ILightSwitchChannel
     {
         public TcpClient TcpClient { get; private set; }
         public int Nonce { get; private set; }
-        public bool isAuthenticated { get; set; }
+        public bool IsAuthenticated { get; set; }
         public string RemoteEndPoint { get; private set; }
-        zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<LightSwitchPlugin>();
 
         #region Events
-        public delegate void onDataReceivedEventHandler(object sender, LightSwitchDataEventArgs args);
-        public event onDataReceivedEventHandler onDataReceived = delegate { };
+        public delegate void OnDataReceivedEventHandler(object sender, LightSwitchDataEventArgs args);
+        public event OnDataReceivedEventHandler OnDataReceived = delegate { };
 
-        public delegate void onDataSentEventHandler(object sender, LightSwitchDataEventArgs args);
-        public event onDataSentEventHandler onDataSent = delegate { };
+        public delegate void OnDataSentEventHandler(object sender, LightSwitchDataEventArgs args);
+        public event OnDataSentEventHandler OnDataSent = delegate { };
 
-        public delegate void onConnectionClosedEventHandler(object sender, LightSwitchClientEventArgs args);
-        public event onConnectionClosedEventHandler onConnectionClosed = delegate { };
+        public delegate void OnConnectionClosedEventHandler(object sender, LightSwitchClientEventArgs args);
+        public event OnConnectionClosedEventHandler OnConnectionClosed = delegate { };
 
-        public delegate void onConnectionEstabilishedEventHandler(object sender, LightSwitchClientEventArgs args);
-        public event onConnectionEstabilishedEventHandler onConnectionEstabilished = delegate { };
+        public delegate void OnConnectionEstabilishedEventHandler(object sender, LightSwitchClientEventArgs args);
+        public event OnConnectionEstabilishedEventHandler OnConnectionEstabilished = delegate { };
 
-        public delegate void onCmdIphoneEventHandler(object sender, LightSwitchClientEventArgs args);
-        public event onCmdIphoneEventHandler onCmdIphone = delegate { };
+        public delegate void OnCmdIphoneEventHandler(object sender, LightSwitchClientEventArgs args);
+        public event OnCmdIphoneEventHandler OnCmdIphone = delegate { };
 
-        public delegate void onCmdVersionEventHandler(object sender, LightSwitchClientEventArgs args);
-        public event onCmdVersionEventHandler onCmdVersion = delegate { };
+        public delegate void OnCmdVersionEventHandler(object sender, LightSwitchClientEventArgs args);
+        public event OnCmdVersionEventHandler OnCmdVersion = delegate { };
 
-        public delegate void onCmdServerEventHandler(object sender, LightSwitchClientEventArgs args);
-        public event onCmdServerEventHandler onCmdServer = delegate { };
+        public delegate void OnCmdServerEventHandler(object sender, LightSwitchClientEventArgs args);
+        public event OnCmdServerEventHandler OnCmdServer = delegate { };
 
-        public delegate void onCmdTerminateEventHandler(object sender, LightSwitchClientEventArgs args);
-        public event onCmdTerminateEventHandler onCmdTerminate = delegate { };
+        public delegate void OnCmdTerminateEventHandler(object sender, LightSwitchClientEventArgs args);
+        public event OnCmdTerminateEventHandler OnCmdTerminate = delegate { };
 
-        public delegate void onCmdAListEventHandler(object sender, LightSwitchClientEventArgs args);
-        public event onCmdAListEventHandler onCmdAList = delegate { };
+        public delegate void OnCmdAListEventHandler(object sender, LightSwitchClientEventArgs args);
+        public event OnCmdAListEventHandler OnCmdAList = delegate { };
 
-        public delegate void onCmdSListEventHandler(object sender, LightSwitchClientEventArgs args);
-        public event onCmdSListEventHandler onCmdSList = delegate { };
+        public delegate void OnCmdSListEventHandler(object sender, LightSwitchClientEventArgs args);
+        public event OnCmdSListEventHandler OnCmdSList = delegate { };
 
-        public delegate void onCmdListEventHandler(object sender, LightSwitchClientEventArgs args);
-        public event onCmdListEventHandler onCmdList = delegate { };
+        public delegate void OnCmdListEventHandler(object sender, LightSwitchClientEventArgs args);
+        public event OnCmdListEventHandler OnCmdList = delegate { };
 
-        public delegate void onCmdZListEventHandler(object sender, LightSwitchClientEventArgs args);
-        public event onCmdZListEventHandler onCmdZList = delegate { };
+        public delegate void OnCmdZListEventHandler(object sender, LightSwitchClientEventArgs args);
+        public event OnCmdZListEventHandler OnCmdZList = delegate { };
 
-        public delegate void onCmdPasswordEventHandler(object sender, onPasswordEventArgs args);
-        public event onCmdPasswordEventHandler onCmdPassword = delegate { };
+        public delegate void OnCmdPasswordEventHandler(object sender, OnPasswordEventArgs args);
+        public event OnCmdPasswordEventHandler OnCmdPassword = delegate { };
 
-        public delegate void onCmdDeviceEventHandler(object sender, onDeviceEventArgs args);
-        public event onCmdDeviceEventHandler onCmdDevice = delegate { };
+        public delegate void OnCmdDeviceEventHandler(object sender, OnDeviceEventArgs args);
+        public event OnCmdDeviceEventHandler OnCmdDevice = delegate { };
 
-        public delegate void onCmdSceneEventHandler(object sender, onSceneEventArgs args);
-        public event onCmdSceneEventHandler onCmdScene = delegate { };
+        public delegate void OnCmdSceneEventHandler(object sender, OnSceneEventArgs args);
+        public event OnCmdSceneEventHandler OnCmdScene = delegate { };
 
-        public delegate void onCmdZoneEventHandler(object sender, onZoneEventArgs args);
-        public event onCmdZoneEventHandler onCmdZone = delegate { };
+        public delegate void OnCmdZoneEventHandler(object sender, OnZoneEventArgs args);
+        public event OnCmdZoneEventHandler OnCmdZone = delegate { };
 
-        public delegate void onCmdThermTempEventHandler(object sender, onThermTempEventArgs args);
-        public event onCmdThermTempEventHandler onCmdThermTemp = delegate { };
+        public delegate void OnCmdThermTempEventHandler(object sender, OnThermTempEventArgs args);
+        public event OnCmdThermTempEventHandler OnCmdThermTemp = delegate { };
 
-        public delegate void onCmdThermModeEventHandler(object sender, onThermModeEventArgs args);
-        public event onCmdThermModeEventHandler onCmdThermMode = delegate { };
+        public delegate void OnCmdThermModeEventHandler(object sender, OnThermModeEventArgs args);
+        public event OnCmdThermModeEventHandler OnCmdThermMode = delegate { };
         #endregion
+
+        public IFeedback<LogEntry> Log { get; set; }
 
         public LightSwitchClient(TcpClient tcpClient)
         {
-            isAuthenticated = false;
+            IsAuthenticated = false;
             TcpClient = tcpClient;
             Nonce = new Random().Next(65536);
             RemoteEndPoint = TcpClient.Connected ? TcpClient.Client.RemoteEndPoint.ToString() : "Unknown";
@@ -89,20 +91,19 @@ namespace LightSwitchPlugin
             if (TcpClient.Connected)
                 TcpClient.Close();
         }
-      
+
         public async void ProcessConnection(TcpClient tcpClient)
         {
-            byte[] message = new byte[1024];
-            int bytesRead;
+            var message = new byte[1024];
 
-            NetworkStream networkStream = tcpClient.GetStream();
+            var networkStream = tcpClient.GetStream();
 
-            if (this.onConnectionEstabilished != null)
-                this.onConnectionEstabilished(this, new LightSwitchClientEventArgs(this));
+            if (OnConnectionEstabilished != null)
+                OnConnectionEstabilished(this, new LightSwitchClientEventArgs(this));
 
             while (true)
             {
-                bytesRead = 0;
+                int bytesRead;
                 try
                 {
                     bytesRead = await networkStream.ReadAsync(message, 0, 1024);
@@ -119,118 +120,114 @@ namespace LightSwitchPlugin
                     break;
                 }
 
-                ASCIIEncoding encoder = new ASCIIEncoding();
-                if (this.onDataReceived != null)
-                {
-                    string incomingMessage = encoder.GetString(message, 0, bytesRead);
-                    this.onDataReceived(this, new LightSwitchDataEventArgs(this, incomingMessage));
-                    LightSwitch.LightSwitchProtocol.DecodeIncoming(incomingMessage, this);
-                }
+                var encoder = new ASCIIEncoding();
+                if (OnDataReceived == null) continue;
+                var incomingMessage = encoder.GetString(message, 0, bytesRead);
+                OnDataReceived(this, new LightSwitchDataEventArgs(this, incomingMessage));
+                LightSwitchProtocol.DecodeIncoming(incomingMessage, this);
             }
             tcpClient.Close();
-            if (this.onConnectionClosed != null)
-                this.onConnectionClosed(this, new LightSwitchClientEventArgs(this));
+            if (OnConnectionClosed != null)
+                OnConnectionClosed(this, new LightSwitchClientEventArgs(this));
         }
 
         /// <summary>
         /// Send command to a client
         /// </summary>
-        /// <param name="client"></param>
-        /// <param name="msg"></param>
-        public async Task SendCommandAsync(LightSwitchCommand command)
+        public async Task<Result> SendCommandAsync(LightSwitchCommand command)
         {
-            if (command.RawCommand.Length > 0 && this.TcpClient.Connected)
+            if (command == null) throw new ArgumentNullException("command");
+            if (command.RawCommand.Length > 0 && TcpClient.Connected)
             {
                 try
                 {
                     var byteArray = command.ToBytes();
-                    var clientStream = this.TcpClient.GetStream();
+                    var clientStream = TcpClient.GetStream();
                     await clientStream.WriteAsync(byteArray, 0, byteArray.Length);
                 }
                 catch (SocketException se)
                 {
-                    log.Error("LightSwitch Socket Exception: " + se.Message);
-                    return;
+                    return Result.ReportError(string.Format("LightSwitch Socket Exception: {0}", se.Message));
                 }
                 catch (Exception e)
                 {
-                    log.Error("LightSwitch Exception: " + e.Message);
-                    return;
+                    return Result.ReportError(string.Format("LightSwitch Exception: " + e.Message));
                 }
-                onDataSent(this, new LightSwitchDataEventArgs(this, command.RawCommand));
+                OnDataSent(this, new LightSwitchDataEventArgs(this, command.RawCommand));
             }
+            return Result.ReportSuccess();
         }
 
         #region ILightSwitchChannel Methods
-        
-        public void onIphone()
+
+        public void OnIphone()
         {
-            onCmdIphone(this, new LightSwitchClientEventArgs(this));
+            OnCmdIphone(this, new LightSwitchClientEventArgs(this));
         }
 
-        public void onPassword(string password)
+        public void OnPassword(string password)
         {
-            onCmdPassword(this, new onPasswordEventArgs(this, password));
+            OnCmdPassword(this, new OnPasswordEventArgs(this, password));
         }
 
-        public void onVersion()
+        public void OnVersion()
         {
-            onCmdVersion(this, new LightSwitchClientEventArgs(this));
+            OnCmdVersion(this, new LightSwitchClientEventArgs(this));
         }
 
-        public void onServer()
+        public void OnServer()
         {
-            onCmdServer(this, new LightSwitchClientEventArgs(this));
+            OnCmdServer(this, new LightSwitchClientEventArgs(this));
         }
 
-        public void onTerminate()
+        public void OnTerminate()
         {
-            onCmdTerminate(this, new LightSwitchClientEventArgs(this));
+            OnCmdTerminate(this, new LightSwitchClientEventArgs(this));
         }
 
-        public void onAList()
+        public void OnAList()
         {
-            onCmdAList(this, new LightSwitchClientEventArgs(this));
+            OnCmdAList(this, new LightSwitchClientEventArgs(this));
         }
 
-        public void onSList()
+        public void OnSList()
         {
-            onCmdSList(this, new LightSwitchClientEventArgs(this));
+            OnCmdSList(this, new LightSwitchClientEventArgs(this));
         }
 
-        public void onList()
+        public void OnList()
         {
-            onCmdList(this, new LightSwitchClientEventArgs(this));
+            OnCmdList(this, new LightSwitchClientEventArgs(this));
         }
 
-        public void onZList()
+        public void OnZList()
         {
-            onCmdZList(this, new LightSwitchClientEventArgs(this));
+            OnCmdZList(this, new LightSwitchClientEventArgs(this));
         }
 
-        public void onDevice(string deviceId, string level, string type)
+        public void OnDevice(string deviceId, string level, string type)
         {
-            onCmdDevice(this, new onDeviceEventArgs(this, deviceId, level, type));
+            OnCmdDevice(this, new OnDeviceEventArgs(this, deviceId, level, type));
         }
 
-        public void onScene(string sceneId)
+        public void OnScene(string sceneId)
         {
-            onCmdScene(this, new onSceneEventArgs(this, sceneId));
+            OnCmdScene(this, new OnSceneEventArgs(this, sceneId));
         }
 
-        public void onZone(string zoneId, string level)
+        public void OnZone(string zoneId, string level)
         {
-            onCmdZone(this, new onZoneEventArgs(this, zoneId, level));
+            OnCmdZone(this, new OnZoneEventArgs(this, zoneId, level));
         }
 
-        public void onThermTemp(string deviceId, string mode, string temp, string type)
+        public void OnThermTemp(string deviceId, string mode, string temp, string type)
         {
-            onCmdThermTemp(this, new onThermTempEventArgs(this, deviceId, mode, temp, type));
+            OnCmdThermTemp(this, new OnThermTempEventArgs(this, deviceId, mode, temp, type));
         }
 
-        public void onThermMode(string deviceId, string mode, string type)
+        public void OnThermMode(string deviceId, string mode, string type)
         {
-            onCmdThermMode(this, new onThermModeEventArgs(this, deviceId, mode, type));
+            OnCmdThermMode(this, new OnThermModeEventArgs(this, deviceId, mode, type));
         }
         #endregion
     }
@@ -241,7 +238,7 @@ namespace LightSwitchPlugin
         public LightSwitchClient LightSwitchClient { get; private set; }
         public LightSwitchClientEventArgs(LightSwitchClient lightSwitchClient)
         {
-            this.LightSwitchClient = lightSwitchClient;
+            LightSwitchClient = lightSwitchClient;
         }
     }
 
@@ -251,83 +248,83 @@ namespace LightSwitchPlugin
         public LightSwitchDataEventArgs(LightSwitchClient lightSwitchClient, String rawData)
             : base(lightSwitchClient)
         {
-            this.RawData = rawData;
+            RawData = rawData;
         }
     }
 
-    public class onPasswordEventArgs : LightSwitchClientEventArgs
+    public class OnPasswordEventArgs : LightSwitchClientEventArgs
     {
         public string Password { get; private set; }
-        public onPasswordEventArgs(LightSwitchClient lightSwitchClient, string password)
+        public OnPasswordEventArgs(LightSwitchClient lightSwitchClient, string password)
             : base(lightSwitchClient)
         {
-            this.Password = password;
+            Password = password;
         }
     }
 
-    public class onDeviceEventArgs : LightSwitchClientEventArgs
+    public class OnDeviceEventArgs : LightSwitchClientEventArgs
     {
         public string DeviceId { get; private set; }
         public string Level { get; private set; }
         public string Type { get; private set; }
-        public onDeviceEventArgs(LightSwitchClient lightSwitchClient, string deviceId, string level, string type)
+        public OnDeviceEventArgs(LightSwitchClient lightSwitchClient, string deviceId, string level, string type)
             : base(lightSwitchClient)
         {
-            this.DeviceId = deviceId;
-            this.Level = level;
-            this.Type = type;
+            DeviceId = deviceId;
+            Level = level;
+            Type = type;
         }
     }
 
-    public class onSceneEventArgs : LightSwitchClientEventArgs
+    public class OnSceneEventArgs : LightSwitchClientEventArgs
     {
         public string SceneId { get; private set; }
-        public onSceneEventArgs(LightSwitchClient lightSwitchClient, string sceneId)
+        public OnSceneEventArgs(LightSwitchClient lightSwitchClient, string sceneId)
             : base(lightSwitchClient)
         {
-            this.SceneId = sceneId;
+            SceneId = sceneId;
         }
     }
 
-    public class onZoneEventArgs : LightSwitchClientEventArgs
+    public class OnZoneEventArgs : LightSwitchClientEventArgs
     {
         public string ZoneId { get; private set; }
         public string Level { get; private set; }
-        public onZoneEventArgs(LightSwitchClient lightSwitchClient, string zoneId, string level)
+        public OnZoneEventArgs(LightSwitchClient lightSwitchClient, string zoneId, string level)
             : base(lightSwitchClient)
         {
-            this.ZoneId = zoneId;
-            this.Level = level;
+            ZoneId = zoneId;
+            Level = level;
         }
     }
 
-    public class onThermTempEventArgs : LightSwitchClientEventArgs
+    public class OnThermTempEventArgs : LightSwitchClientEventArgs
     {
         public string DeviceId { get; private set; }
         public string Mode { get; private set; }
         public string Temp { get; private set; }
         public string Type { get; private set; }
-        public onThermTempEventArgs(LightSwitchClient lightSwitchClient, string deviceId, string mode, string temp, string type)
+        public OnThermTempEventArgs(LightSwitchClient lightSwitchClient, string deviceId, string mode, string temp, string type)
             : base(lightSwitchClient)
         {
-            this.DeviceId = deviceId;
-            this.Mode = mode;
-            this.Temp = temp;
-            this.Type = type;
+            DeviceId = deviceId;
+            Mode = mode;
+            Temp = temp;
+            Type = type;
         }
     }
 
-    public class onThermModeEventArgs : LightSwitchClientEventArgs
+    public class OnThermModeEventArgs : LightSwitchClientEventArgs
     {
         public string DeviceId { get; private set; }
         public string Mode { get; private set; }
         public string Type { get; private set; }
-        public onThermModeEventArgs(LightSwitchClient lightSwitchClient, string deviceId, string mode, string type)
+        public OnThermModeEventArgs(LightSwitchClient lightSwitchClient, string deviceId, string mode, string type)
             : base(lightSwitchClient)
         {
-            this.DeviceId = deviceId;
-            this.Mode = mode;
-            this.Type = type;
+            DeviceId = deviceId;
+            Mode = mode;
+            Type = type;
         }
     }
     #endregion

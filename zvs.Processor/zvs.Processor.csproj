@@ -79,6 +79,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FeedbackExtensionMethods.cs" />
     <Compile Include="IRunner.cs" />
     <Compile Include="JavaScriptRunner.cs" />
     <Compile Include="PluginLoader.cs" />
@@ -93,7 +94,6 @@
     <Compile Include="ICommandProcessor.cs" />
     <Compile Include="PluginManager.cs" />
     <Compile Include="Properties\Annotations.cs" />
-    <Compile Include="FeedbackExtensionMethods.cs" />
     <Compile Include="SceneRunner.cs" />
     <Compile Include="SceneSettingBuilder.cs" />
     <Compile Include="NativeMethods.cs" />

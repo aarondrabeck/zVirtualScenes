@@ -36,6 +36,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zvs.Processor.UnitTestAdapt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpeechPlugin", "Plugins\SpeechPlugin\SpeechPlugin.csproj", "{4F2A0218-0AF4-4EBA-BC2D-E982DBE37E66}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LightSwitchPlugin", "Plugins\LightSwitchPlugin\LightSwitchPlugin.csproj", "{F9F697BB-3589-4FED-8E15-F15D16D56C91}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -230,6 +232,22 @@ Global
 		{4F2A0218-0AF4-4EBA-BC2D-E982DBE37E66}.Release|Win32.ActiveCfg = Release|Any CPU
 		{4F2A0218-0AF4-4EBA-BC2D-E982DBE37E66}.Release|x64.ActiveCfg = Release|Any CPU
 		{4F2A0218-0AF4-4EBA-BC2D-E982DBE37E66}.Release|x86.ActiveCfg = Release|Any CPU
+		{F9F697BB-3589-4FED-8E15-F15D16D56C91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9F697BB-3589-4FED-8E15-F15D16D56C91}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9F697BB-3589-4FED-8E15-F15D16D56C91}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{F9F697BB-3589-4FED-8E15-F15D16D56C91}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{F9F697BB-3589-4FED-8E15-F15D16D56C91}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{F9F697BB-3589-4FED-8E15-F15D16D56C91}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{F9F697BB-3589-4FED-8E15-F15D16D56C91}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F9F697BB-3589-4FED-8E15-F15D16D56C91}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F9F697BB-3589-4FED-8E15-F15D16D56C91}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9F697BB-3589-4FED-8E15-F15D16D56C91}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9F697BB-3589-4FED-8E15-F15D16D56C91}.Release|ARM.ActiveCfg = Release|Any CPU
+		{F9F697BB-3589-4FED-8E15-F15D16D56C91}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{F9F697BB-3589-4FED-8E15-F15D16D56C91}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{F9F697BB-3589-4FED-8E15-F15D16D56C91}.Release|Win32.ActiveCfg = Release|Any CPU
+		{F9F697BB-3589-4FED-8E15-F15D16D56C91}.Release|x64.ActiveCfg = Release|Any CPU
+		{F9F697BB-3589-4FED-8E15-F15D16D56C91}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -239,6 +257,7 @@ Global
 		{0A43D202-F903-44C8-83E3-03A3928E9480} = {505C4DBB-763D-488B-9CA7-BED1AC34966C}
 		{36154973-544F-4B02-A6E0-7EBB59046CAF} = {9EDBAA9B-7C45-493F-9147-6A40D35DC3C2}
 		{4F2A0218-0AF4-4EBA-BC2D-E982DBE37E66} = {9EDBAA9B-7C45-493F-9147-6A40D35DC3C2}
+		{F9F697BB-3589-4FED-8E15-F15D16D56C91} = {9EDBAA9B-7C45-493F-9147-6A40D35DC3C2}
 	EndGlobalSection
 	GlobalSection(SubversionScc) = preSolution
 		Svn-Managed = True

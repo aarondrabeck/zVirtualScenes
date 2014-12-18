@@ -11,8 +11,7 @@ namespace zvs
 
             if (ex.Message.Contains("See the inner exception for details.") && ex.InnerException != null)
                 return ex.InnerException.GetInnerMostExceptionMessage();
-            else
-                return ex.Message;
+            return ex.Message;
         }
 
     }
