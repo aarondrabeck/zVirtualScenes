@@ -1,68 +1,66 @@
 ﻿using System;
-using System.Data;
-using System.Configuration;
-using System.Text;
 using System.Net;
-using System.IO;
+using System.Text;
 
-namespace ThingSpeak
+namespace ThingSpeak.Client
 {
     public class ThingSpeakClient
     {
-        public string APIKey { get; set; }
-        private const string _url = "http://api.thingspeak.com/";
-        
-        zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<ThingSpeakClient>();
+        private string ApiKey { get; set; }
+        private const string Url = "http://api.thingspeak.com/";
 
-
-        public Boolean SendDataToThingSpeak(out Int16 TSResponse, params string[] fields)
+        public ThingSpeakClient(string apiKey)
         {
-            StringBuilder sbQS = new StringBuilder();
+            ApiKey = apiKey;
+        }
+
+        public Boolean SendDataToThingSpeak(out Int16 tsResponse, params string[] fields)
+        {
+            var sbQs = new StringBuilder();
 
             // Build the querystring
-            sbQS.Append(_url + "update?key=" + APIKey);
-            for (int x = 0; x < fields.Length; x++)
+            sbQs.Append(Url + "update?key=" + ApiKey);
+            for (var x = 0; x < fields.Length; x++)
             {
-                int index = x + 1;
-                if (!string.IsNullOrEmpty(fields[x])) sbQS.Append("&field" + index + "=" + System.Uri.EscapeDataString(fields[x]));
-
+                var index = x + 1;
+                if (!string.IsNullOrEmpty(fields[x])) sbQs.Append("&field" + index + "=" + Uri.EscapeDataString(fields[x]));
             }
 
             // The response will be a "0" if there is an error or the entry_id if > 0
-            TSResponse = Convert.ToInt16(PostToThingSpeak(sbQS.ToString()));
+            tsResponse = Convert.ToInt16(PostToThingSpeak(sbQs.ToString()));
 
-            return (TSResponse > 0);
+            return (tsResponse > 0);
 
         }
 
-        public Boolean UpdateThingkSpeakStatus(string status, out Int16 TSResponse)
+        public Boolean UpdateThingkSpeakStatus(string status, out Int16 tsResponse)
         {
-            StringBuilder sbQS = new StringBuilder();
-            sbQS.Append(_url + "update?key=" + APIKey + "&status=" + System.Uri.EscapeDataString(status));
+            var sbQs = new StringBuilder();
+            sbQs.Append(Url + "update?key=" + ApiKey + "&status=" + Uri.EscapeDataString(status));
 
-            TSResponse = Convert.ToInt16(PostToThingSpeak(sbQS.ToString()));
+            tsResponse = Convert.ToInt16(PostToThingSpeak(sbQs.ToString()));
 
-            return (TSResponse > 0);
+            return (tsResponse > 0);
         }
 
-        public Boolean UpdateThingSpeakLocation(string TSLat, string TSLong, string TSElevation, out Int16 TSResponse)
+        public Boolean UpdateThingSpeakLocation(string tsLat, string tsLong, string tsElevation, out Int16 tsResponse)
         {
-            StringBuilder sbQS = new StringBuilder();
-            sbQS.Append(_url + "update?key=" + APIKey);
+            var sbQs = new StringBuilder();
+            sbQs.Append(Url + "update?key=" + ApiKey);
 
-            if (TSLat != null) sbQS.Append("&lat=" + TSLat);
-            if (TSLong != null) sbQS.Append("&long=" + TSLong);
-            if (TSElevation != null) sbQS.Append("&elevation=" + TSElevation);
+            if (tsLat != null) sbQs.Append("&lat=" + tsLat);
+            if (tsLong != null) sbQs.Append("&long=" + tsLong);
+            if (tsElevation != null) sbQs.Append("&elevation=" + tsElevation);
 
-            TSResponse = Convert.ToInt16(PostToThingSpeak(sbQS.ToString()));
+            tsResponse = Convert.ToInt16(PostToThingSpeak(sbQs.ToString()));
 
-            return (TSResponse > 0);
+            return (tsResponse > 0);
         }
 
-        private string PostToThingSpeak(string QueryString)
+        private string PostToThingSpeak(string queryString)
         {
             var wc = new WebClient();
-            return wc.DownloadString(QueryString);
+            return wc.DownloadString(queryString);
         }
     }
 }
