@@ -77,105 +77,43 @@ namespace zvs.WPF.DeviceControls
                                     bool.TryParse(dv.Value, out defaultValue);
                                 }
 
-                                var control = new CheckboxControl(deviceCommand.Name, deviceCommand.Description, defaultValue, async isChecked =>
+                                var control = new CheckboxControl(async isChecked =>
                                 {
                                     await _app.ZvsEngine.RunCommandAsync(deviceCommand.Id, isChecked.ToString(), string.Empty, CancellationToken.None);
-                                }, _icon) { ToolTip = tip };
-                                DeviceCommandsStkPnl.Children.Add(control);
-
-                                break;
-                            }
-                        case DataType.DECIMAL:
-                            {
-                                //get the current value from the value table list
-                                var defaultValue = "0";
-                                var dv = d.Values.FirstOrDefault(v => v.UniqueIdentifier == deviceCommand.CustomData2);
-                                if (dv != null)
-                                    defaultValue = dv.Value;
-
-                                var control = new NumericControl(deviceCommand.Name,
-                                    deviceCommand.Description,
-                                    defaultValue,
-                                    NumericControl.NumberType.Decimal,
-                                    async value =>
-                                    {
-                                        await _app.ZvsEngine.RunCommandAsync(deviceCommand.Id, value, string.Empty, CancellationToken.None);
-                                    },
-                                    _icon) { ToolTip = tip };
+                                },
+                                    _icon)
+                                {
+                                    Header = deviceCommand.Name,
+                                    Description = deviceCommand.Description,
+                                    Value = defaultValue
+                                };
                                 DeviceCommandsStkPnl.Children.Add(control);
 
                                 break;
                             }
                         case DataType.INTEGER:
-                            {
-                                //get the current value from the value table list
-                                var defaultValue = "0";
-                                var dv = d.Values.FirstOrDefault(v => v.UniqueIdentifier == deviceCommand.CustomData2);
-                                if (dv != null)
-                                {
-                                    defaultValue = dv.Value;
-                                }
-
-                                var control = new NumericControl(deviceCommand.Name,
-                                    deviceCommand.Description,
-                                    defaultValue,
-                                    NumericControl.NumberType.Integer,
-                                    async value =>
-                                    {
-                                        await _app.ZvsEngine.RunCommandAsync(deviceCommand.Id, value, string.Empty, CancellationToken.None);
-                                    },
-                                    _icon) { ToolTip = tip };
-                                DeviceCommandsStkPnl.Children.Add(control);
-
-                                break;
-                            }
+                        case DataType.DECIMAL:
                         case DataType.BYTE:
-                            {
-                                //get the current value from the value table list
-                                var defaultValue = "0";
-                                var dv = d.Values.FirstOrDefault(v => v.UniqueIdentifier == deviceCommand.CustomData2);
-                                if (dv != null)
-                                {
-                                    defaultValue = dv.Value;
-                                }
-
-                                var control = new NumericControl(deviceCommand.Name,
-                                    deviceCommand.Description,
-                                    defaultValue,
-                                    NumericControl.NumberType.Byte,
-                                    async value =>
-                                    {
-                                        await _app.ZvsEngine.RunCommandAsync(deviceCommand.Id, value, string.Empty, CancellationToken.None);
-                                    },
-                                    _icon) { ToolTip = tip };
-                                DeviceCommandsStkPnl.Children.Add(control);
-
-                                break;
-                            }
                         case DataType.SHORT:
                             {
                                 //get the current value from the value table list
                                 var defaultValue = "0";
                                 var dv = d.Values.FirstOrDefault(v => v.UniqueIdentifier == deviceCommand.CustomData2);
                                 if (dv != null)
-                                {
                                     defaultValue = dv.Value;
-                                }
-
-                                var control = new NumericControl(deviceCommand.Name,
-                                    deviceCommand.Description,
-                                    defaultValue,
-                                    NumericControl.NumberType.Short,
-                                    async value =>
+                                var control = new NumericControl(async value =>
                                     {
                                         await _app.ZvsEngine.RunCommandAsync(deviceCommand.Id, value, string.Empty, CancellationToken.None);
                                     },
-                                    _icon) { ToolTip = tip };
+                                    _icon, deviceCommand.ArgumentType)
+                                {
+                                    Name = deviceCommand.Name,
+                                    Description = deviceCommand.Description,
+                                    Value = defaultValue
+                                };
                                 DeviceCommandsStkPnl.Children.Add(control);
-
                                 break;
                             }
-
                         case DataType.STRING:
                             {
                                 //get the current value from the value table list
@@ -186,14 +124,17 @@ namespace zvs.WPF.DeviceControls
                                     defaultValue = dv.Value;
                                 }
 
-                                var control = new StringControl(deviceCommand.Name,
-                                    deviceCommand.Description,
-                                    defaultValue,
+                                var control = new StringControl(
                                     async value =>
                                     {
                                         await _app.ZvsEngine.RunCommandAsync(deviceCommand.Id, value, string.Empty, CancellationToken.None);
                                     },
-                                    _icon) { ToolTip = tip };
+                                        _icon)
+                                {
+                                    Header = deviceCommand.Name,
+                                    Description = deviceCommand.Description,
+                                    Value = defaultValue
+                                };
                                 DeviceCommandsStkPnl.Children.Add(control);
 
                                 break;
@@ -251,84 +192,23 @@ namespace zvs.WPF.DeviceControls
                                     bool.TryParse(dv.Value, out defaultValue);
                                 }
 
-                                var control = new CheckboxControl(deviceTypeCommand.Name, deviceTypeCommand.Description, defaultValue, async isChecked =>
+                                var control = new CheckboxControl(async isChecked =>
                                 {
                                     await _app.ZvsEngine.RunCommandAsync(deviceTypeCommand.Id, isChecked.ToString(), d.Id.ToString(CultureInfo.InvariantCulture), CancellationToken.None);
                                 },
-                                    _icon);
+                                    _icon)
+                                {
+                                    Header = deviceTypeCommand.Name,
+                                    Description = deviceTypeCommand.Description,
+                                    Value = defaultValue
+                                };
                                 TypeCommandsStkPnl.Children.Add(control);
 
                                 break;
                             }
                         case DataType.DECIMAL:
-                            {
-                                //get the current value from the value table list
-                                var defaultValue = "0";
-                                var dv = d.Values.FirstOrDefault(v => v.UniqueIdentifier == deviceTypeCommand.CustomData2);
-                                if (dv != null)
-                                {
-                                    defaultValue = dv.Value;
-                                }
-
-                                var control = new NumericControl(deviceTypeCommand.Name,
-                                    deviceTypeCommand.Description,
-                                    defaultValue,
-                                    NumericControl.NumberType.Decimal,
-                                   async value =>
-                                   {
-                                       await _app.ZvsEngine.RunCommandAsync(deviceTypeCommand.Id, value, d.Id.ToString(CultureInfo.InvariantCulture), CancellationToken.None);
-                                   },
-                                    _icon);
-                                TypeCommandsStkPnl.Children.Add(control);
-
-                                break;
-                            }
                         case DataType.INTEGER:
-                            {
-                                //get the current value from the value table list
-                                var defaultValue = "0";
-                                var dv = d.Values.FirstOrDefault(v => v.UniqueIdentifier == deviceTypeCommand.CustomData2);
-                                if (dv != null)
-                                {
-                                    defaultValue = dv.Value;
-                                }
-
-                                var control = new NumericControl(deviceTypeCommand.Name,
-                                    deviceTypeCommand.Description,
-                                    defaultValue,
-                                   NumericControl.NumberType.Integer,
-                                    async value =>
-                                    {
-                                        await _app.ZvsEngine.RunCommandAsync(deviceTypeCommand.Id, value, d.Id.ToString(CultureInfo.InvariantCulture), CancellationToken.None);
-                                    },
-                                    _icon);
-                                TypeCommandsStkPnl.Children.Add(control);
-
-                                break;
-                            }
                         case DataType.SHORT:
-                            {
-                                //get the current value from the value table list
-                                var defaultValue = "0";
-                                var dv = d.Values.FirstOrDefault(v => v.UniqueIdentifier == deviceTypeCommand.CustomData2);
-                                if (dv != null)
-                                {
-                                    defaultValue = dv.Value;
-                                }
-
-                                var control = new NumericControl(deviceTypeCommand.Name,
-                                    deviceTypeCommand.Description,
-                                    defaultValue,
-                                    NumericControl.NumberType.Short,
-                                    async value =>
-                                    {
-                                        await _app.ZvsEngine.RunCommandAsync(deviceTypeCommand.Id, value, d.Id.ToString(CultureInfo.InvariantCulture), CancellationToken.None);
-                                    },
-                                    _icon);
-                                TypeCommandsStkPnl.Children.Add(control);
-
-                                break;
-                            }
                         case DataType.BYTE:
                             {
                                 //get the current value from the value table list
@@ -339,15 +219,16 @@ namespace zvs.WPF.DeviceControls
                                     defaultValue = dv.Value;
                                 }
 
-                                var control = new NumericControl(deviceTypeCommand.Name,
-                                    deviceTypeCommand.Description,
-                                    defaultValue,
-                                   NumericControl.NumberType.Byte,
-                                    async value =>
-                                    {
-                                        await _app.ZvsEngine.RunCommandAsync(deviceTypeCommand.Id, value, d.Id.ToString(CultureInfo.InvariantCulture), CancellationToken.None);
-                                    },
-                                    _icon);
+                                var control = new NumericControl(async value =>
+                                   {
+                                       await _app.ZvsEngine.RunCommandAsync(deviceTypeCommand.Id, value, d.Id.ToString(CultureInfo.InvariantCulture), CancellationToken.None);
+                                   },
+                                    _icon, deviceTypeCommand.ArgumentType)
+                                {
+                                    Name = deviceTypeCommand.Name,
+                                    Description = deviceTypeCommand.Description,
+                                    Value = defaultValue
+                                };
                                 TypeCommandsStkPnl.Children.Add(control);
 
                                 break;
@@ -362,14 +243,17 @@ namespace zvs.WPF.DeviceControls
                                     defaultValue = dv.Value;
                                 }
 
-                                var control = new StringControl(deviceTypeCommand.Name,
-                                    deviceTypeCommand.Description,
-                                    defaultValue,
+                                var control = new StringControl(
                                     async value =>
                                     {
                                         await _app.ZvsEngine.RunCommandAsync(deviceTypeCommand.Id, value, d.Id.ToString(CultureInfo.InvariantCulture), CancellationToken.None);
                                     },
-                                    _icon);
+                                        _icon)
+                                {
+                                    Header = deviceTypeCommand.Name,
+                                    Description = deviceTypeCommand.Description,
+                                    Value = defaultValue
+                                };
                                 TypeCommandsStkPnl.Children.Add(control);
 
                                 break;
@@ -414,7 +298,7 @@ namespace zvs.WPF.DeviceControls
             if (!disposing) return;
             if (_context == null)
                 return;
-            
+
             _context.Dispose();
         }
     }

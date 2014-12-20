@@ -38,21 +38,6 @@ namespace zvs.WPF.DeviceControls
         {
         }
 
-        public NumericControl.NumberType GetNumberControlType(DataType dataType)
-        {
-            switch (dataType)
-            {
-                case DataType.INTEGER:
-                    return NumericControl.NumberType.Integer;
-                case DataType.DECIMAL:
-                    return NumericControl.NumberType.Decimal;
-                case DataType.BYTE:
-                    return NumericControl.NumberType.Byte;
-                default:
-                    return NumericControl.NumberType.Short;
-            }
-        }
-
         private async Task LoadCommandsAsync()
         {
             PropertiesStkPnl.Children.Clear();
@@ -89,8 +74,7 @@ namespace zvs.WPF.DeviceControls
                             bool defaultValue;
                             bool.TryParse(value, out defaultValue);
 
-                            var control = new CheckboxControl(deviceTypeSetting.Name, deviceTypeSetting.Description, defaultValue,
-                            async isChecked =>
+                            var control = new CheckboxControl(async isChecked =>
                             {
                                 if (deviceTypeSettingValue != null)
                                     deviceTypeSettingValue.Value = isChecked.ToString();
@@ -109,9 +93,14 @@ namespace zvs.WPF.DeviceControls
                                 var result = await Context.TrySaveChangesAsync(_app.Cts.Token);
                                 if (result.HasError)
                                     await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving device type setting. {0}", result.Message);
-				
+
                             },
-                            _icon);
+                                    _icon)
+                            {
+                                Header = deviceTypeSetting.Name,
+                                Description = deviceTypeSetting.Description,
+                                Value = defaultValue
+                            };
                             PropertiesStkPnl.Children.Add(control);
 
                             break;
@@ -123,8 +112,7 @@ namespace zvs.WPF.DeviceControls
                     case DataType.BYTE:
                         {
                             #region NumericControl
-                            var control = new NumericControl(deviceTypeSetting.Name, deviceTypeSetting.Description, value,
-                                GetNumberControlType(deviceTypeSetting.ValueType),
+                            var control = new NumericControl(
                                 async v =>
                                 {
                                     if (deviceTypeSettingValue != null)
@@ -144,7 +132,12 @@ namespace zvs.WPF.DeviceControls
                                     if (result.HasError)
                                         await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving device type setting. {0}", result.Message);
                                 },
-                                _icon);
+                                    _icon, deviceTypeSetting.ValueType)
+                            {
+                                Name = deviceTypeSetting.Name,
+                                Description = deviceTypeSetting.Description,
+                                Value = value
+                            };
                             PropertiesStkPnl.Children.Add(control);
 
                             break;
@@ -153,8 +146,7 @@ namespace zvs.WPF.DeviceControls
                     case DataType.STRING:
                         {
                             #region StringControl
-                            var control = new StringControl(deviceTypeSetting.Name, deviceTypeSetting.Description, value,
-                                async v =>
+                            var control = new StringControl(async v =>
                                 {
                                     if (deviceTypeSettingValue != null)
                                         deviceTypeSettingValue.Value = v;
@@ -173,7 +165,12 @@ namespace zvs.WPF.DeviceControls
                                     if (result.HasError)
                                         await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving device type setting. {0}", result.Message);
                                 },
-                                _icon);
+                                        _icon)
+                            {
+                                Header = deviceTypeSetting.Name,
+                                Description = deviceTypeSetting.Description,
+                                Value = value,
+                            };
                             PropertiesStkPnl.Children.Add(control);
 
                             break;
@@ -237,7 +234,7 @@ namespace zvs.WPF.DeviceControls
                             bool defaultValue;
                             bool.TryParse(_default, out defaultValue);
 
-                            var control = new CheckboxControl(deviceSetting.Name, deviceSetting.Description, defaultValue, async isChecked =>
+                            var control = new CheckboxControl(async isChecked =>
                             {
                                 if (deviceSettingValue != null)
                                 {
@@ -257,7 +254,12 @@ namespace zvs.WPF.DeviceControls
                                 if (result.HasError)
                                     await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving device setting. {0}", result.Message);
                             },
-                            _icon);
+                                        _icon)
+                            {
+                                Header = deviceSetting.Name,
+                                Description = deviceSetting.Description,
+                                Value = defaultValue
+                            };
                             PropertiesStkPnl.Children.Add(control);
 
                             break;
@@ -269,11 +271,7 @@ namespace zvs.WPF.DeviceControls
                     case DataType.BYTE:
                         {
                             #region NumericControl
-                            var control = new NumericControl(deviceSetting.Name,
-                                deviceSetting.Description,
-                                _default,
-                               GetNumberControlType(deviceSetting.ValueType),
-                                async value =>
+                            var control = new NumericControl(async value =>
                                 {
                                     if (deviceSettingValue != null)
                                     {
@@ -292,8 +290,12 @@ namespace zvs.WPF.DeviceControls
                                     var result = await Context.TrySaveChangesAsync(_app.Cts.Token);
                                     if (result.HasError)
                                         await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving device setting. {0}", result.Message);
-                                },
-                                _icon);
+                                }, _icon, deviceSetting.ValueType)
+                            {
+                                Header = deviceSetting.Name,
+                                Description = deviceSetting.Description,
+                                Value = _default
+                            };
                             PropertiesStkPnl.Children.Add(control);
 
                             break;
@@ -302,9 +304,7 @@ namespace zvs.WPF.DeviceControls
                     case DataType.STRING:
                         {
                             #region StringControl
-                            var control = new StringControl(deviceSetting.Name,
-                                deviceSetting.Description,
-                                _default,
+                            var control = new StringControl(
                                 async value =>
                                 {
                                     if (deviceSettingValue != null)
@@ -325,7 +325,12 @@ namespace zvs.WPF.DeviceControls
                                     if (result.HasError)
                                         await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving device setting. {0}", result.Message);
                                 },
-                                _icon);
+                                        _icon)
+                            {
+                                Header = deviceSetting.Name,
+                                Description = deviceSetting.Description,
+                                Value = _default,
+                            };
                             PropertiesStkPnl.Children.Add(control);
 
                             break;

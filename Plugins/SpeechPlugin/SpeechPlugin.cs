@@ -3,6 +3,7 @@ using System.ComponentModel.Composition;
 using System.Data.Entity;
 using System.Speech.Synthesis;
 using System.Threading.Tasks;
+using zvs;
 using zvs.DataModel;
 using zvs.Processor;
 

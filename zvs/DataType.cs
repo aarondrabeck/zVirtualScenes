@@ -1,4 +1,4 @@
-﻿namespace zvs.DataModel
+﻿namespace zvs
 {    
     public enum DataType
     {

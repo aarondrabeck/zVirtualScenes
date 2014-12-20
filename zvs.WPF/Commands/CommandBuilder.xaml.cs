@@ -193,7 +193,7 @@ namespace zvs.WPF.Commands
                                  if (g != null)
                                      _selectedBuiltinArg = g.Id.ToString(CultureInfo.InvariantCulture);
 
-                             
+
                                  return Task.FromResult(0);
 
                              }, _icon);
@@ -257,73 +257,24 @@ namespace zvs.WPF.Commands
                                     bool.TryParse(StoredCommand.Argument, out defaultValue);
                                     _selectedBuiltinArg = defaultValue.ToString();
 
-                                    var control = new CheckboxControl(selectedCmd.Name,
-                                        selectedCmd.Description,
-                                        defaultValue, isChecked =>
+                                    var control = new CheckboxControl(isChecked =>
                                         {
                                             _selectedBuiltinArg = isChecked.ToString();
-                                        }, _icon);
-                                    BuiltinArgSckPnl.Children.Add(control);
-
-                                    break;
-                                }
-                            case DataType.DECIMAL:
-                                {
-                                    var defaultValue = "0";
-                                    if (!string.IsNullOrEmpty(StoredCommand.Argument))
-                                        defaultValue = StoredCommand.Argument;
-                                    _selectedBuiltinArg = defaultValue;
-
-                                    var control = new NumericControl(selectedCmd.Name,
-                                        selectedCmd.Description,
-                                        defaultValue,
-                                        NumericControl.NumberType.Decimal,
-                                        value =>
-                                        {
-                                            _selectedBuiltinArg = value;
-                                        }, _icon);
+                                            return Task.FromResult(0);
+                                        },
+                                        _icon)
+                                    {
+                                        Header = selectedCmd.Name,
+                                        Description = selectedCmd.Description,
+                                        Value = defaultValue
+                                    };
                                     BuiltinArgSckPnl.Children.Add(control);
 
                                     break;
                                 }
                             case DataType.INTEGER:
-                                {
-                                    var defaultValue = "0";
-                                    if (!string.IsNullOrEmpty(StoredCommand.Argument))
-                                        defaultValue = StoredCommand.Argument;
-                                    _selectedBuiltinArg = defaultValue;
-
-                                    var control = new NumericControl(selectedCmd.Name,
-                                        selectedCmd.Description,
-                                        defaultValue,
-                                        NumericControl.NumberType.Integer,
-                                        value =>
-                                        {
-                                            _selectedBuiltinArg = value;
-                                        }, _icon);
-                                    BuiltinArgSckPnl.Children.Add(control);
-
-                                    break;
-                                }
+                            case DataType.DECIMAL:
                             case DataType.BYTE:
-                                {
-                                    var defaultValue = "0";
-                                    if (!string.IsNullOrEmpty(StoredCommand.Argument))
-                                        defaultValue = StoredCommand.Argument;
-                                    _selectedBuiltinArg = defaultValue;
-
-                                    var control = new NumericControl(selectedCmd.Name,
-                                        selectedCmd.Description,
-                                        defaultValue,
-                                        NumericControl.NumberType.Byte,
-                                        value =>
-                                        {
-                                            _selectedBuiltinArg = value;
-                                        }, _icon);
-                                    BuiltinArgSckPnl.Children.Add(control);
-
-                                    break;
-                                }
                             case DataType.SHORT:
                                 {
                                     var defaultValue = "0";
@@ -331,19 +282,20 @@ namespace zvs.WPF.Commands
                                         defaultValue = StoredCommand.Argument;
                                     _selectedBuiltinArg = defaultValue;
 
-                                    var control = new NumericControl(selectedCmd.Name,
-                                        selectedCmd.Description,
-                                        defaultValue,
-                                        NumericControl.NumberType.Short,
-                                        value =>
+                                    var control = new NumericControl(value =>
                                         {
                                             _selectedBuiltinArg = value;
-                                        }, _icon);
+                                            return Task.FromResult(0);
+                                        },
+                                        _icon, selectedCmd.ArgumentType)
+                                    {
+                                        Header = selectedCmd.Name,
+                                        Description = selectedCmd.Description,
+                                        Value = defaultValue
+                                    };
                                     BuiltinArgSckPnl.Children.Add(control);
-
                                     break;
                                 }
-
                             case DataType.STRING:
                                 {
                                     //get the current value from the value table list
@@ -352,13 +304,17 @@ namespace zvs.WPF.Commands
                                         defaultValue = StoredCommand.Argument;
                                     _selectedBuiltinArg = defaultValue;
 
-                                    var control = new StringControl(selectedCmd.Name,
-                                        selectedCmd.Description,
-                                        defaultValue,
-                                        value =>
+                                    var control = new StringControl(value =>
                                         {
                                             _selectedBuiltinArg = value;
-                                        }, _icon);
+                                            return Task.FromResult(0);
+                                        },
+                                        _icon)
+                                    {
+                                        Header = selectedCmd.Name,
+                                        Description = selectedCmd.Description,
+                                        Value = defaultValue
+                                    };
                                     BuiltinArgSckPnl.Children.Add(control);
 
                                     break;
@@ -528,102 +484,42 @@ namespace zvs.WPF.Commands
                             }
                             _selectedDeviceArg = defaultValue.ToString();
 
-                            var control = new CheckboxControl(deviceTypeCommand.Name, deviceTypeCommand.Description, defaultValue, isChecked =>
+                            var control = new CheckboxControl(isChecked =>
                             {
                                 _selectedDeviceArg = isChecked.ToString();
-                            }, _icon);
+                                return Task.FromResult(0);
+                            }, _icon)
+                            {
+                                Header = deviceTypeCommand.Name,
+                                Description = deviceTypeCommand.Description,
+                                Value = defaultValue
+                            };
                             DeviceArgSckPnl.Children.Add(control);
 
                             break;
                         }
                     case DataType.DECIMAL:
-                        {
-                            //get the current value from the value table list
-                            decimal defaultValue;
-                            if (!decimal.TryParse(StoredCommand.Argument, out defaultValue))
-                            {
-                                var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == deviceTypeCommand.CustomData2);
-                                if (dv != null)
-                                    decimal.TryParse(dv.Value, out defaultValue);
-                            }
-                            _selectedDeviceArg = defaultValue.ToString(CultureInfo.InvariantCulture);
-                            var control = new NumericControl(deviceTypeCommand.Name,
-                                deviceTypeCommand.Description,
-                                defaultValue.ToString(CultureInfo.InvariantCulture),
-                                NumericControl.NumberType.Decimal,
-                                value =>
-                                {
-                                    _selectedDeviceArg = value;
-                                }, _icon);
-                            DeviceArgSckPnl.Children.Add(control);
-
-                            break;
-                        }
                     case DataType.INTEGER:
-                        {
-                            //get the current value from the value table list
-                            int defaultValue;
-                            if (!int.TryParse(StoredCommand.Argument, out defaultValue))
-                            {
-                                var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == deviceTypeCommand.CustomData2);
-                                if (dv != null)
-                                    int.TryParse(dv.Value, out defaultValue);
-                            }
-                            _selectedDeviceArg = defaultValue.ToString(CultureInfo.InvariantCulture);
-                            var control = new NumericControl(deviceTypeCommand.Name,
-                                deviceTypeCommand.Description,
-                                defaultValue.ToString(CultureInfo.InvariantCulture),
-                                NumericControl.NumberType.Integer,
-                                value =>
-                                {
-                                    _selectedDeviceArg = value;
-                                }, _icon);
-                            DeviceArgSckPnl.Children.Add(control);
-
-                            break;
-                        }
+                    case DataType.BYTE:
                     case DataType.SHORT:
                         {
                             //get the current value from the value table list
-                            short defaultValue;
-                            if (!short.TryParse(StoredCommand.Argument, out defaultValue))
-                            {
-                                var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == deviceTypeCommand.CustomData2);
-                                if (dv != null)
-                                    short.TryParse(dv.Value, out defaultValue);
-                            }
-                            _selectedDeviceArg = defaultValue.ToString(CultureInfo.InvariantCulture);
-                            var control = new NumericControl(deviceTypeCommand.Name,
-                                deviceTypeCommand.Description,
-                                defaultValue.ToString(CultureInfo.InvariantCulture),
-                                NumericControl.NumberType.Short,
-                                value =>
+                            var defaultValue = "0";
+                            var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == deviceTypeCommand.CustomData2);
+                            if (dv != null)
+                                defaultValue = dv.Value;
+                            _selectedDeviceArg = defaultValue;
+                            var control = new NumericControl(value =>
                                 {
                                     _selectedDeviceArg = value;
-                                }, _icon);
-                            DeviceArgSckPnl.Children.Add(control);
-
-                            break;
-                        }
-                    case DataType.BYTE:
-                        {
-                            //get the current value from the value table list
-                            byte defaultValue;
-                            if (!byte.TryParse(StoredCommand.Argument, out defaultValue))
+                                    return Task.FromResult(0);
+                                },
+                                        _icon, deviceTypeCommand.ArgumentType)
                             {
-                                var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == deviceTypeCommand.CustomData2);
-                                if (dv != null)
-                                    byte.TryParse(dv.Value, out defaultValue);
-                            }
-                            _selectedDeviceArg = defaultValue.ToString(CultureInfo.InvariantCulture);
-                            var control = new NumericControl(deviceTypeCommand.Name,
-                                deviceTypeCommand.Description,
-                                defaultValue.ToString(CultureInfo.InvariantCulture),
-                                NumericControl.NumberType.Byte,
-                                value =>
-                                {
-                                    _selectedDeviceArg = value;
-                                }, _icon);
+                                Header = deviceTypeCommand.Name,
+                                Description = deviceTypeCommand.Description,
+                                Value = defaultValue
+                            };
                             DeviceArgSckPnl.Children.Add(control);
 
                             break;
@@ -645,13 +541,18 @@ namespace zvs.WPF.Commands
                                 }
                             }
                             _selectedDeviceArg = defaultValue;
-                            var control = new StringControl(deviceTypeCommand.Name,
-                                deviceTypeCommand.Description,
-                                defaultValue,
+                            var control = new StringControl(
                                 value =>
                                 {
                                     _selectedDeviceArg = value;
-                                }, _icon);
+                                    return Task.FromResult(0);
+                                },
+                                        _icon)
+                            {
+                                Header = deviceTypeCommand.Name,
+                                Description = deviceTypeCommand.Description,
+                                Value = defaultValue
+                            };
                             DeviceArgSckPnl.Children.Add(control);
 
                             break;
@@ -720,108 +621,47 @@ namespace zvs.WPF.Commands
                             }
                             _selectedDeviceArg = defaultValue.ToString();
 
-                            var control = new CheckboxControl(dCmd.Name, dCmd.Description, defaultValue, isChecked =>
+                            var control = new CheckboxControl(isChecked =>
                             {
                                 _selectedDeviceArg = isChecked.ToString();
-                            }, _icon);
+                                return Task.FromResult(0);
+                            }, _icon)
+                            {
+                                Header = dCmd.Name,
+                                Description = dCmd.Description,
+                                Value = defaultValue
+                            };
                             DeviceArgSckPnl.Children.Add(control);
 
                             break;
                         }
                     case DataType.DECIMAL:
-                        {
-                            //get the current value from the value table list
-                            decimal defaultValue;
-                            if (!decimal.TryParse(StoredCommand.Argument, out defaultValue))
-                            {
-                                var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == dCmd.CustomData2);
-                                if (dv != null)
-                                    decimal.TryParse(dv.Value, out defaultValue);
-                            }
-                            _selectedDeviceArg = defaultValue.ToString(CultureInfo.InvariantCulture);
-
-                            var control = new NumericControl(dCmd.Name,
-                                dCmd.Description,
-                                defaultValue.ToString(CultureInfo.InvariantCulture),
-                                NumericControl.NumberType.Decimal,
-                                value =>
-                                {
-                                    _selectedDeviceArg = value;
-                                }, _icon);
-                            DeviceArgSckPnl.Children.Add(control);
-
-                            break;
-                        }
                     case DataType.INTEGER:
-                        {
-                            //get the current value from the value table list
-                            int defaultValue;
-                            if (!int.TryParse(StoredCommand.Argument, out defaultValue))
-                            {
-                                var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == dCmd.CustomData2);
-                                if (dv != null)
-                                    int.TryParse(dv.Value, out defaultValue);
-                            }
-                            _selectedDeviceArg = defaultValue.ToString(CultureInfo.InvariantCulture);
-                            var control = new NumericControl(dCmd.Name,
-                                dCmd.Description,
-                                defaultValue.ToString(CultureInfo.InvariantCulture),
-                                NumericControl.NumberType.Integer,
-                                value =>
-                                {
-                                    _selectedDeviceArg = value;
-                                }, _icon);
-                            DeviceArgSckPnl.Children.Add(control);
-
-                            break;
-                        }
                     case DataType.BYTE:
-                        {
-                            //get the current value from the value table list
-                            byte defaultValue;
-                            if (!byte.TryParse(StoredCommand.Argument, out defaultValue))
-                            {
-                                var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == dCmd.CustomData2);
-                                if (dv != null)
-                                    byte.TryParse(dv.Value, out defaultValue);
-                            }
-                            _selectedDeviceArg = defaultValue.ToString(CultureInfo.InvariantCulture);
-                            var control = new NumericControl(dCmd.Name,
-                                dCmd.Description,
-                                defaultValue.ToString(CultureInfo.InvariantCulture),
-                                NumericControl.NumberType.Byte,
-                                value =>
-                                {
-                                    _selectedDeviceArg = value;
-                                }, _icon);
-                            DeviceArgSckPnl.Children.Add(control);
-
-                            break;
-                        }
                     case DataType.SHORT:
                         {
                             //get the current value from the value table list
-                            short defaultValue;
-                            if (!short.TryParse(StoredCommand.Argument, out defaultValue))
-                            {
-                                var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == dCmd.CustomData2);
-                                if (dv != null)
-                                    short.TryParse(dv.Value, out defaultValue);
-                            }
-                            _selectedDeviceArg = defaultValue.ToString(CultureInfo.InvariantCulture);
-                            var control = new NumericControl(dCmd.Name,
-                                dCmd.Description,
-                                defaultValue.ToString(CultureInfo.InvariantCulture),
-                                NumericControl.NumberType.Short,
-                                value =>
-                                {
-                                    _selectedDeviceArg = value;
-                                }, _icon);
-                            DeviceArgSckPnl.Children.Add(control);
+                            var defaultValue = "0";
+                            var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == dCmd.CustomData2);
+                            if (dv != null)
+                                defaultValue = dv.Value;
 
+                            _selectedDeviceArg = defaultValue;
+
+                            var control = new NumericControl(value =>
+                            {
+                                _selectedDeviceArg = value;
+                                return Task.FromResult(0);
+                            },
+                                        _icon, dCmd.ArgumentType)
+                            {
+                                Header = dCmd.Name,
+                                Description = dCmd.Description,
+                                Value = defaultValue
+                            };
+                            DeviceArgSckPnl.Children.Add(control);
                             break;
                         }
-
                     case DataType.STRING:
                         {
                             //get the current value from the value table list
@@ -839,13 +679,18 @@ namespace zvs.WPF.Commands
                                 }
                             }
                             _selectedDeviceArg = defaultValue;
-                            var control = new StringControl(dCmd.Name,
-                                dCmd.Description,
-                                defaultValue,
+                            var control = new StringControl(
                                 value =>
                                 {
                                     _selectedDeviceArg = value;
-                                }, _icon);
+                                    return Task.FromResult(0);
+                                },
+                                        _icon)
+                            {
+                                Header = dCmd.Name,
+                                Description = dCmd.Description,
+                                Value = defaultValue
+                            };
                             DeviceArgSckPnl.Children.Add(control);
 
                             break;

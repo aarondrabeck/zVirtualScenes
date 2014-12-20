@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 
@@ -11,65 +13,82 @@ namespace zvs.WPF.DynamicActionControls
     /// </summary>
     public partial class CheckboxControl : UserControl
     {
-        private string name = string.Empty;
-        private string Description = string.Empty;
-        private Action<bool> CheckedChangedAction = null;
-        private bool isLoaded = false;
-        private bool defaultIsChecked = false;
-
-        public CheckboxControl(string Name, string Description, bool defaultIsChecked, Action<bool> CheckedChangedAction, BitmapImage icon)
+        #region Dependecy Properties
+        public string Header
         {
-            this.name = Name;
-            this.Description = Description;
-            this.CheckedChangedAction = CheckedChangedAction;
-            this.defaultIsChecked = defaultIsChecked;
+            get { return (string)GetValue(HeaderProperty); }
+            set { SetValue(HeaderProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Header.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty HeaderProperty =
+            DependencyProperty.Register("Header", typeof(string), typeof(CheckboxControl), new PropertyMetadata(string.Empty));
+
+        public string Description
+        {
+            get { return (string)GetValue(DescriptionProperty); }
+            set { SetValue(DescriptionProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Description.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty DescriptionProperty =
+            DependencyProperty.Register("Description", typeof(string), typeof(CheckboxControl), new PropertyMetadata(string.Empty));
+
+        public string ErrorMessage
+        {
+            get { return (string)GetValue(ErrorMessageProperty); }
+            set { SetValue(ErrorMessageProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for ErrorMessage.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty ErrorMessageProperty =
+            DependencyProperty.Register("ErrorMessage", typeof(string), typeof(CheckboxControl), new PropertyMetadata(string.Empty));
+
+
+        public bool Value
+        {
+            get { return (bool)GetValue(ValueProperty); }
+            set { SetValue(ValueProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Value.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty ValueProperty =
+            DependencyProperty.Register("Value", typeof(bool), typeof(CheckboxControl), new PropertyMetadata(false));
+
+        #endregion
+
+        private Func<bool, Task> SendCommandAction { get; set; }
+
+        public CheckboxControl(Func<bool, Task> sendCommandAction, ImageSource signalIcon)
+        {
+            SendCommandAction = sendCommandAction;
             InitializeComponent();
-
-            this.SignalImg.Source = icon;
+            SignalImg.Source = signalIcon;
         }
 
-        private void UserControl_Loaded_1(object sender, RoutedEventArgs e)
+        private async Task SendCommandAsync(bool state)
         {
-            isLoaded = false;
+            if (SendCommandAction == null)
+                return;
 
-            CheckBx.Content = name;
-            CheckBx.ToolTip = Description;
-            CheckBx.IsChecked = defaultIsChecked;
-            
+            SignalImg.Opacity = 1;
 
-            if (string.IsNullOrEmpty(Description))
-                DescTxt.Visibility = System.Windows.Visibility.Collapsed;
+            await SendCommandAction(state);
 
-            DescTxt.Text = Description;
-
-            isLoaded = true;
+            var da = new DoubleAnimation { From = 1, To = 0, Duration = new Duration(TimeSpan.FromSeconds(.8)) };
+            SignalImg.BeginAnimation(OpacityProperty, da);
         }
 
-        private void CheckBx_Checked(object sender, RoutedEventArgs e)
+        private async void ToggleButton_OnChecked(object sender, RoutedEventArgs e)
         {
-            if (isLoaded)
-                SendCommand(CheckBx.IsChecked ?? false);
+            if (IsLoaded)
+                await SendCommandAsync(ToggleButton.IsChecked ?? false);
         }
 
-        private void CheckBx_Unchecked(object sender, RoutedEventArgs e)
+        private async void ToggleButton_OnUnchecked(object sender, RoutedEventArgs e)
         {
-            if (isLoaded)
-                SendCommand(CheckBx.IsChecked ?? false);
-        }
-
-        private void SendCommand(bool isChecked)
-        {
-            if (CheckedChangedAction != null)
-            {
-                CheckedChangedAction.DynamicInvoke(isChecked);
-
-                SignalImg.Opacity = 1;
-                var da = new DoubleAnimation();
-                da.From = 1;
-                da.To = 0;
-                da.Duration = new Duration(TimeSpan.FromSeconds(.8));
-                SignalImg.BeginAnimation(OpacityProperty, da);
-            }
+            if (IsLoaded)
+                await SendCommandAsync(ToggleButton.IsChecked ?? false);
         }
     }
 }

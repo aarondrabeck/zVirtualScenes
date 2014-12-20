@@ -4,6 +4,7 @@ using System.ComponentModel.Composition;
 using System.Data.Entity;
 using System.Threading.Tasks;
 using ThingSpeak.Client;
+using zvs;
 using zvs.DataModel;
 using zvs.Processor;
 

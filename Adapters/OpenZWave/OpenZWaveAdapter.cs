@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using OpenZWaveDotNet;
 using OpenZWavePlugin;
 using OpenZWavePlugin.Forms;
+using zvs;
 using zvs.DataModel;
 using zvs.Processor;
 

@@ -1,192 +1,155 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.Windows.Media.Imaging;
 
 namespace zvs.WPF.DynamicActionControls
 {
     /// <summary>
     /// Interaction logic for ButtonControl.xaml
     /// </summary>
-    public partial class NumericControl : UserControl
+    public partial class NumericControl
     {
-        private string name = string.Empty;
-        private string Description = string.Empty;
-        private string defaultVaule = string.Empty;
-        private Action<string> SendCommandAction = null;
-        private NumberType numType = NumberType.Integer;
-        bool isLoaded = false;
-        string lastValue = string.Empty;
-        bool hasChanged = false;
-
-        public NumericControl(string Name, string Description, string defaultVaule, NumberType numType, Action<string> SendCommandAction, BitmapImage icon)
+        #region Dependecy Properties
+        public string Header
         {
-            this.name = Name;
-            this.numType = numType;
-            this.defaultVaule = defaultVaule;
-            this.Description = Description;
-            this.SendCommandAction = SendCommandAction;
-
-            InitializeComponent();
-
-            this.SignalImg.Source = icon;
+            get { return (string)GetValue(HeaderProperty); }
+            set { SetValue(HeaderProperty, value); }
         }
 
-        private void UserControl_Loaded_1(object sender, RoutedEventArgs e)
+        // Using a DependencyProperty as the backing store for Header.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty HeaderProperty =
+            DependencyProperty.Register("Header", typeof(string), typeof(NumericControl), new PropertyMetadata(string.Empty));
+
+        public string Description
         {
-            if (string.IsNullOrEmpty(Description))
-            {
-                NameTxt.Text = string.Format("{0} ({1})", name, numType.ToString());
-                DescTxt.Visibility = System.Windows.Visibility.Collapsed;
-            }
-            else
-            {
-                NameTxt.Text = name;
-                DescTxt.Text = string.Format("{0} ({1})", Description, numType.ToString());
-            }
+            get { return (string)GetValue(DescriptionProperty); }
+            set { SetValue(DescriptionProperty, value); }
+        }
 
-            TextBox.ToolTip = string.Format("{0} ({1})", Description, numType.ToString());
-            TextBox.Text = defaultVaule;
-            lastValue = defaultVaule;
+        // Using a DependencyProperty as the backing store for Description.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty DescriptionProperty =
+            DependencyProperty.Register("Description", typeof(string), typeof(NumericControl), new PropertyMetadata(string.Empty));
 
-            isLoaded = true;
+        public string ErrorMessage
+        {
+            get { return (string)GetValue(ErrorMessageProperty); }
+            set { SetValue(ErrorMessageProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for ErrorMessage.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty ErrorMessageProperty =
+            DependencyProperty.Register("ErrorMessage", typeof(string), typeof(NumericControl), new PropertyMetadata(string.Empty));
+
+
+        public string Value
+        {
+            get { return (string)GetValue(ValueProperty); }
+            set { SetValue(ValueProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Value.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty ValueProperty =
+            DependencyProperty.Register("Value", typeof(string), typeof(NumericControl), new PropertyMetadata(string.Empty));
+
+        #endregion
+
+        private DataType Type { get; set; }
+        private Func<string, Task> SendCommandAction { get; set; }
+
+        public NumericControl(Func<string, Task> sendCommandAction, ImageSource signalIcon, DataType type)
+        {
+            SendCommandAction = sendCommandAction;
+            Type = type;
+            InitializeComponent();
+            SignalImg.Source = signalIcon;
+        }
+        private void ValidateEntry()
+        {
+            ErrorMessage = IsEntryValid(TextBox.Text, Type) ? string.Empty : "Invalid Entry";
         }
 
         private void TextBox_TextChanged_1(object sender, TextChangedEventArgs e)
         {
-            if (isLoaded)
-            {
-                if (isEntryValid(TextBox.Text))
-                {
-                    TextBox.Background = new SolidColorBrush(Colors.White);
-
-                    if (lastValue != TextBox.Text)
-                        hasChanged = true;
-                }
-                else
-                    TextBox.Background = new SolidColorBrush(Color.FromArgb(255, 255, 198, 198));
-
-            }
+            if (!IsLoaded) return;
+            ValidateEntry();
         }
 
-        private void TextBox_PreviewKeyDown_1(object sender, KeyEventArgs e)
+        private async void TextBox_PreviewKeyDown_1(object sender, KeyEventArgs e)
         {
             //Allow arrown and delete keys
-            if (e.Key == Key.Back || e.Key == Key.Delete || e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.Up || e.Key == Key.Down)
-                return;
-
-            if (e.Key == Key.Enter)
+            switch (e.Key)
             {
-                if (!isEntryValid(TextBox.Text))
-                    TextBox.Text = defaultVaule;
-                else
-                    SendCommand();
+                case Key.Back:
+                case Key.Delete:
+                case Key.Left:
+                case Key.Right:
+                case Key.Up:
+                case Key.Down:
+                    return;
+                case Key.Enter:
+                    if (IsEntryValid(TextBox.Text, Type))
+                        await SendCommandAsync();
 
-                e.Handled = true;
-                return;
-            }
-
-            ////Deny certain keys
-            //Regex regex = null;
-            //switch (numType)
-            //{
-            //    case NumberType.Byte:
-            //    case NumberType.Integer:
-            //    case NumberType.Short:
-            //    case NumberType.ComPort:
-            //        regex = new Regex("[0-9]");
-            //        break;
-            //    case NumberType.Decimal:
-            //        regex = new Regex(@"([0-9]|\.|\+|-)");
-            //        break;
-            //    default:
-            //        regex = new Regex(@"[0-9]\.");
-            //        break;
-            //}
-
-            //if (!regex.IsMatch(e.Key.ToString()))
-            //{
-            //    e.Handled = true;
-            //    return;
-            //}
-        }
-
-        private void TextBox_LostFocus_1(object sender, RoutedEventArgs e)
-        {
-            if (isEntryValid(TextBox.Text))
-                SendCommand();
-        }
-
-        private void SendCommand()
-        {
-            if (SendCommandAction != null && hasChanged)
-            {
-                lastValue = TextBox.Text;
-                hasChanged = false;
-                SendCommandAction.DynamicInvoke(TextBox.Text);
-
-                SignalImg.Opacity = 1;
-                var da = new DoubleAnimation();
-                da.From = 1;
-                da.To = 0;
-                da.Duration = new Duration(TimeSpan.FromSeconds(.8));
-                SignalImg.BeginAnimation(OpacityProperty, da);
+                    e.Handled = true;
+                    break;
             }
         }
 
-        private bool isEntryValid(string value)
+        private async void TextBox_LostFocus_1(object sender, RoutedEventArgs e)
+        {
+            ValidateEntry();
+
+            if (IsEntryValid(TextBox.Text, Type))
+                await SendCommandAsync();
+        }
+
+        private async Task SendCommandAsync()
+        {
+            if (SendCommandAction == null)
+                return;
+
+            SignalImg.Opacity = 1;
+
+            await SendCommandAction(TextBox.Text);
+
+            var da = new DoubleAnimation { From = 1, To = 0, Duration = new Duration(TimeSpan.FromSeconds(.8)) };
+            SignalImg.BeginAnimation(OpacityProperty, da);
+        }
+
+        private bool IsEntryValid(string value, DataType type)
         {
             if (string.IsNullOrEmpty(TextBox.Text))
                 return false;
 
-            switch (numType)
+            switch (type)
             {
-                case NumberType.Byte:
+                case DataType.INTEGER:
                     {
-                        byte num = 0;
-                        if (byte.TryParse(value, out num))
-                        {
-                            if (num >= byte.MinValue && num <= byte.MaxValue)
-                                return true;
-                        }
-                        break;
+                        int num;
+                        return int.TryParse(value, out num);
                     }
-                case NumberType.Decimal:
+                case DataType.DECIMAL:
                     {
-                        decimal num = 0;
-                        if (decimal.TryParse(value, out num))
-                        {
-                            if (num >= decimal.MinValue && num <= decimal.MaxValue)
-                                return true;
-                        }
-                        break;
+                        decimal num;
+                        return decimal.TryParse(value, out num);
                     }
-                case NumberType.Integer:
+                case DataType.BYTE:
                     {
-                        var num = 0;
-                        if (int.TryParse(value, out num))
-                        {
-                            if (num >= int.MinValue && num <= int.MaxValue)
-                                return true;
-                        }
-                        break;
+                        byte num;
+                        return byte.TryParse(value, out num);
                     }
-                case NumberType.Short:
+                case DataType.SHORT:
                     {
-                        short num = 0;
-                        if (short.TryParse(value, out num))
-                        {
-                            if (num >= short.MinValue && num <= short.MaxValue)
-                                return true;
-                        }
-                        break;
+                        short num;
+                        return short.TryParse(value, out num);
                     }
-                case NumberType.ComPort:
+                case DataType.COMPORT:
                     {
-                        var num = 0;
+                        int num;
                         if (int.TryParse(value, out num))
                         {
                             if (num >= 0 && num <= 99)
@@ -197,16 +160,5 @@ namespace zvs.WPF.DynamicActionControls
             }
             return false;
         }
-
-        public enum NumberType
-        {
-            Integer,
-            Decimal,
-            Byte,
-            Short,
-            ComPort
-        }
-
-
     }
 }

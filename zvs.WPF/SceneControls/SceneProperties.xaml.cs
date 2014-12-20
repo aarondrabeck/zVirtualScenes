@@ -79,7 +79,7 @@ namespace zvs.WPF.SceneControls
                             bool defaultValue;
                             bool.TryParse(_default, out defaultValue);
 
-                            var control = new CheckboxControl(sceneSetting.Name, string.Empty, defaultValue, async isChecked =>
+                            var control = new CheckboxControl(async isChecked =>
                             {
                                 if (sceneSettingValue != null)
                                 {
@@ -98,112 +98,22 @@ namespace zvs.WPF.SceneControls
                                 var result = await Context.TrySaveChangesAsync(_app.Cts.Token);
                                 if (result.HasError)
                                     await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving scene. {0}", result.Message);
-                            },
-                            icon);
+                            }, icon)
+                            {
+                                Header = sceneSetting.Name,
+                                Description = string.Empty,
+                                Value = defaultValue
+                            };
                             PropertiesStkPnl.Children.Add(control);
 
                             break;
                         }
                     case DataType.DECIMAL:
-                        {
-                            var control = new NumericControl(sceneSetting.Name,
-                                string.Empty,
-                                _default,
-                                NumericControl.NumberType.Decimal,
-                                async value =>
-                                {
-                                    if (sceneSettingValue != null)
-                                    {
-                                        sceneSettingValue.Value = value;
-                                    }
-                                    else
-                                    {
-                                        sceneSettingValue = new SceneSettingValue()
-                                        {
-                                            SceneSetting = sceneSetting,
-                                            Value = value
-                                        };
-                                        scene.SettingValues.Add(sceneSettingValue);
-                                    }
-
-                                    var result = await Context.TrySaveChangesAsync(_app.Cts.Token);
-                                    if (result.HasError)
-                                        await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving scene. {0}", result.Message);
-                                },
-                                icon);
-                            PropertiesStkPnl.Children.Add(control);
-
-                            break;
-                        }
                     case DataType.INTEGER:
-                        {
-                            var control = new NumericControl(sceneSetting.Name,
-                                string.Empty,
-                                _default,
-                                NumericControl.NumberType.Integer,
-                                async value =>
-                                {
-                                    if (sceneSettingValue != null)
-                                    {
-                                        sceneSettingValue.Value = value;
-                                    }
-                                    else
-                                    {
-                                        sceneSettingValue = new SceneSettingValue()
-                                        {
-                                            SceneSetting = sceneSetting,
-                                            Value = value
-                                        };
-                                        scene.SettingValues.Add(sceneSettingValue);
-                                    }
-
-                                    var result = await Context.TrySaveChangesAsync(_app.Cts.Token);
-                                    if (result.HasError)
-                                        await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving scene. {0}", result.Message);
-                                },
-                                icon);
-                            PropertiesStkPnl.Children.Add(control);
-
-                            break;
-                        }
                     case DataType.BYTE:
-                        {
-                            var control = new NumericControl(sceneSetting.Name,
-                                string.Empty,
-                                _default,
-                                NumericControl.NumberType.Byte,
-                                async value =>
-                                {
-                                    if (sceneSettingValue != null)
-                                    {
-                                        sceneSettingValue.Value = value;
-                                    }
-                                    else
-                                    {
-                                        sceneSettingValue = new SceneSettingValue()
-                                        {
-                                            SceneSetting = sceneSetting,
-                                            Value = value
-                                        };
-                                        scene.SettingValues.Add(sceneSettingValue);
-                                    }
-
-                                    var result = await Context.TrySaveChangesAsync(_app.Cts.Token);
-                                    if (result.HasError)
-                                        await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving scene. {0}", result.Message);
-                                },
-                                icon);
-                            PropertiesStkPnl.Children.Add(control);
-
-                            break;
-                        }
                     case DataType.SHORT:
                         {
-                            var control = new NumericControl(sceneSetting.Name,
-                                string.Empty,
-                                _default,
-                                NumericControl.NumberType.Short,
-                                async value =>
+                            var control = new NumericControl(async value =>
                                 {
                                     if (sceneSettingValue != null)
                                     {
@@ -223,17 +133,19 @@ namespace zvs.WPF.SceneControls
                                     if (result.HasError)
                                         await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving scene. {0}", result.Message);
                                 },
-                                icon);
+                                    icon, sceneSetting.ValueType)
+                            {
+                                Name = sceneSetting.Name,
+                                Description = string.Empty,
+                                Value = _default
+                            };
                             PropertiesStkPnl.Children.Add(control);
 
                             break;
                         }
-
                     case DataType.STRING:
                         {
-                            var control = new StringControl(sceneSetting.Name,
-                                string.Empty,
-                                _default,
+                            var control = new StringControl(
                                async value =>
                                {
                                    if (sceneSettingValue != null)
@@ -242,7 +154,7 @@ namespace zvs.WPF.SceneControls
                                    }
                                    else
                                    {
-                                       sceneSettingValue = new SceneSettingValue()
+                                       sceneSettingValue = new SceneSettingValue
                                        {
                                            SceneSetting = sceneSetting,
                                            Value = value
@@ -254,7 +166,12 @@ namespace zvs.WPF.SceneControls
                                    if (result.HasError)
                                        await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving scene. {0}", result.Message);
                                },
-                                icon);
+                                       icon)
+                            {
+                                Header = sceneSetting.Name,
+                                Description = string.Empty,
+                                Value = _default
+                            };
                             PropertiesStkPnl.Children.Add(control);
 
                             break;
@@ -275,7 +192,7 @@ namespace zvs.WPF.SceneControls
                                     else
                                     {
                                         //assign sceneSettingValue so above null check is ran in the case this is called 2 times before the save changes hits.
-                                        sceneSettingValue = new SceneSettingValue()
+                                        sceneSettingValue = new SceneSettingValue
                                         {
                                             SceneSetting = sceneSetting,
                                             Value = value.ToString()

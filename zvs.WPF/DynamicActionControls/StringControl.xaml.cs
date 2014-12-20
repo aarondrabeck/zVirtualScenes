@@ -1,113 +1,116 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.Windows.Media.Imaging;
 
 namespace zvs.WPF.DynamicActionControls
 {
     /// <summary>
     /// Interaction logic for ButtonControl.xaml
     /// </summary>
-    public partial class StringControl : UserControl
+    public partial class StringControl
     {
-        private string name = string.Empty;
-        private string Description = string.Empty;
-        private string defaultVaule = string.Empty;
-        private Action<string> SendCommandAction = null;
-        bool isLoaded = false;
-        string lastValue = string.Empty;
-        bool hasChanged = false;
-
-        public StringControl(string Name, string Description, string defaultVaule, Action<string> SendCommandAction, BitmapImage icon)
+        #region Dependecy Properties
+        public string Header
         {
-            this.name = Name;
-            this.defaultVaule = defaultVaule;
-            this.Description = Description;
-            this.SendCommandAction = SendCommandAction;
-
-            InitializeComponent();
-
-            this.SignalImg.Source = icon;
+            get { return (string)GetValue(HeaderProperty); }
+            set { SetValue(HeaderProperty, value); }
         }
 
-        private void UserControl_Loaded_1(object sender, RoutedEventArgs e)
+        // Using a DependencyProperty as the backing store for Header.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty HeaderProperty =
+            DependencyProperty.Register("Header", typeof(string), typeof(StringControl), new PropertyMetadata(string.Empty));
+
+        public string Description
         {
-            if (string.IsNullOrEmpty(Description))
-                DescTxt.Visibility = System.Windows.Visibility.Collapsed;
+            get { return (string)GetValue(DescriptionProperty); }
+            set { SetValue(DescriptionProperty, value); }
+        }
 
-            NameTxt.Text = name;
-            TextBox.ToolTip = Description;
-            DescTxt.Text = Description;
+        // Using a DependencyProperty as the backing store for Description.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty DescriptionProperty =
+            DependencyProperty.Register("Description", typeof(string), typeof(StringControl), new PropertyMetadata(string.Empty));
 
-            TextBox.Text = defaultVaule;
-            lastValue = defaultVaule;
+        public string ErrorMessage
+        {
+            get { return (string)GetValue(ErrorMessageProperty); }
+            set { SetValue(ErrorMessageProperty, value); }
+        }
 
-            isLoaded = true;
+        // Using a DependencyProperty as the backing store for ErrorMessage.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty ErrorMessageProperty =
+            DependencyProperty.Register("ErrorMessage", typeof(string), typeof(StringControl), new PropertyMetadata(string.Empty));
+
+
+        public string Value
+        {
+            get { return (string)GetValue(ValueProperty); }
+            set { SetValue(ValueProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Value.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty ValueProperty =
+            DependencyProperty.Register("Value", typeof(string), typeof(StringControl), new PropertyMetadata(string.Empty));
+
+        #endregion
+
+        private Func<string, Task> SendCommandAction { get; set; }
+
+        public StringControl(Func<string, Task> sendCommandAction, ImageSource signalIcon)
+        {
+            SendCommandAction = sendCommandAction;
+            InitializeComponent();
+            SignalImg.Source = signalIcon;
         }
 
         private void TextBox_TextChanged_1(object sender, TextChangedEventArgs e)
         {
-            if (isLoaded)
-            {
-                if (isEntryValid(TextBox.Text))
-                {
-                    TextBox.Background = new SolidColorBrush(Colors.White);
-                    
-                    if (lastValue != TextBox.Text)                    
-                        hasChanged = true;                    
-                }
-                else
-                    TextBox.Background = new SolidColorBrush(Color.FromArgb(255, 255, 198, 198));
-
-            }
+            if (!IsLoaded) return;
+            ValidateEntry();
         }
 
-        private void TextBox_PreviewKeyDown_1(object sender, KeyEventArgs e)
+        private async void TextBox_PreviewKeyDown_1(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter)
-            {
-                if (!isEntryValid(TextBox.Text))                
-                    TextBox.Text = defaultVaule;
-                else                
-                    SendCommand(); 
+            if (e.Key != Key.Enter) return;
 
-                e.Handled = true;
+            if (IsEntryValid(TextBox.Text))
+                await SendCommandAsync();
+
+            e.Handled = true;
+        }
+
+        private async void TextBox_LostFocus_1(object sender, RoutedEventArgs e)
+        {
+            ValidateEntry();
+
+            if (IsEntryValid(TextBox.Text))
+                await SendCommandAsync();
+        }
+
+        private async Task SendCommandAsync()
+        {
+            if (SendCommandAction == null) 
                 return;
-            }
+
+            SignalImg.Opacity = 1;
+
+            await SendCommandAction(TextBox.Text);
+
+            var da = new DoubleAnimation { From = 1, To = 0, Duration = new Duration(TimeSpan.FromSeconds(.8)) };
+            SignalImg.BeginAnimation(OpacityProperty, da);
         }
 
-        private void TextBox_LostFocus_1(object sender, RoutedEventArgs e)
+        private static bool IsEntryValid(string value)
         {
-            if (isEntryValid(TextBox.Text))            
-                SendCommand();
+            return !string.IsNullOrEmpty(value);
         }
 
-        private void SendCommand()
+        private void ValidateEntry()
         {
-            if (SendCommandAction != null && hasChanged)
-            {
-                lastValue = TextBox.Text;
-                hasChanged = false;
-                SendCommandAction.DynamicInvoke(TextBox.Text);
-
-                SignalImg.Opacity = 1;
-                var da = new DoubleAnimation();
-                da.From = 1;
-                da.To = 0;
-                da.Duration = new Duration(TimeSpan.FromSeconds(.8));
-                SignalImg.BeginAnimation(OpacityProperty, da);               
-            }
+            ErrorMessage = IsEntryValid(TextBox.Text) ? string.Empty : "Invalid Entry";
         }
-
-        private bool isEntryValid(string value)
-        {
-            if (!string.IsNullOrEmpty(TextBox.Text))
-                return true;
-            
-            return false;
-        }        
     }
 }

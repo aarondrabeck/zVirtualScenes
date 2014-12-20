@@ -32,22 +32,19 @@
 
             <Grid Grid.Column="1" Margin="0 10 10 0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="75"/>
+                    <RowDefinition Height="60"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <Grid Background="#26C6DA">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    <TextBlock Text="{Binding Path=Name, StringFormat={}{0} for zVirtualScenes, FallbackValue=Plugins for zVirtualSenes}" Foreground="White" FontSize="18"  Margin="5 10 5 0" />
-                    <TextBlock Grid.Row="1" Text="{Binding Path=Description, FallbackValue=Integrate with zVirtualScenes by creating custom plug-ins.}" TextWrapping="Wrap"  
-                                   Foreground="White" TextTrimming="WordEllipsis" Margin="15 3 5 5"/>
+                <Grid Background="#26C6DA" ToolTip="{Binding Path=Description, FallbackValue=Integrate with zVirtualScenes by creating custom plug-ins.}">
+                    <TextBlock Text="{Binding Path=Name, StringFormat={}{0} for zVirtualScenes, FallbackValue=Plugin for zVirtualSenes}" Foreground="White" Margin="20 0" FontSize="26" VerticalAlignment="Center" />
                 </Grid>
                 <Border  Grid.Row="1" BorderBrush="#B2EBF2" BorderThickness="1 0 1 1">
                     <ScrollViewer HorizontalScrollBarVisibility="Disabled"  VerticalScrollBarVisibility="Auto" >
-                        <StackPanel Name="ControlsStkPnl"  Orientation="Vertical" Margin="0,10,0,0"></StackPanel>
+                       
+                     
+                        <StackPanel Name="ControlsStkPnl" Orientation="Vertical" Margin="0,10,0,0"></StackPanel>
+                       
                     </ScrollViewer>
                 </Border>
             </Grid>

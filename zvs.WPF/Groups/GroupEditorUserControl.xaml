@@ -71,7 +71,7 @@
                         </Style>
                     </DataGrid.Resources>
                     <DataGrid.Columns>
-                        <DataGridTemplateColumn HeaderStyle="{StaticResource NoSelectionDataGridHeader}" MaxWidth="50" MinWidth="50" Width="50"  Header="" CanUserResize="False" CanUserReorder="False" CanUserSort="False">
+                        <DataGridTemplateColumn HeaderStyle="{StaticResource NoSelectionDataGridHeader}"  MaxWidth="70" MinWidth="70" Width="70" Header="" CanUserResize="False" CanUserReorder="False" CanUserSort="False">
                             <DataGridTemplateColumn.CellTemplate >
                                 <DataTemplate>
                                     <Grid Height="40" Width="40">

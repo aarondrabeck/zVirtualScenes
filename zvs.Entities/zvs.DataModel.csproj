@@ -125,7 +125,6 @@
     <Compile Include="Device.cs" />
     <Compile Include="TriggerOperator.cs" />
     <Compile Include="AdapterSettingOption.cs" />
-    <Compile Include="DataType.cs" />
     <Compile Include="AdapterSetting.cs" />
     <Compile Include="Adapter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

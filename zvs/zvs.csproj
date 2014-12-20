@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CurrentTimeProvider.cs" />
+    <Compile Include="DataType.cs" />
     <Compile Include="ExceptionExtensionMethods.cs" />
     <Compile Include="IEntityContextConnection.cs" />
     <Compile Include="IFeedback.cs" />

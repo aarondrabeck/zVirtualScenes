@@ -105,9 +105,7 @@ namespace zvs.WPF.AdapterManager
             var adapter = (Adapter)AdapterListView.SelectedItem;
             if (adapter == null) return;
             //ADD THE ENABLED BUTTON
-            var c = new CheckboxControl(string.Format("{0} is enabled", adapter.Name),
-                "Starts and stops the selected adapter",
-                adapter.IsEnabled,
+            var c = new CheckboxControl(
                 async isChecked =>
                 {
                     //Save to the database
@@ -123,7 +121,12 @@ namespace zvs.WPF.AdapterManager
                     else
                         await App.ZvsEngine.AdapterManager.DisableAdapterAsync(adapter.AdapterGuid, App.Cts.Token);
                 },
-                _icon);
+                                        _icon)
+            {
+                Header = string.Format("{0} is enabled", adapter.Name),
+                Description = "Starts and stops the selected adapter",
+                Value = adapter.IsEnabled
+            };
             ControlsStkPnl.Children.Add(c);
 
 
@@ -139,120 +142,64 @@ namespace zvs.WPF.AdapterManager
                             bool defaultValue;
                             bool.TryParse(adapterSetting.Value, out defaultValue);
 
-                            var control = new CheckboxControl(adapterSetting.Name,
-                                adapterSetting.Description,
-                                defaultValue,
-                                async isChecked =>
+                            var control = new CheckboxControl(async isChecked =>
                                 {
                                     adapterSetting.Value = isChecked.ToString();
                                     var result = await Context.TrySaveChangesAsync(App.Cts.Token);
                                     if (result.HasError)
                                         await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving adapter setting. {0}", result.Message);
                                 },
-                                _icon);
-                            ControlsStkPnl.Children.Add(control);
-                            break;
-                        }
-                    case DataType.DECIMAL:
-                        {
-                            var control = new NumericControl(adapterSetting.Name,
-                                adapterSetting.Description,
-                                adapterSetting.Value,
-                                NumericControl.NumberType.Decimal,
-                                async value =>
-                                {
-                                    adapterSetting.Value = value;
-                                    var result = await Context.TrySaveChangesAsync(App.Cts.Token);
-                                    if (result.HasError)
-                                        await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving adapter setting. {0}", result.Message);
-                                },
-                                _icon);
+                                        _icon)
+                            {
+                                Header = adapterSetting.Name,
+                                Description = adapterSetting.Description,
+                                Value = defaultValue
+                            };
                             ControlsStkPnl.Children.Add(control);
                             break;
                         }
                     case DataType.BYTE:
-                        {
-                            var control = new NumericControl(adapterSetting.Name,
-                                adapterSetting.Description,
-                                adapterSetting.Value,
-                                NumericControl.NumberType.Byte,
-                                async value =>
-                                {
-                                    adapterSetting.Value = value;
-
-                                    var result = await Context.TrySaveChangesAsync(App.Cts.Token);
-                                    if (result.HasError)
-                                        await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving adapter setting. {0}", result.Message);
-                                },
-                                _icon);
-                            ControlsStkPnl.Children.Add(control);
-                            break;
-                        }
-                    case DataType.INTEGER:
-                        {
-                            var control = new NumericControl(adapterSetting.Name,
-                                adapterSetting.Description,
-                                adapterSetting.Value,
-                                NumericControl.NumberType.Integer,
-                                async value =>
-                                {
-                                    adapterSetting.Value = value;
-
-                                    var result = await Context.TrySaveChangesAsync(App.Cts.Token);
-                                    if (result.HasError)
-                                        await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving adapter setting. {0}", result.Message);
-                                },
-                                _icon);
-                            ControlsStkPnl.Children.Add(control);
-                            break;
-                        }
+                    case DataType.DECIMAL:
                     case DataType.SHORT:
-                        {
-                            var control = new NumericControl(adapterSetting.Name,
-                                adapterSetting.Description,
-                                adapterSetting.Value,
-                                NumericControl.NumberType.Short,
-                                async value =>
-                                {
-                                    adapterSetting.Value = value;
-                                    var result = await Context.TrySaveChangesAsync(App.Cts.Token);
-                                    if (result.HasError)
-                                        await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving adapter setting. {0}", result.Message);
-                                },
-                                _icon);
-                            ControlsStkPnl.Children.Add(control);
-                            break;
-                        }
+                    case DataType.INTEGER:
                     case DataType.COMPORT:
                         {
-                            var control = new NumericControl(adapterSetting.Name,
-                                adapterSetting.Description,
-                                adapterSetting.Value,
-                                NumericControl.NumberType.ComPort,
-                                async value =>
+                            var control = new NumericControl(async value =>
                                 {
                                     adapterSetting.Value = value;
                                     var result = await Context.TrySaveChangesAsync(App.Cts.Token);
                                     if (result.HasError)
                                         await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving adapter setting. {0}", result.Message);
                                 },
-                                _icon);
+                                        _icon, adapterSetting.ValueType)
+                            {
+                                Header = adapterSetting.Name,
+                                Description = adapterSetting.Description,
+                                Value = adapterSetting.Value
+                            };
                             ControlsStkPnl.Children.Add(control);
                             break;
                         }
                     case DataType.STRING:
                         {
-                            var control = new StringControl(adapterSetting.Name,
-                                adapterSetting.Description,
-                                adapterSetting.Value,
+                            var control = new StringControl(
                                 async value =>
                                 {
                                     adapterSetting.Value = value;
                                     var result = await Context.TrySaveChangesAsync(App.Cts.Token);
                                     if (result.HasError)
-                                        await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving adapter setting. {0}", result.Message);
+                                        await
+                                            Log.ReportErrorFormatAsync(App.Cts.Token,
+                                                "Error saving adapter setting. {0}", result.Message);
                                 },
-                                _icon);
+                                _icon)
+                            {
+                                Header = adapterSetting.Name,
+                                Description = adapterSetting.Description,
+                                Value = adapterSetting.Value
+                            };
+
+
                             ControlsStkPnl.Children.Add(control);
                             break;
                         }

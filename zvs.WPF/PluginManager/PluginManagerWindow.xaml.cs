@@ -107,10 +107,7 @@ namespace zvs.WPF.PluginManager
             if (plugin == null) return;
 
             //ADD THE ENABLED BUTTON
-            var c = new CheckboxControl(string.Format("{0} is enabled", plugin.Name),
-                "Starts and stops the selected plug-in",
-                plugin.IsEnabled,
-                async isChecked =>
+            var c = new CheckboxControl(async isChecked =>
                 {
                     //Save to the database
                     plugin.IsEnabled = isChecked;
@@ -125,7 +122,12 @@ namespace zvs.WPF.PluginManager
                     else
                         await App.ZvsEngine.PluginManager.DisablePluginAsync(plugin.PluginGuid, App.Cts.Token);
                 },
-                _icon);
+                _icon)
+            {
+                Header = string.Format("{0} is enabled", plugin.Name),
+                Description = "Starts and stops the selected plug-in",
+                Value = plugin.IsEnabled
+            };
             ControlsStkPnl.Children.Add(c);
 
 
@@ -137,144 +139,84 @@ namespace zvs.WPF.PluginManager
                 switch (pluginSettings.ValueType)
                 {
                     case DataType.BOOL:
-                    {
-                        bool defaultValue;
-                        bool.TryParse(pluginSettings.Value, out defaultValue);
+                        {
+                            bool defaultValue;
+                            bool.TryParse(pluginSettings.Value, out defaultValue);
 
-                        var control = new CheckboxControl(pluginSettings.Name,
-                            pluginSettings.Description,
-                            defaultValue,
-                            async isChecked =>
+                            var control = new CheckboxControl(async isChecked =>
+                                {
+                                    pluginSettings.Value = isChecked.ToString();
+                                    var result = await Context.TrySaveChangesAsync(App.Cts.Token);
+                                    if (result.HasError)
+                                        await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving plugin setting. {0}", result.Message);
+                                },
+                                _icon)
                             {
-                                pluginSettings.Value = isChecked.ToString();
-                                var result = await Context.TrySaveChangesAsync(App.Cts.Token);
-                                if (result.HasError)
-                                    await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving plugin setting. {0}", result.Message);
-                            },
-                            _icon);
-                        ControlsStkPnl.Children.Add(control);
-                        break;
-                    }
+                                Header = pluginSettings.Name,
+                                Description = pluginSettings.Description,
+                                Value = defaultValue
+                            };
+                            ControlsStkPnl.Children.Add(control);
+                            break;
+                        }
                     case DataType.DECIMAL:
-                    {
-                        var control = new NumericControl(pluginSettings.Name,
-                            pluginSettings.Description,
-                            pluginSettings.Value,
-                            NumericControl.NumberType.Decimal,
-                            async value =>
-                            {
-                                pluginSettings.Value = value;
-                                var result = await Context.TrySaveChangesAsync(App.Cts.Token);
-                                if (result.HasError)
-                                    await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving plugin setting. {0}", result.Message);
-                            },
-                            _icon);
-                        ControlsStkPnl.Children.Add(control);
-                        break;
-                    }
                     case DataType.BYTE:
-                    {
-                        var control = new NumericControl(pluginSettings.Name,
-                            pluginSettings.Description,
-                            pluginSettings.Value,
-                            NumericControl.NumberType.Byte,
-                            async value =>
-                            {
-                                pluginSettings.Value = value;
-
-                                var result = await Context.TrySaveChangesAsync(App.Cts.Token);
-                                if (result.HasError)
-                                    await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving plugin setting. {0}", result.Message);
-                            },
-                            _icon);
-                        ControlsStkPnl.Children.Add(control);
-                        break;
-                    }
                     case DataType.INTEGER:
-                    {
-                        var control = new NumericControl(pluginSettings.Name,
-                            pluginSettings.Description,
-                            pluginSettings.Value,
-                            NumericControl.NumberType.Integer,
-                            async value =>
-                            {
-                                pluginSettings.Value = value;
-
-                                var result = await Context.TrySaveChangesAsync(App.Cts.Token);
-                                if (result.HasError)
-                                    await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving plugin setting. {0}", result.Message);
-                            },
-                            _icon);
-                        ControlsStkPnl.Children.Add(control);
-                        break;
-                    }
                     case DataType.SHORT:
-                    {
-                        var control = new NumericControl(pluginSettings.Name,
-                            pluginSettings.Description,
-                            pluginSettings.Value,
-                            NumericControl.NumberType.Short,
-                            async value =>
-                            {
-                                pluginSettings.Value = value;
-                                var result = await Context.TrySaveChangesAsync(App.Cts.Token);
-                                if (result.HasError)
-                                    await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving plugin setting. {0}", result.Message);
-                            },
-                            _icon);
-                        ControlsStkPnl.Children.Add(control);
-                        break;
-                    }
                     case DataType.COMPORT:
-                    {
-                        var control = new NumericControl(pluginSettings.Name,
-                            pluginSettings.Description,
-                            pluginSettings.Value,
-                            NumericControl.NumberType.ComPort,
-                            async value =>
+                        {
+                            var control = new NumericControl(async value =>
+                                {
+                                    pluginSettings.Value = value;
+                                    var result = await Context.TrySaveChangesAsync(App.Cts.Token);
+                                    if (result.HasError)
+                                        await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving plugin setting. {0}", result.Message);
+                                },
+                                        _icon, pluginSettings.ValueType)
                             {
-                                pluginSettings.Value = value;
-                                var result = await Context.TrySaveChangesAsync(App.Cts.Token);
-                                if (result.HasError)
-                                    await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving plugin setting. {0}", result.Message);
-                            },
-                            _icon);
-                        ControlsStkPnl.Children.Add(control);
-                        break;
-                    }
+                                Header = pluginSettings.Name,
+                                Description = pluginSettings.Description,
+                                Value = pluginSettings.Value
+                            };
+                            ControlsStkPnl.Children.Add(control);
+                            break;
+                        }
                     case DataType.STRING:
-                    {
-                        var control = new StringControl(pluginSettings.Name,
-                            pluginSettings.Description,
-                            pluginSettings.Value,
-                            async value =>
+                        {
+                            var control = new StringControl(
+                                async value =>
+                                {
+                                    pluginSettings.Value = value;
+                                    var result = await Context.TrySaveChangesAsync(App.Cts.Token);
+                                    if (result.HasError)
+                                        await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving plugin setting. {0}", result.Message);
+                                },
+                                            _icon)
                             {
-                                pluginSettings.Value = value;
-                                var result = await Context.TrySaveChangesAsync(App.Cts.Token);
-                                if (result.HasError)
-                                    await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving plugin setting. {0}", result.Message);
-                            },
-                            _icon);
-                        ControlsStkPnl.Children.Add(control);
-                        break;
-                    }
+                                Header = pluginSettings.Name,
+                                Description = pluginSettings.Description,
+                                Value = pluginSettings.Value,
+                            };
+                            ControlsStkPnl.Children.Add(control);
+                            break;
+                        }
                     case DataType.LIST:
-                    {
-                        var control = new ComboboxControl(pluginSettings.Name,
-                            pluginSettings.Description,
-                            pluginSettings.Options.Select(o => o.Name).ToList(),
-                            pluginSettings.Value,
-                            async value =>
-                            {
-                                pluginSettings.Value = value.ToString();
-                                var result = await Context.TrySaveChangesAsync(App.Cts.Token);
-                                if (result.HasError)
-                                    await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving plugin setting. {0}", result.Message);
-                            },
-                            _icon);
-                        ControlsStkPnl.Children.Add(control);
-                        break;
-                    }
+                        {
+                            var control = new ComboboxControl(pluginSettings.Name,
+                                pluginSettings.Description,
+                                pluginSettings.Options.Select(o => o.Name).ToList(),
+                                pluginSettings.Value,
+                                async value =>
+                                {
+                                    pluginSettings.Value = value.ToString();
+                                    var result = await Context.TrySaveChangesAsync(App.Cts.Token);
+                                    if (result.HasError)
+                                        await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving plugin setting. {0}", result.Message);
+                                },
+                                _icon);
+                            ControlsStkPnl.Children.Add(control);
+                            break;
+                        }
                 }
             }
         }

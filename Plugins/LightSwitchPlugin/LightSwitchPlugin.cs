@@ -14,6 +14,7 @@ using zvs.DataModel;
 using System.Threading.Tasks;
 using LightSwitchPlugin.LightSwitch;
 using System.Data.Entity;
+using zvs;
 
 namespace LightSwitchPlugin
 {
