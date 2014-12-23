@@ -105,7 +105,6 @@ namespace zvs.WPF.DeviceControls
                 device.DeviceTypeId = e.NewEntity.DeviceTypeId;
                 device.CurrentLevelInt = e.NewEntity.CurrentLevelInt;
                 device.CurrentLevelText = e.NewEntity.CurrentLevelText;
-                device.LastHeardFrom = e.NewEntity.LastHeardFrom;
                 device.NodeNumber = e.NewEntity.NodeNumber;
                 device.Name = e.NewEntity.Name;
                 device.Location = e.NewEntity.Location;

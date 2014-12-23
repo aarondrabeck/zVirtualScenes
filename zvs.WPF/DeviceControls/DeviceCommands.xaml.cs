@@ -60,10 +60,15 @@ namespace zvs.WPF.DeviceControls
                     {
                         case DataType.NONE:
                             {
-                                var bc = new ButtonControl(deviceCommand.Name, deviceCommand.Description, async () =>
+                                var bc = new ButtonControl(async () =>
                                 {
                                     await _app.ZvsEngine.RunCommandAsync(deviceCommand.Id, string.Empty, string.Empty, CancellationToken.None);
-                                }, _icon) { ToolTip = tip };
+                                }, _icon)
+                                {
+                                    Name = deviceCommand.Name,
+                                    ButtonContent = deviceCommand.Name,
+                                    Description = deviceCommand.Description
+                                };
                                 DeviceCommandsStkPnl.Children.Add(bc);
                                 break;
                             }
@@ -149,15 +154,17 @@ namespace zvs.WPF.DeviceControls
                                     defaultValue = dv.Value;
                                 }
 
-                                var control = new ComboboxControl(deviceCommand.Name,
-                                    deviceCommand.Description,
-                                    deviceCommand.Options.Select(o => o.Name).ToList(),
-                                    defaultValue,
-                                    async value =>
+                                var control = new ComboboxControl(async value =>
                                     {
                                         await _app.ZvsEngine.RunCommandAsync(deviceCommand.Id, value.ToString(), string.Empty, CancellationToken.None);
                                     },
-                                    _icon) { ToolTip = tip };
+                            _icon,
+                            deviceCommand.Options.Select(o => o.Name).ToList())
+                                {
+                                    Header = deviceCommand.Name,
+                                    Description = deviceCommand.Description,
+                                    SelectedItem = defaultValue
+                                };
                                 DeviceCommandsStkPnl.Children.Add(control);
 
                                 break;
@@ -174,11 +181,15 @@ namespace zvs.WPF.DeviceControls
                     {
                         case DataType.NONE:
                             {
-                                var bc = new ButtonControl(deviceTypeCommand.Name, deviceTypeCommand.Description, async () =>
+                                var bc = new ButtonControl(async () =>
                                 {
                                     await _app.ZvsEngine.RunCommandAsync(deviceTypeCommand.Id, string.Empty, d.Id.ToString(CultureInfo.InvariantCulture), CancellationToken.None);
-                                },
-                                    _icon);
+                                }, _icon)
+                                {
+                                    Name = deviceTypeCommand.Name,
+                                    ButtonContent = deviceTypeCommand.Name,
+                                    Description = deviceTypeCommand.Description
+                                };
                                 TypeCommandsStkPnl.Children.Add(bc);
                                 break;
                             }
@@ -268,15 +279,17 @@ namespace zvs.WPF.DeviceControls
                                     defaultValue = dv.Value;
                                 }
 
-                                var control = new ComboboxControl(deviceTypeCommand.Name,
-                                    deviceTypeCommand.Description,
-                                    deviceTypeCommand.Options.Select(o => o.Name).ToList(),
-                                    defaultValue,
-                                    async value =>
+                                var control = new ComboboxControl(async value =>
                                     {
                                         await _app.ZvsEngine.RunCommandAsync(deviceTypeCommand.Id, value.ToString(), d.Id.ToString(CultureInfo.InvariantCulture), CancellationToken.None);
                                     },
-                                    _icon);
+                                 _icon,
+                                 deviceTypeCommand.Options.Select(o => o.Name).ToList())
+                                {
+                                    Header = deviceTypeCommand.Name,
+                                    Description = deviceTypeCommand.Description,
+                                    SelectedItem = defaultValue
+                                };
                                 TypeCommandsStkPnl.Children.Add(control);
 
                                 break;

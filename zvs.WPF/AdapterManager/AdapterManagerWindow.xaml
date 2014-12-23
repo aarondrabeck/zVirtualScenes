@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Adapter Manager" Width="800" mc:Ignorable="d" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" FontFamily="Roboto"
-        Loaded="Window_Loaded" Icon="/zVirtualScenes;component/Images/zvs-icon.ico"  MinHeight="300" MinWidth="675" 
+        Loaded="Window_Loaded" Icon="/zVirtualScenes;component/Images/zvs-icon.ico"  MinHeight="300" MinWidth="675"  
         WindowStyle="ToolWindow" d:DesignHeight="312" Height="500" WindowStartupLocation="CenterOwner" Closed="Window_Closed_1">
     <Window.Resources>
         <CollectionViewSource x:Key="ZvsEntities2AdapterViewSource"  />
@@ -19,7 +19,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <ListView Grid.Column="0" HorizontalAlignment="Left" Name="AdapterListView" Margin="10 10 10 0"  DisplayMemberPath="Name" BorderBrush="#B2EBF2" ItemsSource="{Binding}" 
-                  SelectedValuePath="Description" SelectionMode="Single" SelectionChanged="AdapterListView_SelectionChanged" MinWidth="200" >
+                  SelectedValuePath="Description" SelectionMode="Single" SelectionChanged="AdapterListView_SelectionChanged" MinWidth="200" FontSize="16" >
                 <ListView.ItemContainerStyle>
                     <Style TargetType="{x:Type ListViewItem}">
                         <Style.Resources>
@@ -37,14 +37,8 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <Grid Background="#26C6DA">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    <TextBlock Text="{Binding Path=Name, StringFormat={}{0} for zVirtualScenes, FallbackValue=Adapters for zVirtualSenes}" Foreground="White" FontSize="18"  Margin="5 10 5 0" />
-                    <TextBlock Grid.Row="1" Text="{Binding Path=Description, FallbackValue=Add devices from any protocol or type by creating custom adapters.}" TextWrapping="Wrap"  
-                                   Foreground="White" TextTrimming="WordEllipsis" Margin="15 3 5 5"/>
+                <Grid Background="#26C6DA" ToolTip="{Binding Path=Description, FallbackValue=Integrate with zVirtualScenes by creating custom plug-ins.}">
+                    <TextBlock Text="{Binding Path=Name, StringFormat={}{0} for zVirtualScenes, FallbackValue=Adapter for zVirtualSenes}" Foreground="White" Margin="20 0" FontSize="26" VerticalAlignment="Center" />
                 </Grid>
                 <Border  Grid.Row="1" BorderBrush="#B2EBF2" BorderThickness="1 0 1 1">
                     <ScrollViewer HorizontalScrollBarVisibility="Disabled"  VerticalScrollBarVisibility="Auto" >

@@ -205,18 +205,20 @@ namespace zvs.WPF.AdapterManager
                         }
                     case DataType.LIST:
                         {
-                            var control = new ComboboxControl(adapterSetting.Name,
-                                adapterSetting.Description,
-                                adapterSetting.Options.Select(o => o.Name).ToList(),
-                                adapterSetting.Value,
-                                async value =>
+                            var control = new ComboboxControl(async value =>
                                 {
                                     adapterSetting.Value = value.ToString();
                                     var result = await Context.TrySaveChangesAsync(App.Cts.Token);
                                     if (result.HasError)
                                         await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving adapter setting. {0}", result.Message);
                                 },
-                                _icon);
+                                 _icon,
+                             adapterSetting.Options.Select(o => o.Name).ToList())
+                            {
+                                Header = adapterSetting.Name,
+                                Description = adapterSetting.Description,
+                                SelectedItem = adapterSetting.Value
+                            };
                             ControlsStkPnl.Children.Add(control);
                             break;
                         }

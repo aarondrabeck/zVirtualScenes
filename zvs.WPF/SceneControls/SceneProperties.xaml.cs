@@ -179,11 +179,7 @@ namespace zvs.WPF.SceneControls
 
                     case DataType.LIST:
                         {
-                            var control = new ComboboxControl(sceneSetting.Name,
-                                string.Empty,
-                                sceneSetting.Options.Select(o => o.Name).ToList(),
-                                _default,
-                                async value =>
+                            var control = new ComboboxControl(async value =>
                                 {
                                     if (sceneSettingValue != null)
                                     {
@@ -204,7 +200,13 @@ namespace zvs.WPF.SceneControls
                                     if (result.HasError)
                                         await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving scene. {0}", result.Message);
                                 },
-                                icon);
+                                 icon,
+                           sceneSetting.Options.Select(o => o.Name).ToList())
+                            {
+                                Header = sceneSetting.Name,
+                                Description = string.Empty,
+                                SelectedItem = _default
+                            };
                             PropertiesStkPnl.Children.Add(control);
 
                             break;

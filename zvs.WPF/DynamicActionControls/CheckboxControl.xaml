@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" MinWidth="203" Name="This" ToolTip="{Binding Description, ElementName=This, FallbackValue='Please input a valid number.'}" FontFamily="Roboto" Margin="16 0 16 5">
+             mc:Ignorable="d" MinWidth="203" Name="This" ToolTip="{Binding Description, ElementName=This, FallbackValue=' '}" FontFamily="Roboto" Margin="16 0 16 5">
     <StackPanel Orientation="Vertical">
         <TextBlock TextTrimming="CharacterEllipsis" Text="{Binding Header, ElementName=This, FallbackValue='Label Text'}" VerticalAlignment="Top" Margin="2 8 0 0" FontSize="12" Foreground="#919191" />
         <Grid Margin="0 3 0 0">

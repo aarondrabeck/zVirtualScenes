@@ -1,51 +1,75 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.Windows.Media.Imaging;
 
 namespace zvs.WPF.DynamicActionControls
 {
     /// <summary>
     /// Interaction logic for ButtonControl.xaml
     /// </summary>
-    public partial class ButtonControl : UserControl
+    public partial class ButtonControl
     {
-        private string BtnName = string.Empty;
-        private string Description = string.Empty;
-        private Action ButtonClickAction = null;
-
-        public ButtonControl(string BtnName, string Description, Action ButtonClickAction, BitmapImage icon)
+        #region Dependecy Properties
+        public string Header
         {
-            this.BtnName = BtnName;
-            this.Description = Description;
-            this.ButtonClickAction = ButtonClickAction;
+            get { return (string)GetValue(HeaderProperty); }
+            set { SetValue(HeaderProperty, value); }
+        }
 
+        // Using a DependencyProperty as the backing store for Header.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty HeaderProperty =
+            DependencyProperty.Register("Header", typeof(string), typeof(ButtonControl), new PropertyMetadata(string.Empty));
+
+        public string Description
+        {
+            get { return (string)GetValue(DescriptionProperty); }
+            set { SetValue(DescriptionProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Description.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty DescriptionProperty =
+            DependencyProperty.Register("Description", typeof(string), typeof(ButtonControl), new PropertyMetadata(string.Empty));
+
+        public string ButtonContent
+        {
+            get { return (string)GetValue(ButtonContentProperty); }
+            set { SetValue(ButtonContentProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for ButtonContent.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty ButtonContentProperty =
+            DependencyProperty.Register("ButtonContent", typeof(string), typeof(ButtonControl), new PropertyMetadata(string.Empty));
+
+        #endregion
+
+        private Func<Task> SendCommandAction { get; set; }
+        public ButtonControl(Func<Task> sendCommandAction, ImageSource signalIcon)
+        {
+            SendCommandAction = sendCommandAction;
             InitializeComponent();
-
-            this.SignalImg.Source = icon;
+            SignalImg.Source = signalIcon;
         }
 
-        private void ButtonBtm_Click(object sender, RoutedEventArgs e)
+        private async Task SendCommandAsync()
         {
-            if (ButtonClickAction != null)
-            {
-                ButtonClickAction.DynamicInvoke();
+            if (SendCommandAction == null)
+                return;
 
-                SignalImg.Opacity = 1;
-                var da = new DoubleAnimation();
-                da.From = 1;
-                da.To = 0;
-                da.Duration = new Duration(TimeSpan.FromSeconds(.8));
-                SignalImg.BeginAnimation(OpacityProperty, da);          
-            }
+            SignalImg.Opacity = 1;
+
+            await SendCommandAction();
+
+            var da = new DoubleAnimation { From = 1, To = 0, Duration = new Duration(TimeSpan.FromSeconds(.8)) };
+            SignalImg.BeginAnimation(OpacityProperty, da);
         }
 
-        private void UserControl_Loaded_1(object sender, RoutedEventArgs e)
+        private async void ToggleButton_OnClick(object sender, RoutedEventArgs e)
         {
-            ButtonBtn.Content = BtnName;
-            ButtonBtn.ToolTip = Description;
-            DescTxt.Text = Description;
+            if (IsLoaded)
+                await SendCommandAsync();
         }
     }
 }

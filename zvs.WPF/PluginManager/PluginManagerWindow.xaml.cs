@@ -202,18 +202,20 @@ namespace zvs.WPF.PluginManager
                         }
                     case DataType.LIST:
                         {
-                            var control = new ComboboxControl(pluginSettings.Name,
-                                pluginSettings.Description,
-                                pluginSettings.Options.Select(o => o.Name).ToList(),
-                                pluginSettings.Value,
-                                async value =>
+                            var control = new ComboboxControl(async value =>
                                 {
                                     pluginSettings.Value = value.ToString();
                                     var result = await Context.TrySaveChangesAsync(App.Cts.Token);
                                     if (result.HasError)
                                         await Log.ReportErrorFormatAsync(App.Cts.Token, "Error saving plugin setting. {0}", result.Message);
                                 },
-                                _icon);
+                                 _icon,
+                             pluginSettings.Options.Select(o => o.Name).ToList())
+                            {
+                                Header = pluginSettings.Name,
+                                Description = pluginSettings.Description,
+                                SelectedItem =  pluginSettings.Value
+                            };
                             ControlsStkPnl.Children.Add(control);
                             break;
                         }

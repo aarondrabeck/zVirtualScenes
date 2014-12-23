@@ -186,7 +186,6 @@
     <Compile Include="FatalErrorWindow.xaml.cs">
       <DependentUpon>FatalErrorWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="JavaScript\JSResult.cs" />
     <Compile Include="NotifyIcon.cs" />
     <Compile Include="SceneControls\SceneProperties.xaml.cs">
       <DependentUpon>SceneProperties.xaml</DependentUpon>

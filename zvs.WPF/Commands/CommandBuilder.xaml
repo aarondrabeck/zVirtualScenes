@@ -19,7 +19,7 @@
                 </TabItem.Header>
                 <Grid>
                     <TextBlock HorizontalAlignment="Left" Margin="10,18,0,0" TextWrapping="Wrap" Text="Device" VerticalAlignment="Top"/>
-                    <ComboBox x:Name="DevicesCmboBox" Margin="85,15,12,0" VerticalAlignment="Top"  SelectionChanged="DevicesCmboBox_SelectionChanged_1">
+                    <ComboBox x:Name="DevicesCmboBox" Style="{StaticResource ComboBoxMaterialStyle}" Margin="85,15,12,0" VerticalAlignment="Top"  SelectionChanged="DevicesCmboBox_SelectionChanged_1">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock>
@@ -35,7 +35,7 @@
                     </ComboBox>
 
                     <TextBlock HorizontalAlignment="Left" Margin="10,51,0,0" TextWrapping="Wrap" Text="Commands" VerticalAlignment="Top"/>
-                    <ComboBox Name="DeviceCmdsCmboBox" Margin="85,48,12,0" VerticalAlignment="Top" DisplayMemberPath="Name" SelectionChanged="DeviceCmdsCmboBox_SelectionChanged_1"/>
+                    <ComboBox Name="DeviceCmdsCmboBox" Style="{StaticResource ComboBoxMaterialStyle}" Margin="85,48,12,0" VerticalAlignment="Top" DisplayMemberPath="Name" SelectionChanged="DeviceCmdsCmboBox_SelectionChanged_1"/>
                     <StackPanel Name="DeviceArgSckPnl" HorizontalAlignment="Left" Height="49" Margin="58,86,0,0" VerticalAlignment="Top" Width="369"/>
                     <TextBlock  HorizontalAlignment="Left" Margin="10,85,0,0" TextWrapping="Wrap" Text="Arg" VerticalAlignment="Top"/>
                 </Grid>
@@ -49,7 +49,7 @@
                 </TabItem.Header>
                 <Grid>
                     <TextBlock HorizontalAlignment="Left" Margin="12,21,0,0" TextWrapping="Wrap" Text="Commands" VerticalAlignment="Top"/>
-                    <ComboBox Name="BuiltinCmdsCmboBox" Margin="87,18,10,0" VerticalAlignment="Top" DisplayMemberPath="Name" SelectionChanged="BuiltinCmdsCmboBox_SelectionChanged_1"/>
+                    <ComboBox Style="{StaticResource ComboBoxMaterialStyle}" Name="BuiltinCmdsCmboBox" Margin="87,18,10,0" VerticalAlignment="Top" DisplayMemberPath="Name" SelectionChanged="BuiltinCmdsCmboBox_SelectionChanged_1"/>
                     <StackPanel Name="BuiltinArgSckPnl" HorizontalAlignment="Left" Height="49" Margin="60,56,0,0" VerticalAlignment="Top" Width="369"/>
                     <TextBlock  HorizontalAlignment="Left" Margin="12,55,0,0" TextWrapping="Wrap" Text="Arg" VerticalAlignment="Top"/>
                 </Grid>
@@ -63,7 +63,7 @@
                 </TabItem.Header>
                 <Grid DataContext="{StaticResource JSCmdsViewSource}">
                     <TextBlock HorizontalAlignment="Left" Margin="10,21,0,0" TextWrapping="Wrap" Text="Commands" VerticalAlignment="Top"/>
-                    <ComboBox x:Name="JavaScriptCmboBox" Margin="85,18,12,0" VerticalAlignment="Top" DisplayMemberPath="Name" ItemsSource="{Binding ., UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Id"/>
+                    <ComboBox x:Name="JavaScriptCmboBox" Style="{StaticResource ComboBoxMaterialStyle}" Margin="85,18,12,0" VerticalAlignment="Top" DisplayMemberPath="Name" ItemsSource="{Binding ., UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Id"/>
                 </Grid>
             </TabItem>
         </TabControl>

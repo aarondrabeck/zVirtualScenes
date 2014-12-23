@@ -65,6 +65,8 @@
                     </Style>
                 </DataGrid.Resources>
                 <DataGrid.Columns>
+                    <DataGridTextColumn x:Name="NodeID" HeaderStyle="{StaticResource SelectionDataGridHeader}"   CellStyle="{StaticResource BodyHozCenter}"  MinWidth="50"  Width="25" Header="Id" Binding="{Binding NodeNumber}" IsReadOnly="True" 
+                                    CanUserResize="False" CanUserReorder="True"  FontSize="14" Foreground="#B2B2B2" FontFamily="zVirtualScenes"/>
                     <DataGridTemplateColumn HeaderStyle="{StaticResource NoSelectionDataGridHeader}" SortMemberPath="Type.Name"  MaxWidth="70" MinWidth="70" Width="70" 
                                         Header="" CanUserResize="False" CanUserReorder="False">
                         <DataGridTemplateColumn.CellTemplate >
@@ -143,7 +145,7 @@
 
                             <DataTemplate>
 
-                                <ComboBox x:Name="GroupsCmbBox" Foreground="#181818" FontSize="16" Padding="8" ItemsSource="{Binding Path=Groups}" SelectedIndex="0" Margin="5,0" FontFamily="zVirtualScenes">
+                                <ComboBox x:Name="GroupsCmbBox" Style="{StaticResource ComboBoxMaterialStyle}" Padding="8" ItemsSource="{Binding Path=Groups}" SelectedIndex="0" Margin="5,0" FontFamily="zVirtualScenes">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <TextBlock Text="{Binding Path=Name}"/>
@@ -201,8 +203,7 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
-                    <DataGridTextColumn x:Name="NodeID" HeaderStyle="{StaticResource SelectionDataGridHeader}"   CellStyle="{StaticResource BodyHozCenter}"  MinWidth="50"  Width="25" Header="Id" Binding="{Binding NodeNumber}" IsReadOnly="True" 
-                                    CanUserResize="False" CanUserReorder="True"  FontSize="14" Foreground="#B2B2B2"/>
+               
                 </DataGrid.Columns>
             </DataGrid>
             <Border Grid.Row="1" Margin="0">

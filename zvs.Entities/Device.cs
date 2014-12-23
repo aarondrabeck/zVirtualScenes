@@ -55,23 +55,6 @@ namespace zvs.DataModel
             }
         }
 
-        private DateTime? _lastHeardFrom;
-        public DateTime? LastHeardFrom
-        {
-            get
-            {
-                return _lastHeardFrom;
-            }
-            set
-            {
-                if (value != _lastHeardFrom)
-                {
-                    _lastHeardFrom = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
         private string _currentLevelText;
         [StringLength(255)]
         public string CurrentLevelText
@@ -185,20 +168,6 @@ namespace zvs.DataModel
         protected void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        [NotMapped]
-        public DateTimeOffset? LastHeardFromOffset
-        {
-            // Assume the CreateOn property stores UTC time.
-            get
-            {
-                return LastHeardFrom.HasValue ? new DateTimeOffset(LastHeardFrom.Value, TimeSpan.FromHours(0)) : (DateTimeOffset?)null;
-            }
-            set
-            {
-                LastHeardFrom = value.HasValue ? value.Value.UtcDateTime : (DateTime?)null;
-            }
         }
 
         public async Task<string> GetDeviceTypeValueAsync(string deviceTypeSettingUniqueIdentifier, ZvsContext context)

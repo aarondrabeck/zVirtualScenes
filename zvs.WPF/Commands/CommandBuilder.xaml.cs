@@ -152,18 +152,21 @@ namespace zvs.WPF.Commands
                             selectedDevice = device;
                             _selectedBuiltinArg = device.Id.ToString(CultureInfo.InvariantCulture);
                         }
-                        var control = new ComboboxControl(selectedCmd.Name,
-                            selectedCmd.Description,
-                            await Context.Devices.ToListAsync(),
-                            selectedDevice,
-                            obj =>
+                        var control = new ComboboxControl(obj =>
                             {
                                 var d = obj as Device;
                                 if (d != null)
                                     _selectedBuiltinArg = d.Id.ToString(CultureInfo.InvariantCulture);
 
                                 return Task.FromResult(0);
-                            }, _icon);
+                            },
+                            _icon,
+                            await Context.Devices.ToListAsync())
+                        {
+                            Header = selectedCmd.Name,
+                            Description = selectedCmd.Description,
+                            SelectedItem = selectedDevice
+                        };
                         BuiltinArgSckPnl.Children.Add(control);
                         break;
                     }
@@ -183,11 +186,7 @@ namespace zvs.WPF.Commands
                             _selectedBuiltinArg = group.Id.ToString(CultureInfo.InvariantCulture);
                         }
 
-                        var control = new ComboboxControl(selectedCmd.Name,
-                            selectedCmd.Description,
-                            await Context.Groups.ToListAsync(),
-                            selectedGroup,
-                             arg =>
+                        var control = new ComboboxControl(arg =>
                              {
                                  var g = arg as Group;
                                  if (g != null)
@@ -196,7 +195,14 @@ namespace zvs.WPF.Commands
 
                                  return Task.FromResult(0);
 
-                             }, _icon);
+                             },
+                                 _icon,
+                            await Context.Groups.ToListAsync())
+                        {
+                            Header = selectedCmd.Name,
+                            Description = selectedCmd.Description,
+                            SelectedItem = selectedGroup
+                        };
                         BuiltinArgSckPnl.Children.Add(control);
                     }
                     break;
@@ -218,11 +224,7 @@ namespace zvs.WPF.Commands
                             _selectedBuiltinArg = scene.Id.ToString(CultureInfo.InvariantCulture);
                         }
 
-                        var control = new ComboboxControl(selectedCmd.Name,
-                            selectedCmd.Description,
-                            await Context.Scenes.ToListAsync(),
-                            selectedScene,
-                            arg =>
+                        var control = new ComboboxControl(arg =>
                             {
                                 var s = arg as Scene;
                                 if (s != null)
@@ -230,7 +232,14 @@ namespace zvs.WPF.Commands
 
                                 return Task.FromResult(0);
 
-                            }, _icon);
+                            },
+                                 _icon,
+                             await Context.Scenes.ToListAsync())
+                        {
+                            Header = selectedCmd.Name,
+                            Description = selectedCmd.Description,
+                            SelectedItem = selectedScene
+                        };
                         BuiltinArgSckPnl.Children.Add(control);
                         break;
                     }
@@ -335,15 +344,18 @@ namespace zvs.WPF.Commands
                                         defaultValue = StoredCommand.Argument;
                                     _selectedBuiltinArg = defaultValue;
 
-                                    var control = new ComboboxControl(selectedCmd.Name,
-                                        selectedCmd.Description,
-                                        selectedCmd.Options.Select(o => o.Name).ToList(),
-                                        defaultValue,
-                                        value =>
+                                    var control = new ComboboxControl(value =>
                                         {
                                             _selectedBuiltinArg = value.ToString();
                                             return Task.FromResult(0);
-                                        }, _icon);
+                                        },
+                                 _icon,
+                                 selectedCmd.Options.Select(o => o.Name).ToList())
+                                    {
+                                        Header = selectedCmd.Name,
+                                        Description = selectedCmd.Description,
+                                        SelectedItem = defaultValue
+                                    };
                                     BuiltinArgSckPnl.Children.Add(control);
 
                                     break;
@@ -574,15 +586,18 @@ namespace zvs.WPF.Commands
                                 }
                             }
                             _selectedDeviceArg = defaultValue;
-                            var control = new ComboboxControl(deviceTypeCommand.Name,
-                                deviceTypeCommand.Description,
-                                deviceTypeCommand.Options.Select(o => o.Name).ToList(),
-                                defaultValue,
-                                value =>
+                            var control = new ComboboxControl(value =>
                                 {
                                     _selectedDeviceArg = value.ToString();
                                     return Task.FromResult(0);
-                                }, _icon);
+                                },
+                                _icon,
+                                deviceTypeCommand.Options.Select(o => o.Name).ToList())
+                            {
+                                Header = deviceTypeCommand.Name,
+                                Description = deviceTypeCommand.Description,
+                                SelectedItem = defaultValue
+                            };
                             DeviceArgSckPnl.Children.Add(control);
 
                             break;
@@ -712,15 +727,18 @@ namespace zvs.WPF.Commands
                                 }
                             }
                             _selectedDeviceArg = defaultValue;
-                            var control = new ComboboxControl(dCmd.Name,
-                                dCmd.Description,
-                                dCmd.Options.Select(o => o.Name).ToList(),
-                                defaultValue,
-                                value =>
+                            var control = new ComboboxControl(value =>
                                 {
                                     _selectedDeviceArg = value.ToString();
                                     return Task.FromResult(0);
-                                }, _icon);
+                                },
+                                _icon,
+                                dCmd.Options.Select(o => o.Name).ToList())
+                            {
+                                Header = dCmd.Name,
+                                Description = dCmd.Description,
+                                SelectedItem = defaultValue
+                            };
                             DeviceArgSckPnl.Children.Add(control);
 
                             break;

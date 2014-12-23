@@ -180,11 +180,7 @@ namespace zvs.WPF.DeviceControls
                     case DataType.LIST:
                         {
                             #region ComboboxControl
-                            var control = new ComboboxControl(deviceTypeSetting.Name,
-                                deviceTypeSetting.Description,
-                                deviceTypeSetting.Options.Select(o => o.Name).ToList(),
-                                value,
-                                async v =>
+                            var control = new ComboboxControl(async v =>
                                 {
                                     if (deviceTypeSettingValue != null)
                                         deviceTypeSettingValue.Value = v.ToString();
@@ -203,7 +199,13 @@ namespace zvs.WPF.DeviceControls
                                     if (result.HasError)
                                         await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving device type setting. {0}", result.Message);
                                 },
-                                _icon);
+                                 _icon,
+                           deviceTypeSetting.Options.Select(o => o.Name).ToList())
+                            {
+                                Header = deviceTypeSetting.Name,
+                                Description = deviceTypeSetting.Description,
+                                SelectedItem = value
+                            };
                             PropertiesStkPnl.Children.Add(control);
 
                             break;
@@ -340,11 +342,7 @@ namespace zvs.WPF.DeviceControls
                     case DataType.LIST:
                         {
                             #region ComboboxControl
-                            var control = new ComboboxControl(deviceSetting.Name,
-                                deviceSetting.Description,
-                                deviceSetting.Options.Select(o => o.Name).ToList(),
-                                _default,
-                                async value =>
+                            var control = new ComboboxControl(async value =>
                                 {
                                     if (deviceSettingValue != null)
                                     {
@@ -364,7 +362,13 @@ namespace zvs.WPF.DeviceControls
                                     if (result.HasError)
                                         await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving device setting. {0}", result.Message);
                                 },
-                                _icon);
+                                _icon,
+                                deviceSetting.Options.Select(o => o.Name).ToList())
+                            {
+                                Header = deviceSetting.Name,
+                                Description = deviceSetting.Description,
+                                SelectedItem = _default
+                            };
                             PropertiesStkPnl.Children.Add(control);
 
                             break;

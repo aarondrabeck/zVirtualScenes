@@ -3,16 +3,17 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" Loaded="UserControl_Loaded_1" Padding="0,0,0,1" Margin="0,0,10,10"
-             >
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="26"/>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <Image Grid.Column="0" Name="SignalImg" Source="../Images/send_signal.png" Margin="5,0" Opacity="0"></Image>
-        <Button Grid.Column="1" Height="28" VerticalContentAlignment="Center" Name="ButtonBtn" Content="Button" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,5,0" Click="ButtonBtm_Click" Padding="5,1"/>
-        <TextBlock  Grid.Column="2" VerticalAlignment="Center" Name="DescTxt" TextTrimming="CharacterEllipsis" Text="Long Description of what this does." HorizontalAlignment="Left" Padding="0" Margin="10,0"/>
-    </Grid>
+             mc:Ignorable="d" MinWidth="203" Name="This" ToolTip="{Binding Description, ElementName=This, FallbackValue=''}" FontFamily="Roboto" Margin="16 0 16 5">
+    <StackPanel Orientation="Vertical">
+        <TextBlock TextTrimming="CharacterEllipsis" Text="{Binding Header, ElementName=This, FallbackValue='Label Text'}" VerticalAlignment="Top" Margin="0 8 0 0" FontSize="12" Foreground="#919191" />
+        <Grid Margin="0 3 0 0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="30"/>
+            </Grid.ColumnDefinitions>
+            <Button Cursor="Hand"  Style="{StaticResource MaterialLightButton}"  Name="ToggleButton" HorizontalAlignment="Left"  Click="ToggleButton_OnClick"
+                              VerticalAlignment="Center" Content="{Binding ButtonContent, ElementName=This, FallbackValue='My Button'}"  Margin="0 5 25 5"/>
+            <Image Grid.Column="1" Name="SignalImg" Source="../Images/send_signal.png" Height="15" Width="15"  Opacity="1" />
+        </Grid>
+    </StackPanel>
 </UserControl>

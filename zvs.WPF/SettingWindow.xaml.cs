@@ -18,8 +18,6 @@ namespace zvs.WPF
 
         private async void SettingWindow_Loaded_1(object sender, RoutedEventArgs e)
         {
-            //TODO: enable
-          //  EnableJavaScriptDebugger.IsChecked = zvs.Processor.JavaScriptRunner.JavascriptDebugEnabled; 
             using (var context = new ZvsContext(_app.EntityContextConnection))
             {
                 var option = await context.ProgramOptions.FirstOrDefaultAsync(o => o.UniqueIdentifier == "LOGDIRECTION");
@@ -34,42 +32,34 @@ namespace zvs.WPF
         private async void AcenLogOrderRadioBtn_Checked(object sender, RoutedEventArgs e)
         {
             DecenLogOrderRadioBtn.IsChecked = false;
-            if (!_isLoading)
+            if (_isLoading) return;
+            using (var context = new ZvsContext(_app.EntityContextConnection))
             {
-                using (var context = new ZvsContext(_app.EntityContextConnection))
+                await ProgramOption.TryAddOrEditAsync(context, new ProgramOption()
                 {
-                    await ProgramOption.TryAddOrEditAsync(context, new ProgramOption()
-                    {
-                        UniqueIdentifier = "LOGDIRECTION",
-                        Value = "Ascending"
-                    }, _app.Cts.Token);
-                }
+                    UniqueIdentifier = "LOGDIRECTION",
+                    Value = "Ascending"
+                }, _app.Cts.Token);
             }
         }
 
         private async void DecenLogOrderRadioBtn_Checked(object sender, RoutedEventArgs e)
         {
             AcenLogOrderRadioBtn.IsChecked = false;
-            if (!_isLoading)
+            if (_isLoading) return;
+            using (var context = new ZvsContext(_app.EntityContextConnection))
             {
-                using (var context = new ZvsContext())
+                await ProgramOption.TryAddOrEditAsync(context, new ProgramOption()
                 {
-                    await ProgramOption.TryAddOrEditAsync(context, new ProgramOption()
-                    {
-                        UniqueIdentifier = "LOGDIRECTION",
-                        Value = "Descending"
-                    }, _app.Cts.Token);
-                }
+                    UniqueIdentifier = "LOGDIRECTION",
+                    Value = "Descending"
+                }, _app.Cts.Token);
             }
         }
 
         private void BtnDone_Click(object sender, RoutedEventArgs e)
         {
-            //TODO: RESTORE
-          //  if(EnableJavaScriptDebugger.IsChecked.HasValue) zvs.Processor.JavaScriptRunner.JavascriptDebugEnabled = EnableJavaScriptDebugger.IsChecked.Value;
             Close();
         }
-
-
     }
 }

@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.Windows.Media.Imaging;
 
 namespace zvs.WPF.DynamicActionControls
 {
     /// <summary>
     /// Interaction logic for ButtonControl.xaml
     /// </summary>
-    public partial class CheckboxControl : UserControl
+    public partial class CheckboxControl
     {
         #region Dependecy Properties
         public string Header
@@ -33,17 +31,6 @@ namespace zvs.WPF.DynamicActionControls
         // Using a DependencyProperty as the backing store for Description.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty DescriptionProperty =
             DependencyProperty.Register("Description", typeof(string), typeof(CheckboxControl), new PropertyMetadata(string.Empty));
-
-        public string ErrorMessage
-        {
-            get { return (string)GetValue(ErrorMessageProperty); }
-            set { SetValue(ErrorMessageProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for ErrorMessage.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty ErrorMessageProperty =
-            DependencyProperty.Register("ErrorMessage", typeof(string), typeof(CheckboxControl), new PropertyMetadata(string.Empty));
-
 
         public bool Value
         {

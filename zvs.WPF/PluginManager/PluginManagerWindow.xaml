@@ -18,7 +18,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <ListView Grid.Column="0" HorizontalAlignment="Left" Name="PluginListView" Margin="10 10 10 0"  DisplayMemberPath="Name" BorderBrush="#B2EBF2" ItemsSource="{Binding}" 
-                  SelectedValuePath="Description" SelectionMode="Single" SelectionChanged="PluginListView_SelectionChanged" MinWidth="200" >
+                  SelectedValuePath="Description" SelectionMode="Single" SelectionChanged="PluginListView_SelectionChanged" MinWidth="200" FontSize="16" >
                 <ListView.ItemContainerStyle>
                     <Style TargetType="{x:Type ListViewItem}">
                         <Style.Resources>
