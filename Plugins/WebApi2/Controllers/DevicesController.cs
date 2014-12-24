@@ -28,7 +28,7 @@ namespace zvsWebapi2Plugin.Controllers
         }
 
         [EnableQuery]
-        public SingleResult<Device> Get([FromODataUri] long key)
+        public SingleResult<Device> Get([FromODataUri] int key)
         {
             var result = Get().Where(p => p.Id == key);
             return SingleResult.Create(result);

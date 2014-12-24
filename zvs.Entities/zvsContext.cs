@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Data.Entity;
+using System.Data.Entity.Validation;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Data.Entity;
-using System.Data.Entity.Validation;
-using zvs.DataModel.Tasks;
 
 namespace zvs.DataModel
 {
@@ -68,23 +66,22 @@ namespace zvs.DataModel
         public DbSet<SceneSetting> SceneSettings { get; set; }
         public DbSet<SceneSettingOption> SceneSettingOptions { get; set; }
         public DbSet<SceneSettingValue> SceneSettingValues { get; set; }
-        public DbSet<ScheduledTask> ScheduledTasks { get; set; }
         public DbSet<SceneStoredCommand> SceneStoredCommands { get; set; }
-        public DbSet<ZvsScheduledTask> ZvsScheduledTasks { get; set; }
+        public DbSet<ScheduledTask> ScheduledTasks { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<Device>()
-            .HasMany(c => c.Groups)
-            .WithMany(a => a.Devices)
-            .Map(m => m.ToTable("DeviceToGroups", schemaName: "ZVS"));
+                .HasMany(c => c.Groups)
+                .WithMany(a => a.Devices)
+                .Map(m => m.ToTable("DeviceToGroups", schemaName: "ZVS"));
 
             modelBuilder.Entity<DeviceValueHistory>()
-                   .HasRequired(s => s.DeviceValue)
-                   .WithMany(o => o.History)
-                   .WillCascadeOnDelete(true);
+                .HasRequired(s => s.DeviceValue)
+                .WithMany(o => o.History)
+                .WillCascadeOnDelete(true);
 
             modelBuilder.Entity<DeviceType>()
                 .HasMany(o => o.Settings)
@@ -95,11 +92,6 @@ namespace zvs.DataModel
                 .HasRequired(o => o.Type)
                 .WithMany(o => o.Devices)
                 .WillCascadeOnDelete(false);
-
-            modelBuilder.Entity<ZvsScheduledTask>()
-                .HasRequired(o => o.ScheduledTask)
-                .WithRequiredPrincipal(o => o.ZvsScheduledTask)
-                .WillCascadeOnDelete(true);
         }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken)
@@ -141,7 +133,7 @@ namespace zvs.DataModel
             foreach (var cmd in await DeviceValueTriggers.Where(sceneCmdPredicate).ToListAsync(cancellationToken))
                 await cmd.SetTargetObjectNameAsync(this);
 
-            foreach (var cmd in await ZvsScheduledTasks.Where(sceneCmdPredicate).ToListAsync(cancellationToken))
+            foreach (var cmd in await ScheduledTasks.Where(sceneCmdPredicate).ToListAsync(cancellationToken))
                 await cmd.SetTargetObjectNameAsync(this);
 
             //Update Activate Group Command Scene Name upon Group Name update
@@ -153,7 +145,7 @@ namespace zvs.DataModel
             foreach (var cmd in await DeviceValueTriggers.Where(groupPredicate).ToListAsync(cancellationToken))
                 await cmd.SetTargetObjectNameAsync(this);
 
-            foreach (var cmd in await ZvsScheduledTasks.Where(groupPredicate).ToListAsync(cancellationToken))
+            foreach (var cmd in await ScheduledTasks.Where(groupPredicate).ToListAsync(cancellationToken))
                 await cmd.SetTargetObjectNameAsync(this);
 
             //Update cmd descriptions on JavaScriptCommand name changes
@@ -165,7 +157,7 @@ namespace zvs.DataModel
             foreach (var cmd in await DeviceValueTriggers.Where(jsCmdPredicate).ToListAsync(cancellationToken))
                 await cmd.SetTargetObjectNameAsync(this);
 
-            foreach (var cmd in await ZvsScheduledTasks.Where(jsCmdPredicate).ToListAsync(cancellationToken))
+            foreach (var cmd in await ScheduledTasks.Where(jsCmdPredicate).ToListAsync(cancellationToken))
                 await cmd.SetTargetObjectNameAsync(this);
 
             //Update trigger descriptions on device value name changes
@@ -191,7 +183,7 @@ namespace zvs.DataModel
             foreach (var cmd in await DeviceValueTriggers.Where(repollCmdPredicate).ToListAsync(cancellationToken))
                 await cmd.SetTargetObjectNameAsync(this);
 
-            foreach (var cmd in await ZvsScheduledTasks.Where(repollCmdPredicate).ToListAsync(cancellationToken))
+            foreach (var cmd in await ScheduledTasks.Where(repollCmdPredicate).ToListAsync(cancellationToken))
                 await cmd.SetTargetObjectNameAsync(this);
 
             Expression<Func<IStoredCommand, bool>> deviceTypeCmdPredicate = o => o.Command is DeviceTypeCommand && deviceIdsStrOfUpdatedNames.Contains(o.Argument2);
@@ -201,7 +193,7 @@ namespace zvs.DataModel
             foreach (var cmd in await DeviceValueTriggers.Where(deviceTypeCmdPredicate).ToListAsync(cancellationToken))
                 await cmd.SetTargetObjectNameAsync(this);
 
-            foreach (var cmd in await ZvsScheduledTasks.Where(deviceTypeCmdPredicate).ToListAsync(cancellationToken))
+            foreach (var cmd in await ScheduledTasks.Where(deviceTypeCmdPredicate).ToListAsync(cancellationToken))
                 await cmd.SetTargetObjectNameAsync(this);
 
             var deviceCommandIds = await DeviceCommands.Where(o => deviceIdsOfUpdatedNames.Contains(o.DeviceId)).Select(o => o.Id).ToListAsync(cancellationToken);
@@ -212,7 +204,7 @@ namespace zvs.DataModel
             foreach (var cmd in await DeviceValueTriggers.Where(deviceCmdPredicate).ToListAsync(cancellationToken))
                 await cmd.SetTargetObjectNameAsync(this);
 
-            foreach (var cmd in await ZvsScheduledTasks.Where(deviceCmdPredicate).ToListAsync(cancellationToken))
+            foreach (var cmd in await ScheduledTasks.Where(deviceCmdPredicate).ToListAsync(cancellationToken))
                 await cmd.SetTargetObjectNameAsync(this);
 
             //Automatically store history when a device value is changed. 

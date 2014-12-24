@@ -5,7 +5,6 @@ using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
 using zvs.DataModel;
-using zvs.DataModel.Tasks;
 
 namespace zvsWebapi2Plugin.Controllers
 {
@@ -29,7 +28,7 @@ namespace zvsWebapi2Plugin.Controllers
         }
 
         [EnableQuery]
-        public SingleResult<ScheduledTask> Get([FromODataUri] long key)
+        public SingleResult<ScheduledTask> Get([FromODataUri] int key)
         {
             var result = Get().Where(p => p.Id == key);
             return SingleResult.Create(result);

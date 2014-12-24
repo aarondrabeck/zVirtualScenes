@@ -6,11 +6,11 @@ using zvs.DataModel;
 
 namespace zvsWebapi2Plugin.Controllers
 {
-    [ODataRoutePrefix("SceneCommands")]
+    [ODataRoutePrefix("SceneStoredCommands")]
     [Authorize(Roles = "All Access")]
-    public class SceneCommandsController : WebApi2PuginController
+    public class SceneStoredCommandsController : WebApi2PuginController
     {
-        public SceneCommandsController(WebApi2Plugin webApi2Plugin) : base(webApi2Plugin) { }
+        public SceneStoredCommandsController(WebApi2Plugin webApi2Plugin) : base(webApi2Plugin) { }
 
         [ODataRoute]
         [EnableQuery(PageSize = 50)]

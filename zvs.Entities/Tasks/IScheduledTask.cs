@@ -2,9 +2,10 @@
 
 namespace zvs.DataModel.Tasks
 {
-    public interface IDailyScheduledTask
+    public interface IScheduledTask 
     {
         DateTime StartTime { get; set; }
-        int RepeatIntervalInDays { get; set; }
+
+        ZvsScheduledTask ZvsScheduledTask { get; set; }
     }
 }

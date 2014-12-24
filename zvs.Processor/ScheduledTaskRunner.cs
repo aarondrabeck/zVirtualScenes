@@ -17,7 +17,7 @@ namespace zvs.Processor
         private CancellationTokenSource Cts { get; set; }
         private ICommandProcessor CommandProcessor { get; set; }
         private ITimeProvider TimeProvider { get; set; }
-        private IList<ZvsScheduledTask> CommandScheduledTasksCache { get; set; }
+        private IList<DataModel.ScheduledTask> CommandScheduledTasksCache { get; set; }
         private bool UpdateCache { get; set; }
 
         public bool IsRunning { get; private set; }
@@ -54,29 +54,9 @@ namespace zvs.Processor
             await Log.ReportInfoAsync("ScheduledTask runner started", ct);
             Cts = new CancellationTokenSource();
 
-            NotifyEntityChangeContext.ChangeNotifications<ZvsScheduledTask>.OnEntityUpdated += OnEntityChanged;
-            NotifyEntityChangeContext.ChangeNotifications<ZvsScheduledTask>.OnEntityDeleted += OnEntityChanged;
-            NotifyEntityChangeContext.ChangeNotifications<ZvsScheduledTask>.OnEntityAdded += OnEntityChanged;
-
-            NotifyEntityChangeContext.ChangeNotifications<IntervalScheduledTask>.OnEntityAdded += OnEntityChanged;
-            NotifyEntityChangeContext.ChangeNotifications<IntervalScheduledTask>.OnEntityDeleted += OnEntityChanged;
-            NotifyEntityChangeContext.ChangeNotifications<IntervalScheduledTask>.OnEntityUpdated += OnEntityChanged;
-
-            NotifyEntityChangeContext.ChangeNotifications<OneTimeScheduledTask>.OnEntityAdded += OnEntityChanged;
-            NotifyEntityChangeContext.ChangeNotifications<OneTimeScheduledTask>.OnEntityDeleted += OnEntityChanged;
-            NotifyEntityChangeContext.ChangeNotifications<OneTimeScheduledTask>.OnEntityUpdated += OnEntityChanged;
-
-            NotifyEntityChangeContext.ChangeNotifications<MonthlyScheduledTask>.OnEntityAdded += OnEntityChanged;
-            NotifyEntityChangeContext.ChangeNotifications<MonthlyScheduledTask>.OnEntityDeleted += OnEntityChanged;
-            NotifyEntityChangeContext.ChangeNotifications<MonthlyScheduledTask>.OnEntityUpdated += OnEntityChanged;
-
-            NotifyEntityChangeContext.ChangeNotifications<DailyScheduledTask>.OnEntityAdded += OnEntityChanged;
-            NotifyEntityChangeContext.ChangeNotifications<DailyScheduledTask>.OnEntityDeleted += OnEntityChanged;
-            NotifyEntityChangeContext.ChangeNotifications<DailyScheduledTask>.OnEntityUpdated += OnEntityChanged;
-
-            NotifyEntityChangeContext.ChangeNotifications<WeeklyScheduledTask>.OnEntityAdded += OnEntityChanged;
-            NotifyEntityChangeContext.ChangeNotifications<WeeklyScheduledTask>.OnEntityDeleted += OnEntityChanged;
-            NotifyEntityChangeContext.ChangeNotifications<WeeklyScheduledTask>.OnEntityUpdated += OnEntityChanged;
+            NotifyEntityChangeContext.ChangeNotifications<DataModel.ScheduledTask>.OnEntityUpdated += OnEntityChanged;
+            NotifyEntityChangeContext.ChangeNotifications<DataModel.ScheduledTask>.OnEntityDeleted += OnEntityChanged;
+            NotifyEntityChangeContext.ChangeNotifications<DataModel.ScheduledTask>.OnEntityAdded += OnEntityChanged;
 
             CommandScheduledTasksCache = await GetScheduledTasksAsync(Cts.Token);
             Run(Cts.Token);
@@ -89,29 +69,10 @@ namespace zvs.Processor
                 await Log.ReportWarningAsync("ScheduledTask runner is not started", ct);
                 return;
             }
-            NotifyEntityChangeContext.ChangeNotifications<ZvsScheduledTask>.OnEntityUpdated -= OnEntityChanged;
-            NotifyEntityChangeContext.ChangeNotifications<ZvsScheduledTask>.OnEntityDeleted -= OnEntityChanged;
-            NotifyEntityChangeContext.ChangeNotifications<ZvsScheduledTask>.OnEntityAdded -= OnEntityChanged;
+            NotifyEntityChangeContext.ChangeNotifications<DataModel.ScheduledTask>.OnEntityUpdated -= OnEntityChanged;
+            NotifyEntityChangeContext.ChangeNotifications<DataModel.ScheduledTask>.OnEntityDeleted -= OnEntityChanged;
+            NotifyEntityChangeContext.ChangeNotifications<DataModel.ScheduledTask>.OnEntityAdded -= OnEntityChanged;
 
-            NotifyEntityChangeContext.ChangeNotifications<IntervalScheduledTask>.OnEntityAdded -= OnEntityChanged;
-            NotifyEntityChangeContext.ChangeNotifications<IntervalScheduledTask>.OnEntityDeleted -= OnEntityChanged;
-            NotifyEntityChangeContext.ChangeNotifications<IntervalScheduledTask>.OnEntityUpdated -= OnEntityChanged;
-
-            NotifyEntityChangeContext.ChangeNotifications<OneTimeScheduledTask>.OnEntityAdded -= OnEntityChanged;
-            NotifyEntityChangeContext.ChangeNotifications<OneTimeScheduledTask>.OnEntityDeleted -= OnEntityChanged;
-            NotifyEntityChangeContext.ChangeNotifications<OneTimeScheduledTask>.OnEntityUpdated -= OnEntityChanged;
-
-            NotifyEntityChangeContext.ChangeNotifications<MonthlyScheduledTask>.OnEntityAdded -= OnEntityChanged;
-            NotifyEntityChangeContext.ChangeNotifications<MonthlyScheduledTask>.OnEntityDeleted -= OnEntityChanged;
-            NotifyEntityChangeContext.ChangeNotifications<MonthlyScheduledTask>.OnEntityUpdated -= OnEntityChanged;
-
-            NotifyEntityChangeContext.ChangeNotifications<DailyScheduledTask>.OnEntityAdded -= OnEntityChanged;
-            NotifyEntityChangeContext.ChangeNotifications<DailyScheduledTask>.OnEntityDeleted -= OnEntityChanged;
-            NotifyEntityChangeContext.ChangeNotifications<DailyScheduledTask>.OnEntityUpdated -= OnEntityChanged;
-
-            NotifyEntityChangeContext.ChangeNotifications<WeeklyScheduledTask>.OnEntityAdded -= OnEntityChanged;
-            NotifyEntityChangeContext.ChangeNotifications<WeeklyScheduledTask>.OnEntityDeleted -= OnEntityChanged;
-            NotifyEntityChangeContext.ChangeNotifications<WeeklyScheduledTask>.OnEntityUpdated -= OnEntityChanged;
             Cts.Cancel();
         }
 
@@ -130,26 +91,35 @@ namespace zvs.Processor
                 {
                     var needsToRun = false;
 
-                    var scheduledTask = task.ScheduledTask as OneTimeScheduledTask;
-                    if (scheduledTask != null)
-                        needsToRun = scheduledTask.EvalTrigger(TimeProvider);
+                    switch (task.TaskType)
+                    {
+                        case ScheduledTaskType.OneTime:
+                        {
+                            needsToRun = task.EvalOneTimeTrigger(TimeProvider);
+                            break;
+                        }
+                        case ScheduledTaskType.Daily:
+                        {
+                            needsToRun = task.EvalDailyTrigger(TimeProvider);
+                            break;
+                        }
+                        case ScheduledTaskType.Interval:
+                        {
+                            needsToRun = task.EvalIntervalTrigger(TimeProvider);
+                            break;
+                        }
+                        case ScheduledTaskType.Weekly:
+                        {
+                            needsToRun = task.EvalWeeklyTrigger(TimeProvider);
+                            break;
+                        }
+                        case ScheduledTaskType.Monthly:
+                        {
+                            needsToRun = task.EvalMonthlyTrigger(TimeProvider);
+                            break;
+                        }
 
-                    var dailyScheduledTask = task.ScheduledTask as DailyScheduledTask;
-                    if (dailyScheduledTask != null)
-                        needsToRun = dailyScheduledTask.EvalTrigger(TimeProvider);
-
-                    var intervalScheduledTask = task.ScheduledTask as IntervalScheduledTask;
-                    if (intervalScheduledTask != null)
-                        needsToRun = intervalScheduledTask.EvalTrigger(TimeProvider);
-
-                    var weeklyScheduledTask = task.ScheduledTask as WeeklyScheduledTask;
-                    if (weeklyScheduledTask != null)
-                        needsToRun = weeklyScheduledTask.EvalTrigger(TimeProvider);
-
-                    var monthlyScheduledTask = task.ScheduledTask as MonthlyScheduledTask;
-                    if (monthlyScheduledTask != null)
-                        needsToRun = monthlyScheduledTask.EvalTrigger(TimeProvider);
-
+                    }
                     if (!needsToRun) continue;
 
                     await Log.ReportInfoFormatAsync(cancellationToken, "Scheduled task '{0}' executed", task.Name);
@@ -172,13 +142,12 @@ namespace zvs.Processor
             await Log.ReportInfoAsync("ScheduledTask runner stopped", CancellationToken.None);
         }
 
-        internal async Task<IList<ZvsScheduledTask>> GetScheduledTasksAsync(CancellationToken cancellationToken)
+        internal async Task<IList<DataModel.ScheduledTask>> GetScheduledTasksAsync(CancellationToken cancellationToken)
         {
             using (var context = new ZvsContext(EntityContextConnection))
             {
-                return await context.ZvsScheduledTasks
+                return await context.ScheduledTasks
                     .Include(o=> o.Command)
-                    .Include(o => o.ScheduledTask)
                     .Where(o => o.IsEnabled)
                     .ToListAsync(cancellationToken);
             }

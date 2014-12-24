@@ -8,17 +8,17 @@ namespace zvs.WPF.ScheduledTaskControls
     /// </summary>
     public partial class MonthlyTaskUserControl
     {
-        public MonthlyScheduledTask MonthlyScheduledTask
+        public IMonthlyScheduledTask MonthlyScheduledTask
         {
-            get { return (MonthlyScheduledTask)GetValue(MonthlyScheduledTaskProperty); }
+            get { return (IMonthlyScheduledTask)GetValue(MonthlyScheduledTaskProperty); }
             set { SetValue(MonthlyScheduledTaskProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for MonthlyScheduledTask.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty MonthlyScheduledTaskProperty =
-            DependencyProperty.Register("MonthlyScheduledTask", typeof(MonthlyScheduledTask), typeof(MonthlyTaskUserControl), new PropertyMetadata(new MonthlyScheduledTask()));
+            DependencyProperty.Register("MonthlyScheduledTask", typeof(IMonthlyScheduledTask), typeof(MonthlyTaskUserControl), new PropertyMetadata(null));
 
-        public MonthlyTaskUserControl(MonthlyScheduledTask monthlyScheduledTask)
+        public MonthlyTaskUserControl(IMonthlyScheduledTask monthlyScheduledTask)
         {
             InitializeComponent();
             MonthlyScheduledTask = monthlyScheduledTask;

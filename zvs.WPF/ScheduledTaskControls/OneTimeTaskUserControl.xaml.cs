@@ -8,17 +8,17 @@ namespace zvs.WPF.ScheduledTaskControls
     /// </summary>
     public partial class OneTimeTaskUserControl
     {
-        public OneTimeScheduledTask OneTimeScheduledTask
+        public IOneTimeScheduledTask OneTimeScheduledTask
         {
-            get { return (OneTimeScheduledTask)GetValue(OneTimeScheduledTaskProperty); }
+            get { return (IOneTimeScheduledTask)GetValue(OneTimeScheduledTaskProperty); }
             set { SetValue(OneTimeScheduledTaskProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for OneTimeScheduledTask.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty OneTimeScheduledTaskProperty =
-            DependencyProperty.Register("OneTimeScheduledTask", typeof(OneTimeScheduledTask), typeof(OneTimeTaskUserControl), new PropertyMetadata(new OneTimeScheduledTask()));
+            DependencyProperty.Register("OneTimeScheduledTask", typeof(IOneTimeScheduledTask), typeof(OneTimeTaskUserControl), new PropertyMetadata(null));
 
-        public OneTimeTaskUserControl(OneTimeScheduledTask oneTimeScheduledTask)
+        public OneTimeTaskUserControl(IOneTimeScheduledTask oneTimeScheduledTask)
         {
             InitializeComponent();
             OneTimeScheduledTask = oneTimeScheduledTask;

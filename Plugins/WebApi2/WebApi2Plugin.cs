@@ -212,22 +212,19 @@ namespace zvsWebapi2Plugin
                 //);
 
                 var builder = new ODataConventionModelBuilder();
-
-               
-
+                
                 var scheduledTaskType = builder.EntityType<ScheduledTask>();
                 scheduledTaskType.Ignore(t => t.StartTime);
-               // scheduledTaskType.Property(t => t.StartTimeOffset).Name = "StartTime";
+                scheduledTaskType.Property(t => t.StartTimeOffset).Name = "StartTime";
 
                 var deviceValueHistoryTaskType = builder.EntityType<DeviceValueHistory>();
                 deviceValueHistoryTaskType.Ignore(t => t.DateTime);
-               // deviceValueHistoryTaskType.Property(t => t.DateTimeOffset).Name = "DateTime";
+                deviceValueHistoryTaskType.Property(t => t.DateTimeOffset).Name = "DateTime";
                 
                 var logEntryType = builder.EntityType<LogEntry>();
                 logEntryType.Ignore(t => t.Datetime);
-               // logEntryType.Property(t => t.DateTimeOffset).Name = "Datetime";
+                logEntryType.Property(t => t.DateTimeOffset).Name = "Datetime";
 
-                builder.EntitySet<ScheduledTask>("ScheduledTasks");
                 builder.EntitySet<Command>("Commands");
                 var cExecute = builder.EntityType<Command>().Action("Execute");
                 cExecute.Parameter<string>("Argument");
@@ -244,9 +241,8 @@ namespace zvsWebapi2Plugin
                 builder.EntitySet<Group>("Groups");
                 builder.EntitySet<Scene>("Scenes");
                 builder.EntitySet<SceneStoredCommand>("SceneStoredCommands");
-              
+                builder.EntitySet<ScheduledTask>("ScheduledTasks");
                 builder.EntitySet<LogEntry>("LogEntries");
-
                 builder.Namespace = "Actions";
                 config.MapODataServiceRoute("ODataRoute", "odata4", builder.GetEdmModel());
 

@@ -1,8 +1,11 @@
-﻿namespace zvs.DataModel.Tasks
+﻿using System;
+
+namespace zvs.DataModel.Tasks
 {
-    public class WeeklyScheduledTask : ScheduledTask
+    public interface IWeeklyScheduledTask
     {
-        public int RepeatIntervalInWeeks { get; set; }
-        public DaysOfWeek DaysOfWeekToActivate { get; set; }
+        DateTime StartTime { get; set; }
+        int RepeatIntervalInWeeks { get; set; }
+        DaysOfWeek DaysOfWeekToActivate { get; set; }
     }
 }

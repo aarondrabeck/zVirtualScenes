@@ -50,7 +50,7 @@
                 <x:Type TypeName="tasks:ScheduledTaskType"/>
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
-        <CollectionViewSource x:Key="ScheduledTaskViewSource" d:DesignSource="{d:DesignInstance {x:Type dataModel:ZvsScheduledTask}, CreateList=True}"/>
+        <CollectionViewSource x:Key="ScheduledTaskViewSource" d:DesignSource="{d:DesignInstance {x:Type dataModel:ScheduledTask}, CreateList=True}"/>
     </UserControl.Resources>
 
     <Grid DataContext="{StaticResource ScheduledTaskViewSource}">
@@ -158,7 +158,7 @@
                             <TextBlock Text="Task Frequency" Margin="10 15 0 0" HorizontalAlignment="Left" FontSize="12" Foreground="#A2A2A2" />
                             <ComboBox Name="FrequencyCmbBx" ItemsSource="{Binding Source={StaticResource ScheduledTaskTypeEnum}}" Margin="10 5 0 0" 
                                       HorizontalAlignment="Left" Width="176" SelectionChanged="FrequencyCmbBx_SelectionChanged" FontSize="14" 
-                                       Background="#FFCCCCCC" ></ComboBox>
+                                       Background="#FFCCCCCC" SelectedItem="{Binding TaskType}"></ComboBox>
                             <TextBlock Text="Command to Run" Margin="10 15 0 0" HorizontalAlignment="Left" FontSize="12" Foreground="#A2A2A2" />
                             <StackPanel Orientation="Horizontal" Margin="10 5 0 0">
                                 <Button x:Name="AddUpdateCommand" HorizontalAlignment="Left" Content="SELECT COMMAND"  

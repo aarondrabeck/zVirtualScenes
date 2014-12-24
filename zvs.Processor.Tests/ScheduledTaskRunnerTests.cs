@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using zvs.DataModel;
 using zvs.DataModel.Tasks;
+using zvs.DataModel.Tasks.Fakes;
 using zvs.Fakes;
 using zvs.Processor.Fakes;
 
@@ -185,7 +186,7 @@ namespace zvs.Processor.Tests
             var commandProcessor = new StubICommandProcessor
             {
 
-                RunCommandAsyncNullableOfInt32StringStringCancellationToken = ( commandId, argument, argument2, cancellationToken) =>
+                RunCommandAsyncNullableOfInt32StringStringCancellationToken = (commandId, argument, argument2, cancellationToken) =>
                 {
                     if (commandId.HasValue) ranstoredCommands.Add(commandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
@@ -199,20 +200,17 @@ namespace zvs.Processor.Tests
 
 
             var command = new Command();
-            var commandScheduledTask = new ZvsScheduledTask
+            var commandScheduledTask = new DataModel.ScheduledTask
             {
                 IsEnabled = true,
                 Name = "Test Command Task",
-                ScheduledTask = new OneTimeScheduledTask()
-                {
-                    StartTime = DateTime.Parse("5/20/14 15:02:20")
-                },
+                StartTime = DateTime.Parse("5/20/14 15:02:20"),
                 Command = command
             };
 
             using (var context = new ZvsContext(dbConnection))
             {
-                context.ZvsScheduledTasks.Add(commandScheduledTask);
+                context.ScheduledTasks.Add(commandScheduledTask);
                 var r = await context.TrySaveChangesAsync(cts.Token);
                 Assert.IsFalse(r.HasError, r.Message);
             }
@@ -251,7 +249,7 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunCommandAsyncNullableOfInt32StringStringCancellationToken = ( commandId, argument, argument2, cancellationToken) =>
+                RunCommandAsyncNullableOfInt32StringStringCancellationToken = (commandId, argument, argument2, cancellationToken) =>
                 {
                     if (commandId.HasValue) ranstoredCommands.Add(commandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
@@ -265,21 +263,18 @@ namespace zvs.Processor.Tests
 
 
             var command = new Command();
-            var commandScheduledTask = new ZvsScheduledTask
+            var commandScheduledTask = new DataModel.ScheduledTask
             {
                 IsEnabled = true,
                 Name = "Test Command Task",
-                ScheduledTask = new DailyScheduledTask
-                {
-                    StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                    RepeatIntervalInDays = 1
-                },
+                StartTime = DateTime.Parse("5/20/14 15:02:20"),
+                RepeatIntervalInDays = 1,
                 Command = command
             };
 
             using (var context = new ZvsContext(dbConnection))
             {
-                context.ZvsScheduledTasks.Add(commandScheduledTask);
+                context.ScheduledTasks.Add(commandScheduledTask);
                 var r = await context.TrySaveChangesAsync(cts.Token);
                 Assert.IsFalse(r.HasError, r.Message);
             }
@@ -318,7 +313,7 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunCommandAsyncNullableOfInt32StringStringCancellationToken = ( commandId, argument, argument2, cancellationToken) =>
+                RunCommandAsyncNullableOfInt32StringStringCancellationToken = (commandId, argument, argument2, cancellationToken) =>
                 {
                     if (commandId.HasValue) ranstoredCommands.Add(commandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
@@ -331,21 +326,18 @@ namespace zvs.Processor.Tests
 
 
             var command = new Command();
-            var commandScheduledTask = new ZvsScheduledTask
+            var commandScheduledTask = new DataModel.ScheduledTask
             {
                 IsEnabled = true,
                 Name = "Test Command Task",
-                ScheduledTask = new IntervalScheduledTask
-                {
-                    StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                    Inteval = TimeSpan.FromSeconds(5)
-                },
+                StartTime = DateTime.Parse("5/20/14 15:02:20"),
+                Inteval = TimeSpan.FromSeconds(5),
                 Command = command
             };
 
             using (var context = new ZvsContext(dbConnection))
             {
-                context.ZvsScheduledTasks.Add(commandScheduledTask);
+                context.ScheduledTasks.Add(commandScheduledTask);
                 var r = await context.TrySaveChangesAsync(cts.Token);
                 Assert.IsFalse(r.HasError, r.Message);
             }
@@ -384,7 +376,7 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunCommandAsyncNullableOfInt32StringStringCancellationToken = ( commandId, argument, argument2, cancellationToken) =>
+                RunCommandAsyncNullableOfInt32StringStringCancellationToken = (commandId, argument, argument2, cancellationToken) =>
                 {
                     if (commandId.HasValue) ranstoredCommands.Add(commandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
@@ -397,22 +389,19 @@ namespace zvs.Processor.Tests
 
 
             var command = new Command();
-            var commandScheduledTask = new ZvsScheduledTask
+            var commandScheduledTask = new DataModel.ScheduledTask
             {
                 IsEnabled = true,
                 Name = "Test Command Task",
-                ScheduledTask = new WeeklyScheduledTask
-                 {
-                     StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                     RepeatIntervalInWeeks = 1,
-                     DaysOfWeekToActivate = DaysOfWeek.All
-                 },
+                StartTime = DateTime.Parse("5/20/14 15:02:20"),
+                RepeatIntervalInWeeks = 1,
+                DaysOfWeekToActivate = DaysOfWeek.All,
                 Command = command
             };
 
             using (var context = new ZvsContext(dbConnection))
             {
-                context.ZvsScheduledTasks.Add(commandScheduledTask);
+                context.ScheduledTasks.Add(commandScheduledTask);
                 var r = await context.TrySaveChangesAsync(cts.Token);
                 Assert.IsFalse(r.HasError, r.Message);
             }
@@ -451,7 +440,7 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunCommandAsyncNullableOfInt32StringStringCancellationToken = ( commandId, argument, argument2, cancellationToken) =>
+                RunCommandAsyncNullableOfInt32StringStringCancellationToken = (commandId, argument, argument2, cancellationToken) =>
                 {
                     if (commandId.HasValue) ranstoredCommands.Add(commandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
@@ -465,22 +454,19 @@ namespace zvs.Processor.Tests
 
 
             var command = new Command();
-            var commandScheduledTask = new ZvsScheduledTask
+            var commandScheduledTask = new DataModel.ScheduledTask
             {
                 IsEnabled = true,
                 Name = "Test Command Task",
-                ScheduledTask = new MonthlyScheduledTask
-                {
                     StartTime = DateTime.Parse("5/20/14 15:02:20"),
                     RepeatIntervalInMonths = 1,
-                    DaysOfMonthToActivate = DaysOfMonth.All
-                },
+                    DaysOfMonthToActivate = DaysOfMonth.All,
                 Command = command
             };
 
             using (var context = new ZvsContext(dbConnection))
             {
-                context.ZvsScheduledTasks.Add(commandScheduledTask);
+                context.ScheduledTasks.Add(commandScheduledTask);
                 var r = await context.TrySaveChangesAsync(cts.Token);
                 Assert.IsFalse(r.HasError, r.Message);
             }
@@ -519,7 +505,7 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunCommandAsyncNullableOfInt32StringStringCancellationToken = ( commandId, argument, argument2, cancellationToken) =>
+                RunCommandAsyncNullableOfInt32StringStringCancellationToken = (commandId, argument, argument2, cancellationToken) =>
                 {
                     if (commandId.HasValue) ranstoredCommands.Add(commandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
@@ -533,22 +519,19 @@ namespace zvs.Processor.Tests
 
 
             var command = new Command();
-            var commandScheduledTask = new ZvsScheduledTask
+            var commandScheduledTask = new DataModel.ScheduledTask
             {
                 IsEnabled = true,
                 Name = "Test Command Task",
-                ScheduledTask = new MonthlyScheduledTask
-                {
                     StartTime = DateTime.Parse("5/20/14 15:02:20"),
                     RepeatIntervalInMonths = 1,
-                    DaysOfMonthToActivate = DaysOfMonth.All
-                },
+                    DaysOfMonthToActivate = DaysOfMonth.All,
                 Command = command
             };
 
             using (var context = new ZvsContext(dbConnection))
             {
-                context.ZvsScheduledTasks.Add(commandScheduledTask);
+                context.ScheduledTasks.Add(commandScheduledTask);
                 var r = await context.TrySaveChangesAsync(cts.Token);
                 Assert.IsFalse(r.HasError, r.Message);
             }
@@ -585,7 +568,7 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunCommandAsyncNullableOfInt32StringStringCancellationToken = ( commandId, argument, argument2, cancellationToken) =>
+                RunCommandAsyncNullableOfInt32StringStringCancellationToken = (commandId, argument, argument2, cancellationToken) =>
                 {
                     if (commandId.HasValue) ranstoredCommands.Add(commandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
@@ -599,21 +582,18 @@ namespace zvs.Processor.Tests
 
 
             var command = new Command();
-            var commandScheduledTask = new ZvsScheduledTask
+            var commandScheduledTask = new DataModel.ScheduledTask
             {
                 IsEnabled = true,
                 Name = "Test Command Task",
-                ScheduledTask = new MonthlyScheduledTask
-                {
                     StartTime = DateTime.Parse("5/20/14 15:02:20"),
                     RepeatIntervalInMonths = 1,
-                    DaysOfMonthToActivate = DaysOfMonth.All
-                },
+                    DaysOfMonthToActivate = DaysOfMonth.All,
                 Command = command
             };
             using (var context = new ZvsContext(dbConnection))
             {
-                context.ZvsScheduledTasks.Add(commandScheduledTask);
+                context.ScheduledTasks.Add(commandScheduledTask);
                 var r = await context.TrySaveChangesAsync(cts.Token);
                 Assert.IsFalse(r.HasError, r.Message);
 
@@ -655,7 +635,7 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunCommandAsyncNullableOfInt32StringStringCancellationToken = ( commandId, argument, argument2, cancellationToken) =>
+                RunCommandAsyncNullableOfInt32StringStringCancellationToken = (commandId, argument, argument2, cancellationToken) =>
                 {
                     if (commandId.HasValue) ranstoredCommands.Add(commandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
@@ -669,29 +649,26 @@ namespace zvs.Processor.Tests
 
 
             var command = new Command();
-            var commandScheduledTask = new ZvsScheduledTask
+            var commandScheduledTask = new DataModel.ScheduledTask
             {
                 IsEnabled = true,
                 Name = "Test Command Task",
-                ScheduledTask = new MonthlyScheduledTask
-                {
                     StartTime = DateTime.Parse("5/20/14 15:02:20"),
                     RepeatIntervalInMonths = 1,
-                    DaysOfMonthToActivate = DaysOfMonth.All
-                },
+                    DaysOfMonthToActivate = DaysOfMonth.All,
                 Command = command
             };
 
             using (var context = new ZvsContext(dbConnection))
             {
-                context.ZvsScheduledTasks.Add(commandScheduledTask);
+                context.ScheduledTasks.Add(commandScheduledTask);
                 var r = await context.TrySaveChangesAsync(cts.Token);
                 Assert.IsFalse(r.HasError, r.Message);
                 await taskRunner.StartAsync(cts.Token);
                 await Task.Delay(700, cts.Token);
 
                 //Act
-                context.ZvsScheduledTasks.Remove(commandScheduledTask);
+                context.ScheduledTasks.Remove(commandScheduledTask);
                 var r2 = await context.TrySaveChangesAsync(cts.Token);
                 Assert.IsFalse(r2.HasError, r2.Message);
                 await Task.Delay(700, cts.Token);
@@ -724,7 +701,7 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunCommandAsyncNullableOfInt32StringStringCancellationToken = ( commandId, argument, argument2, cancellationToken) =>
+                RunCommandAsyncNullableOfInt32StringStringCancellationToken = (commandId, argument, argument2, cancellationToken) =>
                 {
                     if (commandId.HasValue) ranstoredCommands.Add(commandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
@@ -741,19 +718,16 @@ namespace zvs.Processor.Tests
 
             //Act
             var command = new Command();
-            var commandScheduledTask = new ZvsScheduledTask
+            var commandScheduledTask = new DataModel.ScheduledTask
             {
                 IsEnabled = true,
                 Name = "New Command added after start",
-                ScheduledTask = new OneTimeScheduledTask()
-                {
-                    StartTime = DateTime.Parse("5/20/14 15:02:20")
-                },
+                    StartTime = DateTime.Parse("5/20/14 15:02:20"),
                 Command = command
             };
             using (var context = new ZvsContext(dbConnection))
             {
-                context.ZvsScheduledTasks.Add(commandScheduledTask);
+                context.ScheduledTasks.Add(commandScheduledTask);
                 var r = await context.TrySaveChangesAsync(cts.Token);
                 Assert.IsFalse(r.HasError, r.Message);
             }
@@ -789,7 +763,7 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunCommandAsyncNullableOfInt32StringStringCancellationToken = ( commandId, argument, argument2, cancellationToken) =>
+                RunCommandAsyncNullableOfInt32StringStringCancellationToken = (commandId, argument, argument2, cancellationToken) =>
                 {
                     if (commandId.HasValue) ranstoredCommands.Add(commandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
@@ -800,28 +774,24 @@ namespace zvs.Processor.Tests
             var taskRunner = new ScheduledTaskRunner(log, commandProcessor, dbConnection, currentTime);
 
             var command = new Command();
-            var task = new OneTimeScheduledTask
-            {
-                StartTime = DateTime.Parse("5/20/14 15:02:20")
-            };
-            var commandScheduledTask = new ZvsScheduledTask
+            var commandScheduledTask = new DataModel.ScheduledTask
             {
                 IsEnabled = true,
                 Name = "Test Command Task",
-                ScheduledTask = task,
+                StartTime =  DateTime.Parse("5/20/14 15:02:20"),
                 Command = command
             };
 
             using (var context = new ZvsContext(dbConnection))
             {
-                context.ZvsScheduledTasks.Add(commandScheduledTask);
+                context.ScheduledTasks.Add(commandScheduledTask);
                 var r = await context.TrySaveChangesAsync(cts.Token);
                 Assert.IsFalse(r.HasError, r.Message);
                 await taskRunner.StartAsync(cts.Token);
                 await Task.Delay(700, cts.Token);
 
                 //Act
-                task.StartTime = DateTime.Parse("5/21/14 15:02:21");
+                commandScheduledTask.StartTime = DateTime.Parse("5/21/14 15:02:21");
                 var r2 = await context.TrySaveChangesAsync(cts.Token);
                 Assert.IsFalse(r2.HasError, r2.Message);
                 await Task.Delay(2000, cts.Token);
@@ -855,7 +825,7 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunCommandAsyncNullableOfInt32StringStringCancellationToken = ( commandId, argument, argument2, cancellationToken) =>
+                RunCommandAsyncNullableOfInt32StringStringCancellationToken = (commandId, argument, argument2, cancellationToken) =>
                 {
                     if (commandId.HasValue) ranstoredCommands.Add(commandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
@@ -864,29 +834,25 @@ namespace zvs.Processor.Tests
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("5/21/14 15:02:20") };
             var cts = new CancellationTokenSource();
             var taskRunner = new ScheduledTaskRunner(log, commandProcessor, dbConnection, currentTime);
-            var task = new OneTimeScheduledTask
-            {
-                StartTime = DateTime.Parse("5/20/14 15:02:20")
-            };
             var command = new Command();
-            var commandScheduledTask = new ZvsScheduledTask
+            var commandScheduledTask = new DataModel.ScheduledTask
             {
                 IsEnabled = true,
                 Name = "Test Command Task",
-                ScheduledTask = task,
+                StartTime = DateTime.Parse("5/20/14 15:02:20"),
                 Command = command
             };
 
             using (var context = new ZvsContext(dbConnection))
             {
-                context.ZvsScheduledTasks.Add(commandScheduledTask);
+                context.ScheduledTasks.Add(commandScheduledTask);
                 var r = await context.TrySaveChangesAsync(cts.Token);
                 Assert.IsFalse(r.HasError, r.Message);
                 await taskRunner.StartAsync(cts.Token);
                 await Task.Delay(700, cts.Token);
 
                 //Act
-                context.ScheduledTasks.Remove(task);
+                context.ScheduledTasks.Remove(commandScheduledTask);
                 var r2 = await context.TrySaveChangesAsync(cts.Token);
                 Assert.IsFalse(r2.HasError, r2.Message);
                 await Task.Delay(2000, cts.Token);
@@ -919,7 +885,7 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunCommandAsyncNullableOfInt32StringStringCancellationToken = ( commandId, argument, argument2, cancellationToken) =>
+                RunCommandAsyncNullableOfInt32StringStringCancellationToken = (commandId, argument, argument2, cancellationToken) =>
                 {
                     if (commandId.HasValue) ranstoredCommands.Add(commandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
@@ -932,7 +898,7 @@ namespace zvs.Processor.Tests
             var taskRunner = new ScheduledTaskRunner(log, commandProcessor, dbConnection, currentTime);
 
             var command = new Command();
-            var commandScheduledTask = new ZvsScheduledTask
+            var commandScheduledTask = new DataModel.ScheduledTask
             {
                 IsEnabled = true,
                 Name = "New Command added after start",
@@ -940,21 +906,15 @@ namespace zvs.Processor.Tests
             };
             using (var context = new ZvsContext(dbConnection))
             {
-                context.ZvsScheduledTasks.Add(commandScheduledTask);
+                context.ScheduledTasks.Add(commandScheduledTask);
                 var r2 = await context.TrySaveChangesAsync(cts.Token);
                 Assert.IsFalse(r2.HasError, r2.Message);
-
 
                 await taskRunner.StartAsync(cts.Token);
                 await Task.Delay(500, cts.Token);
 
-                var task = new OneTimeScheduledTask
-                {
-                    StartTime = DateTime.Parse("5/20/14 15:02:20")
-                };
-
                 //Act
-                commandScheduledTask.ScheduledTask = task;
+                commandScheduledTask.StartTime = DateTime.Parse("5/20/14 15:02:20");
                 var r = await context.TrySaveChangesAsync(cts.Token);
                 Assert.IsFalse(r.HasError, r.Message);
 
@@ -989,7 +949,7 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunCommandAsyncNullableOfInt32StringStringCancellationToken = ( commandId, argument, argument2, cancellationToken) =>
+                RunCommandAsyncNullableOfInt32StringStringCancellationToken = (commandId, argument, argument2, cancellationToken) =>
                 {
                     if (commandId.HasValue) ranstoredCommands.Add(commandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
@@ -1004,7 +964,7 @@ namespace zvs.Processor.Tests
             await taskRunner.StartAsync(cts.Token);
 
             var command = new Command();
-            var commandScheduledTask = new ZvsScheduledTask
+            var commandScheduledTask = new DataModel.ScheduledTask
             {
                 IsEnabled = true,
                 Name = "New Command added after start",
@@ -1012,23 +972,15 @@ namespace zvs.Processor.Tests
             };
             using (var context = new ZvsContext(dbConnection))
             {
-                context.ZvsScheduledTasks.Add(commandScheduledTask);
+                context.ScheduledTasks.Add(commandScheduledTask);
                 var r2 = await context.TrySaveChangesAsync(cts.Token);
                 Assert.IsFalse(r2.HasError, r2.Message);
 
-                var task = new OneTimeScheduledTask
-                {
-                    StartTime = DateTime.Parse("5/20/14 15:02:20")
-                };
-                commandScheduledTask.ScheduledTask = task;
+                commandScheduledTask.StartTime = DateTime.Parse("5/20/14 15:02:20");
                 var r = await context.TrySaveChangesAsync(cts.Token);
                 Assert.IsFalse(r.HasError, r.Message);
 
-                var task2 = new OneTimeScheduledTask
-                {
-                    StartTime = DateTime.Parse("5/20/14 15:02:21")
-                };
-                commandScheduledTask.ScheduledTask = task2;
+                commandScheduledTask.StartTime = DateTime.Parse("5/20/14 15:02:21");
                 var r3 = await context.TrySaveChangesAsync(cts.Token);
                 Assert.IsFalse(r3.HasError, r.Message);
             }

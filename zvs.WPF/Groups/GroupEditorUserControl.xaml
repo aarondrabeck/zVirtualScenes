@@ -231,7 +231,7 @@
                             <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialToolbarButton}">
                                 <Setter Property="IsEnabled" Value="True" />
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ElementName=GroupsDevicesLstVw, Path=SelectedItem}" Value="{x:Null}">
+                                    <DataTrigger Binding="{Binding ElementName=GroupsDataGrid, Path=SelectedItem}" Value="{x:Null}">
                                         <!--Comment the following line out to view in editor {x:Null}-->
                                         <Setter Property="IsEnabled" Value="False" />
                                     </DataTrigger>

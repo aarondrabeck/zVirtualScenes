@@ -96,7 +96,7 @@
     <Compile Include="Controllers\DeviceValueTriggersController.cs" />
     <Compile Include="Controllers\LogEntriesController.cs" />
     <Compile Include="Controllers\GroupsController.cs" />
-    <Compile Include="Controllers\SceneCommandsController.cs" />
+    <Compile Include="Controllers\SceneStoredCommandsController.cs" />
     <Compile Include="Controllers\ScheduledTasksController.cs" />
     <Compile Include="Controllers\ScenesController.cs" />
     <Compile Include="Controllers\DeviceTypeCommandsController.cs" />

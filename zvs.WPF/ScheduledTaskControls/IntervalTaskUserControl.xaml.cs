@@ -8,17 +8,17 @@ namespace zvs.WPF.ScheduledTaskControls
     /// </summary>
     public partial class IntervalTaskUserControl
     {
-        public IntervalScheduledTask IntervalScheduledTask
+        public IIntervalScheduledTask IntervalScheduledTask
         {
-            get { return (IntervalScheduledTask)GetValue(IntervalScheduledTaskProperty); }
+            get { return (IIntervalScheduledTask)GetValue(IntervalScheduledTaskProperty); }
             set { SetValue(IntervalScheduledTaskProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for IntervalScheduledTask.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty IntervalScheduledTaskProperty =
-            DependencyProperty.Register("IntervalScheduledTask", typeof(IntervalScheduledTask), typeof(IntervalTaskUserControl), new PropertyMetadata(new IntervalScheduledTask()));
+            DependencyProperty.Register("IntervalScheduledTask", typeof(IIntervalScheduledTask), typeof(IntervalTaskUserControl), new PropertyMetadata(null));
 
-        public IntervalTaskUserControl(IntervalScheduledTask intervalScheduledTask)
+        public IntervalTaskUserControl(IIntervalScheduledTask intervalScheduledTask)
         {
             InitializeComponent();
             IntervalScheduledTask = intervalScheduledTask;

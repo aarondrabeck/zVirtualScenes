@@ -1,38 +1,13 @@
-﻿using System.ComponentModel;
-using System.Runtime.CompilerServices;
+﻿using System;
 
 namespace zvs.DataModel.Tasks
 {
-    public class MonthlyScheduledTask : ScheduledTask
+    public interface IMonthlyScheduledTask
     {
-        private int _repeatIntervalInMonths;
-        public int RepeatIntervalInMonths
-        {
-            get
-            {
-                return _repeatIntervalInMonths;
-            }
-            set
-            {
-                if (value == _repeatIntervalInMonths) return;
-                _repeatIntervalInMonths = value;
-                NotifyPropertyChanged();
-            }
-        }
+        DateTime StartTime { get; set; }
 
-        private DaysOfMonth _daysOfMonthToActivate;
-        public DaysOfMonth DaysOfMonthToActivate
-        {
-            get
-            {
-                return _daysOfMonthToActivate;
-            }
-            set
-            {
-                if (value == _daysOfMonthToActivate) return;
-                _daysOfMonthToActivate = value;
-                NotifyPropertyChanged();
-            }
-        }
+        int RepeatIntervalInMonths { get; set; }
+
+        DaysOfMonth DaysOfMonthToActivate { get; set; }
     }
 }

@@ -138,10 +138,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Resources\ChromeStyledWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="PluginManager\PluginManagerWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -168,10 +164,6 @@
     <Compile Include="LogUserControl.xaml.cs">
       <DependentUpon>LogUserControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Resources\ChromeStyledWindow.xaml.cs">
-      <DependentUpon>ChromeStyledWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ChromeWindow.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="PluginManager\PluginManagerWindow.xaml.cs">
       <DependentUpon>PluginManagerWindow.xaml</DependentUpon>

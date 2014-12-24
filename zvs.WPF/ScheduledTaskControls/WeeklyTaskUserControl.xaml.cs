@@ -11,17 +11,17 @@ namespace zvs.WPF.ScheduledTaskControls
     /// </summary>
     public partial class WeeklyTaskUserControl
     {
-        public WeeklyScheduledTask WeeklyScheduledTask
+        public IWeeklyScheduledTask WeeklyScheduledTask
         {
-            get { return (WeeklyScheduledTask)GetValue(WeeklyScheduledTaskProperty); }
+            get { return (IWeeklyScheduledTask)GetValue(WeeklyScheduledTaskProperty); }
             set { SetValue(WeeklyScheduledTaskProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for WeeklyScheduledTask.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty WeeklyScheduledTaskProperty =
-            DependencyProperty.Register("WeeklyScheduledTask", typeof(WeeklyScheduledTask), typeof(WeeklyTaskUserControl), new PropertyMetadata(new WeeklyScheduledTask()));
+            DependencyProperty.Register("WeeklyScheduledTask", typeof(IWeeklyScheduledTask), typeof(WeeklyTaskUserControl), new PropertyMetadata(null));
 
-        public WeeklyTaskUserControl(WeeklyScheduledTask weeklyScheduledTask)
+        public WeeklyTaskUserControl(IWeeklyScheduledTask weeklyScheduledTask)
         {
             InitializeComponent();
             WeeklyScheduledTask = weeklyScheduledTask;

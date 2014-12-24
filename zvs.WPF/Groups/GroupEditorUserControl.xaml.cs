@@ -28,8 +28,14 @@ namespace zvs.WPF.Groups
         {
             Log = new DatabaseFeedback(_app.EntityContextConnection) { Source = "Group Editor" };
             InitializeComponent();
+
             NotifyEntityChangeContext.ChangeNotifications<Device>.OnEntityAdded += GroupEditor_onEntityAdded;
+
+            NotifyEntityChangeContext.ChangeNotifications<Group>.OnEntityAdded += GroupEditorUserControl_OnEntityAdded;
+            NotifyEntityChangeContext.ChangeNotifications<Group>.OnEntityDeleted += ChangeNotificationsOnOnEntityDeleted;
+            NotifyEntityChangeContext.ChangeNotifications<Group>.OnEntityUpdated += GroupEditorUserControl_OnEntityUpdated;
         }
+
 
 #if DEBUG
         ~GroupEditorUserControl()
@@ -70,6 +76,10 @@ namespace zvs.WPF.Groups
         private void GroupEditorUserControl_OnUnloaded(object sender, RoutedEventArgs e)
         {
             NotifyEntityChangeContext.ChangeNotifications<Device>.OnEntityAdded -= GroupEditor_onEntityAdded;
+
+            NotifyEntityChangeContext.ChangeNotifications<Group>.OnEntityAdded -= GroupEditorUserControl_OnEntityAdded;
+            NotifyEntityChangeContext.ChangeNotifications<Group>.OnEntityDeleted -= ChangeNotificationsOnOnEntityDeleted;
+            NotifyEntityChangeContext.ChangeNotifications<Group>.OnEntityUpdated -= GroupEditorUserControl_OnEntityUpdated;
             Context.Dispose();
         }
 
@@ -185,6 +195,53 @@ namespace zvs.WPF.Groups
             var da = new DoubleAnimation { From = 1, To = 0, Duration = new Duration(TimeSpan.FromSeconds(.8)) };
             SignalImg.BeginAnimation(OpacityProperty, da);
         }
+
+        void GroupEditorUserControl_OnEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<Group>.EntityUpdatedArgs e)
+        {
+            if (Context == null)
+                return;
+
+            Dispatcher.Invoke(() =>
+            {
+                //Update the primitives used in this user control
+                var group = Context.Groups.Local.FirstOrDefault(o => o.Id == e.NewEntity.Id);
+                if (group == null)
+                    return;
+
+                group.Name = e.NewEntity.Name;
+                group.Description = e.NewEntity.Description;
+            });
+        }
+
+        private void ChangeNotificationsOnOnEntityDeleted(object sender, NotifyEntityChangeContext.ChangeNotifications<Group>.EntityDeletedArgs entityDeletedArgs)
+        {
+            if (Context == null)
+                return;
+
+            Dispatcher.Invoke(new Action(async () =>
+            {
+                Context.Groups.Local.Remove(entityDeletedArgs.DeletedEntity);
+                //Context.Entry(e.DeletedEntity).State = EntityState.Unchanged;
+
+                //Reloads context from DB when modifications happen
+                foreach (var ent in Context.ChangeTracker.Entries<Group>())
+                    await ent.ReloadAsync();
+            }));
+        }
+
+        void GroupEditorUserControl_OnEntityAdded(object sender, NotifyEntityChangeContext.ChangeNotifications<Group>.EntityAddedArgs e)
+        {
+            if (Context == null)
+                return;
+
+            Dispatcher.Invoke(() =>
+            {
+                Context.Groups.Local.Add(e.AddedEntity);
+                Context.Entry(e.AddedEntity).State = EntityState.Unchanged;
+
+            });
+        }
+
         public void Dispose()
         {
             Dispose(true);

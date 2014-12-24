@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using zvs.DataModel.Tasks;
+using zvs.DataModel.Tasks.Fakes;
 using zvs.Fakes;
 using zvs.Processor.ScheduledTask;
 
@@ -14,10 +15,10 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("5/21/14 15:02:20") };
-            var task = new OneTimeScheduledTask { StartTime = DateTime.Parse("5/21/14 15:02:20") };
+            var task = new StubIOneTimeScheduledTask { StartTimeGet = () => DateTime.Parse("5/21/14 15:02:20") };
 
             //act
-            var result = task.EvalTrigger(currentTime);
+            var result = task.EvalOneTimeTrigger(currentTime);
 
             //assert
             Assert.IsTrue(result);
@@ -28,10 +29,10 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("5/21/14 15:02:20") };
-            var task = new OneTimeScheduledTask { StartTime = DateTime.Parse("5/21/14 15:02:21") };
+            var task = new StubIOneTimeScheduledTask { StartTimeGet = () => DateTime.Parse("5/21/14 15:02:21") };
 
             //act
-            var result = task.EvalTrigger(currentTime);
+            var result = task.EvalOneTimeTrigger(currentTime);
 
             //assert
             Assert.IsFalse(result);
@@ -42,14 +43,14 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("5/20/14 15:02:20 ") };
-            var task = new WeeklyScheduledTask
+            var task = new StubIWeeklyScheduledTask
             {
-                StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                RepeatIntervalInWeeks = 0
+                StartTimeGet = () => DateTime.Parse("5/20/14 15:02:20"),
+                RepeatIntervalInWeeksGet = () => 0
             };
 
             //act
-            var result = task.EvalTrigger(currentTime);
+            var result = task.EvalWeeklyTrigger(currentTime);
 
             //assert
             Assert.IsFalse(result);
@@ -60,14 +61,14 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("5/20/14 15:02:20 ") };
-            var task = new MonthlyScheduledTask
+            var task = new StubIMonthlyScheduledTask
             {
-                StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                RepeatIntervalInMonths = 0
+                StartTimeGet = () => DateTime.Parse("5/20/14 15:02:20"),
+                RepeatIntervalInMonthsGet = () => 0
             };
 
             //act
-            var result = task.EvalTrigger(currentTime);
+            var result = task.EvalMonthlyTrigger(currentTime);
 
             //assert
             Assert.IsFalse(result);
@@ -78,14 +79,14 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("5/20/14 15:02:21 ") };
-            var task = new IntervalScheduledTask
+            var task = new StubIIntervalScheduledTask
             {
-                StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                Inteval = TimeSpan.FromMilliseconds(1)
+                StartTimeGet = () => DateTime.Parse("5/20/14 15:02:20"),
+                IntevalGet = () => TimeSpan.FromMilliseconds(1)
             };
 
             //act
-            var result = task.EvalTrigger(currentTime);
+            var result = task.EvalIntervalTrigger(currentTime);
 
             //assert
             Assert.IsFalse(result);
@@ -96,14 +97,14 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("5/20/14 15:02:20 ") };
-            var task = new DailyScheduledTask
+            var task = new StubIDailyScheduledTask
             {
-                StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                RepeatIntervalInDays = 0
+                StartTimeGet = () => DateTime.Parse("5/20/14 15:02:20"),
+                RepeatIntervalInDaysGet = () => 0
             };
 
             //act
-             var result = task.EvalTrigger(currentTime);
+             var result = task.EvalDailyTrigger(currentTime);
 
             //assert
             Assert.IsFalse(result);
@@ -114,15 +115,15 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("5/20/14 15:02:20 ") };
-            var task = new DailyScheduledTask
+            var task = new StubIDailyScheduledTask
             {
-                StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                RepeatIntervalInDays = 1
+                StartTimeGet = () => DateTime.Parse("5/20/14 15:02:20"),
+                RepeatIntervalInDaysGet = () => 1
             };
             
 
             //act
-             var result = task.EvalTrigger(currentTime);
+             var result = task.EvalDailyTrigger(currentTime);
 
             //assert
             Assert.IsTrue(result);
@@ -133,15 +134,15 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("5/20/14 15:02:20 ").AddMilliseconds(200) };
-            var task = new DailyScheduledTask
+            var task = new StubIDailyScheduledTask
             {
-                StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                RepeatIntervalInDays = 1
+                StartTimeGet = () => DateTime.Parse("5/20/14 15:02:20"),
+                RepeatIntervalInDaysGet = () => 1
             };
             
 
             //act
-             var result = task.EvalTrigger(currentTime);
+             var result = task.EvalDailyTrigger(currentTime);
 
             //assert
             Assert.IsTrue(result);
@@ -152,15 +153,15 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("5/20/14 15:02:21") };
-            var task = new DailyScheduledTask
+            var task = new StubIDailyScheduledTask
             {
-                StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                RepeatIntervalInDays = 1
+                StartTimeGet = () =>DateTime.Parse("5/20/14 15:02:20"),
+                RepeatIntervalInDaysGet = () =>1
             };
             
 
             //act
-             var result = task.EvalTrigger(currentTime);
+             var result = task.EvalDailyTrigger(currentTime);
 
             //assert
             Assert.IsFalse(result);
@@ -171,15 +172,15 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("5/20/14 15:02:20").AddMilliseconds(400) };
-            var task = new DailyScheduledTask
+            var task = new StubIDailyScheduledTask
             {
-                StartTime = DateTime.Parse("5/20/14 15:02:20").AddMilliseconds(100),
-                RepeatIntervalInDays = 1
+                StartTimeGet = () =>DateTime.Parse("5/20/14 15:02:20").AddMilliseconds(100),
+                RepeatIntervalInDaysGet = () =>1
             };
             
 
             //act
-             var result = task.EvalTrigger(currentTime);
+             var result = task.EvalDailyTrigger(currentTime);
 
             //assert
             Assert.IsTrue(result);
@@ -190,15 +191,15 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("5/20/14 15:02:20").AddMilliseconds(200) };
-            var task = new DailyScheduledTask
+            var task = new StubIDailyScheduledTask
             {
-                StartTime = DateTime.Parse("5/20/14 15:02:20").AddMilliseconds(100),
-                RepeatIntervalInDays = 1
+                StartTimeGet = () =>DateTime.Parse("5/20/14 15:02:20").AddMilliseconds(100),
+                RepeatIntervalInDaysGet = () =>1
             };
             
 
             //act
-             var result = task.EvalTrigger(currentTime);
+             var result = task.EvalDailyTrigger(currentTime);
 
             //assert
             Assert.IsTrue(result);
@@ -209,15 +210,15 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("5/20/14 15:02:21") };
-            var task = new DailyScheduledTask
+            var task = new StubIDailyScheduledTask
             {
-                StartTime = DateTime.Parse("5/20/14 15:02:20").AddMilliseconds(100),
-                RepeatIntervalInDays = 1
+                StartTimeGet = () => DateTime.Parse("5/20/14 15:02:20").AddMilliseconds(100),
+                RepeatIntervalInDaysGet = () => 1
             };
             
 
             //act
-             var result = task.EvalTrigger(currentTime);
+             var result = task.EvalDailyTrigger(currentTime);
 
             //assert
             Assert.IsFalse(result);
@@ -228,15 +229,15 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("5/20/14 15:02:21").AddMilliseconds(200) };
-            var task = new DailyScheduledTask
+            var task = new StubIDailyScheduledTask
             {
-                StartTime = DateTime.Parse("5/20/14 15:02:20").AddMilliseconds(100),
-                RepeatIntervalInDays = 1
+                StartTimeGet = () => DateTime.Parse("5/20/14 15:02:20").AddMilliseconds(100),
+                RepeatIntervalInDaysGet = () => 1
             };
             
 
             //act
-             var result = task.EvalTrigger(currentTime);
+             var result = task.EvalDailyTrigger(currentTime);
 
             //assert
             Assert.IsFalse(result);
@@ -247,15 +248,15 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("6/4/14 15:02:20") };
-            var task = new DailyScheduledTask
+            var task = new StubIDailyScheduledTask
             {
-                StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                RepeatIntervalInDays = 3
+                StartTimeGet = () => DateTime.Parse("5/20/14 15:02:20"),
+                RepeatIntervalInDaysGet = () => 3
             };
             
 
             //act
-             var result = task.EvalTrigger(currentTime);
+             var result = task.EvalDailyTrigger(currentTime);
 
             //assert
             Assert.IsTrue(result);
@@ -266,15 +267,15 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("6/5/14 15:02:20") };
-            var task = new DailyScheduledTask
+            var task = new StubIDailyScheduledTask
             {
-                StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                RepeatIntervalInDays = 3
+                StartTimeGet = () => DateTime.Parse("5/20/14 15:02:20"),
+                RepeatIntervalInDaysGet = () => 3
             };
             
 
             //act
-             var result = task.EvalTrigger(currentTime);
+             var result = task.EvalDailyTrigger(currentTime);
 
             //assert
             Assert.IsFalse(result);
@@ -285,15 +286,15 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("6/6/14 15:02:20") };
-            var task = new DailyScheduledTask
+            var task = new StubIDailyScheduledTask
             {
-                StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                RepeatIntervalInDays = 3
+                StartTimeGet = () => DateTime.Parse("5/20/14 15:02:20"),
+                RepeatIntervalInDaysGet = () => 3
             };
             
 
             //act
-             var result = task.EvalTrigger(currentTime);
+             var result = task.EvalDailyTrigger(currentTime);
 
             //assert
             Assert.IsFalse(result);
@@ -305,16 +306,16 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("5/25/14 15:02:20") };
-            var task = new WeeklyScheduledTask
+            var task = new StubIWeeklyScheduledTask
             {
-                StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                RepeatIntervalInWeeks = 1,
-                DaysOfWeekToActivate = DaysOfWeek.All
+                StartTimeGet = () => DateTime.Parse("5/20/14 15:02:20"),
+                RepeatIntervalInWeeksGet = () => 1,
+                DaysOfWeekToActivateGet = () => DaysOfWeek.All
             };
             
 
             //act
-             var result = task.EvalTrigger(currentTime);
+             var result = task.EvalWeeklyTrigger(currentTime);
 
             //assert
             Assert.IsTrue(result);
@@ -325,16 +326,16 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("5/25/14 15:02:20") };
-            var task = new WeeklyScheduledTask
+            var task = new StubIWeeklyScheduledTask
             {
-                StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                RepeatIntervalInWeeks = 1,
-                DaysOfWeekToActivate = DaysOfWeek.Friday
+                StartTimeGet = () => DateTime.Parse("5/20/14 15:02:20"),
+                RepeatIntervalInWeeksGet = () => 1,
+                DaysOfWeekToActivateGet = () => DaysOfWeek.Friday
             };
             
 
             //act
-             var result = task.EvalTrigger(currentTime);
+             var result = task.EvalWeeklyTrigger(currentTime);
 
             //assert
             Assert.IsFalse(result);
@@ -345,16 +346,16 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("5/25/14 15:02:20") };
-            var task = new WeeklyScheduledTask
+            var task = new StubIWeeklyScheduledTask
             {
-                StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                RepeatIntervalInWeeks = 1,
-                DaysOfWeekToActivate = DaysOfWeek.Sunday
+                StartTimeGet = () => DateTime.Parse("5/20/14 15:02:20"),
+                RepeatIntervalInWeeksGet = () => 1,
+                DaysOfWeekToActivateGet = () => DaysOfWeek.Sunday
             };
             
 
             //act
-             var result = task.EvalTrigger(currentTime);
+             var result = task.EvalWeeklyTrigger(currentTime);
 
             //assert
             Assert.IsTrue(result);
@@ -365,16 +366,16 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("5/25/14 15:02:20") };
-            var task = new WeeklyScheduledTask
+            var task = new StubIWeeklyScheduledTask
             {
-                StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                RepeatIntervalInWeeks = 2,
-                DaysOfWeekToActivate = DaysOfWeek.Sunday
+                StartTimeGet = () => DateTime.Parse("5/20/14 15:02:20"),
+                RepeatIntervalInWeeksGet = () => 2,
+                DaysOfWeekToActivateGet = () => DaysOfWeek.Sunday
             };
             
 
             //act
-             var result = task.EvalTrigger(currentTime);
+             var result = task.EvalWeeklyTrigger(currentTime);
 
             //assert
             Assert.IsTrue(result);
@@ -385,16 +386,16 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("6/1/14 15:02:20") };
-            var task = new WeeklyScheduledTask
+            var task = new StubIWeeklyScheduledTask
             {
-                StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                RepeatIntervalInWeeks = 2,
-                DaysOfWeekToActivate = DaysOfWeek.Sunday
+                StartTimeGet = () => DateTime.Parse("5/20/14 15:02:20"),
+                RepeatIntervalInWeeksGet = () => 2,
+                DaysOfWeekToActivateGet = () => DaysOfWeek.Sunday
             };
             
 
             //act
-             var result = task.EvalTrigger(currentTime);
+             var result = task.EvalWeeklyTrigger(currentTime);
 
             //assert
             Assert.IsFalse(result);
@@ -405,16 +406,16 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("6/8/14 15:02:20") };
-            var task = new WeeklyScheduledTask
+            var task = new StubIWeeklyScheduledTask
             {
-                StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                RepeatIntervalInWeeks = 2,
-                DaysOfWeekToActivate = DaysOfWeek.Sunday
+                StartTimeGet = () => DateTime.Parse("5/20/14 15:02:20"),
+                RepeatIntervalInWeeksGet = () => 2,
+                DaysOfWeekToActivateGet = () => DaysOfWeek.Sunday
             };
             
 
             //act
-             var result = task.EvalTrigger(currentTime);
+             var result = task.EvalWeeklyTrigger(currentTime);
 
             //assert
             Assert.IsTrue(result);
@@ -425,16 +426,16 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("6/8/14 15:02:21") };
-            var task = new WeeklyScheduledTask
+            var task = new StubIWeeklyScheduledTask
             {
-                StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                RepeatIntervalInWeeks = 2,
-                DaysOfWeekToActivate = DaysOfWeek.Sunday
+                StartTimeGet = () => DateTime.Parse("5/20/14 15:02:20"),
+                RepeatIntervalInWeeksGet = () => 2,
+                DaysOfWeekToActivateGet = () => DaysOfWeek.Sunday
             };
             
 
             //act
-             var result = task.EvalTrigger(currentTime);
+             var result = task.EvalWeeklyTrigger(currentTime);
 
             //assert
             Assert.IsFalse(result);
@@ -445,16 +446,16 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("5/25/14 15:02:20") };
-            var task = new WeeklyScheduledTask
+            var task = new StubIWeeklyScheduledTask
             {
-                StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                RepeatIntervalInWeeks = 1,
-                DaysOfWeekToActivate = DaysOfWeek.All
+                StartTimeGet = () => DateTime.Parse("5/20/14 15:02:20"),
+                RepeatIntervalInWeeksGet = () => 1,
+                DaysOfWeekToActivateGet = () => DaysOfWeek.All
             };
             
 
             //act
-             var result = task.EvalTrigger(currentTime);
+             var result = task.EvalWeeklyTrigger(currentTime);
 
             //assert
             Assert.IsTrue(result);
@@ -465,16 +466,16 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("5/31/14 15:02:20") };
-            var task = new WeeklyScheduledTask
+            var task = new StubIWeeklyScheduledTask
             {
-                StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                RepeatIntervalInWeeks = 1,
-                DaysOfWeekToActivate = DaysOfWeek.All
+                StartTimeGet = () => DateTime.Parse("5/20/14 15:02:20"),
+                RepeatIntervalInWeeksGet = () => 1,
+                DaysOfWeekToActivateGet = () => DaysOfWeek.All
             };
             
 
             //act
-             var result = task.EvalTrigger(currentTime);
+             var result = task.EvalWeeklyTrigger(currentTime);
 
             //assert
             Assert.IsTrue(result);
@@ -485,16 +486,16 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("6/5/14 15:02:20") };
-            var task = new MonthlyScheduledTask
+            var task = new StubIMonthlyScheduledTask
             {
-                StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                RepeatIntervalInMonths = 1,
-                DaysOfMonthToActivate = DaysOfMonth.Fifth
+                StartTimeGet = () => DateTime.Parse("5/20/14 15:02:20"),
+                RepeatIntervalInMonthsGet = () => 1,
+                DaysOfMonthToActivateGet = () => DaysOfMonth.Fifth
             };
             
 
             //act
-             var result = task.EvalTrigger(currentTime);
+             var result = task.EvalMonthlyTrigger(currentTime);
 
             //assert
             Assert.IsTrue(result);
@@ -505,16 +506,16 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("6/20/14 15:02:20") };
-            var task = new MonthlyScheduledTask
+            var task = new StubIMonthlyScheduledTask
             {
-                StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                RepeatIntervalInMonths = 1,
-                DaysOfMonthToActivate = DaysOfMonth.Fifth
+                StartTimeGet = () => DateTime.Parse("5/20/14 15:02:20"),
+                RepeatIntervalInMonthsGet = () => 1,
+                DaysOfMonthToActivateGet = () => DaysOfMonth.Fifth
             };
             
 
             //act
-             var result = task.EvalTrigger(currentTime);
+             var result = task.EvalMonthlyTrigger(currentTime);
 
             //assert
             Assert.IsFalse(result);
@@ -525,16 +526,16 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("7/5/14 15:02:20") };
-            var task = new MonthlyScheduledTask
+            var task = new StubIMonthlyScheduledTask
             {
-                StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                RepeatIntervalInMonths = 2,
-                DaysOfMonthToActivate = DaysOfMonth.Fifth
+                StartTimeGet = () => DateTime.Parse("5/20/14 15:02:20"),
+                RepeatIntervalInMonthsGet = () => 2,
+                DaysOfMonthToActivateGet = () => DaysOfMonth.Fifth
             };
             
 
             //act
-             var result = task.EvalTrigger(currentTime);
+             var result = task.EvalMonthlyTrigger(currentTime);
 
             //assert
             Assert.IsTrue(result);
@@ -545,16 +546,16 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("6/5/14 15:02:20") };
-            var task = new MonthlyScheduledTask
+            var task = new StubIMonthlyScheduledTask
             {
-                StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                RepeatIntervalInMonths = 2,
-                DaysOfMonthToActivate = DaysOfMonth.Fifth
+                StartTimeGet = () => DateTime.Parse("5/20/14 15:02:20"),
+                RepeatIntervalInMonthsGet = () => 2,
+                DaysOfMonthToActivateGet = () => DaysOfMonth.Fifth
             };
             
 
             //act
-             var result = task.EvalTrigger(currentTime);
+             var result = task.EvalMonthlyTrigger(currentTime);
 
             //assert
             Assert.IsFalse(result);
@@ -565,16 +566,16 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("7/31/14 15:02:20") };
-            var task = new MonthlyScheduledTask
+            var task = new StubIMonthlyScheduledTask
             {
-                StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                RepeatIntervalInMonths = 2,
-                DaysOfMonthToActivate = DaysOfMonth.All
+                StartTimeGet = () => DateTime.Parse("5/20/14 15:02:20"),
+                RepeatIntervalInMonthsGet = () => 2,
+                DaysOfMonthToActivateGet = () => DaysOfMonth.All
             };
             
 
             //act
-             var result = task.EvalTrigger(currentTime);
+             var result = task.EvalMonthlyTrigger(currentTime);
 
             //assert
             Assert.IsTrue(result);
@@ -585,16 +586,16 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("7/1/14 15:02:20") };
-            var task = new MonthlyScheduledTask
+            var task = new StubIMonthlyScheduledTask
             {
-                StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                RepeatIntervalInMonths = 2,
-                DaysOfMonthToActivate = DaysOfMonth.All
+                StartTimeGet = () => DateTime.Parse("5/20/14 15:02:20"),
+                RepeatIntervalInMonthsGet = () => 2,
+                DaysOfMonthToActivateGet = () => DaysOfMonth.All
             };
             
 
             //act
-             var result = task.EvalTrigger(currentTime);
+             var result = task.EvalMonthlyTrigger(currentTime);
 
             //assert
             Assert.IsTrue(result);
@@ -606,15 +607,15 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("6/5/14 17:02:20") };
-            var task = new IntervalScheduledTask
+            var task = new StubIIntervalScheduledTask
             {
-                StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                Inteval = TimeSpan.FromHours(1)
+                StartTimeGet = () => DateTime.Parse("5/20/14 15:02:20"),
+                IntevalGet = () => TimeSpan.FromHours(1)
             };
             
 
             //act
-             var result = task.EvalTrigger(currentTime);
+             var result = task.EvalIntervalTrigger(currentTime);
 
             //assert
             Assert.IsTrue(result);
@@ -625,15 +626,15 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("6/5/14 17:03:20") };
-            var task = new IntervalScheduledTask
+            var task = new StubIIntervalScheduledTask
             {
-                StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                Inteval = TimeSpan.FromHours(1)
+                StartTimeGet = () => DateTime.Parse("5/20/14 15:02:20"),
+                IntevalGet = () => TimeSpan.FromHours(1)
             };
             
 
             //act
-             var result = task.EvalTrigger(currentTime);
+             var result = task.EvalIntervalTrigger(currentTime);
 
             //assert
             Assert.IsFalse(result);
@@ -644,15 +645,15 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("6/5/14 17:02:21") };
-            var task = new IntervalScheduledTask
+            var task = new StubIIntervalScheduledTask
             {
-                StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                Inteval = TimeSpan.FromHours(1)
+                StartTimeGet = () => DateTime.Parse("5/20/14 15:02:20"),
+                IntevalGet = () => TimeSpan.FromHours(1)
             };
             
 
             //act
-             var result = task.EvalTrigger(currentTime);
+             var result = task.EvalIntervalTrigger(currentTime);
 
             //assert
             Assert.IsFalse(result);
@@ -663,15 +664,15 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("6/5/14 17:02:19") };
-            var task = new IntervalScheduledTask
+            var task = new StubIIntervalScheduledTask
             {
-                StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                Inteval = TimeSpan.FromHours(1)
+                StartTimeGet = () => DateTime.Parse("5/20/14 15:02:20"),
+                IntevalGet = () => TimeSpan.FromHours(1)
             };
             
 
             //act
-             var result = task.EvalTrigger(currentTime);
+             var result = task.EvalIntervalTrigger(currentTime);
 
             //assert
             Assert.IsFalse(result);
@@ -682,15 +683,15 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("6/5/14 17:02:19") };
-            var task = new IntervalScheduledTask
+            var task = new StubIIntervalScheduledTask
             {
-                StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                Inteval = TimeSpan.FromSeconds(1)
+                StartTimeGet = () => DateTime.Parse("5/20/14 15:02:20"),
+                IntevalGet = () => TimeSpan.FromSeconds(1)
             };
             
 
             //act
-             var result = task.EvalTrigger(currentTime);
+             var result = task.EvalIntervalTrigger(currentTime);
 
             //assert
             Assert.IsTrue(result);
@@ -701,15 +702,15 @@ namespace zvs.Processor.Tests
         {
             //arrange
             var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("6/5/14 17:02:20") };
-            var task = new IntervalScheduledTask
+            var task = new StubIIntervalScheduledTask
             {
-                StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                Inteval = TimeSpan.FromSeconds(1)
+                StartTimeGet = () => DateTime.Parse("5/20/14 15:02:20"),
+                IntevalGet = () => TimeSpan.FromSeconds(1)
             };
             
 
             //act
-             var result = task.EvalTrigger(currentTime);
+             var result = task.EvalIntervalTrigger(currentTime);
 
             //assert
             Assert.IsTrue(result);

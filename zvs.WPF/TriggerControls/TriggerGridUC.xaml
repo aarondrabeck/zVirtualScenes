@@ -82,7 +82,7 @@
             </Grid.RowDefinitions>
 
             <DataGrid x:Name="TriggerGrid" Background="#FAFAFA" RowBackground="#FAFAFA" AlternatingRowBackground="#FAFAFA"  CellStyle="{DynamicResource NoSelectDataGridCell}" CanUserDeleteRows="False" ItemsSource="{Binding}"           
-                  HorizontalGridLinesBrush="{DynamicResource TriggerBrush}"  RowHeaderWidth="0" CanUserAddRows="False" 
+                  HorizontalGridLinesBrush="{DynamicResource TriggerNoFocusBrush}"  RowHeaderWidth="0" CanUserAddRows="False" 
                  GridLinesVisibility="Horizontal" RowHeight="55" AutoGenerateColumns="False" SelectionUnit="FullRow" SelectionMode="Extended"
                   HorizontalAlignment="Center" BorderThickness="0" >
                 <DataGrid.Resources>

@@ -89,12 +89,12 @@
     <Compile Include="Tasks\DaysOfMonth.cs" />
     <Compile Include="Tasks\DaysOfWeek.cs" />
     <Compile Include="DeviceValueHistory.cs" />
-    <Compile Include="Tasks\IntervalScheduledTask.cs" />
+    <Compile Include="Tasks\IIntervalScheduledTask.cs" />
     <Compile Include="LogEntry.cs" />
     <Compile Include="LogEntryLevel.cs" />
     <Compile Include="Tasks\MonthlyScheduledTask.cs" />
     <Compile Include="NotifyEntityChangeContext.cs" />
-    <Compile Include="Tasks\OneTimeScheduledTask.cs" />
+    <Compile Include="Tasks\IOneTimeScheduledTask.cs" />
     <Compile Include="PluginSettingOption.cs" />
     <Compile Include="PluginSetting.cs" />
     <Compile Include="Plugin.cs" />
@@ -105,7 +105,7 @@
     <Compile Include="IStoredCommand.cs" />
     <Compile Include="JavaScriptCommand.cs" />
     <Compile Include="Migrations\Configuration.cs" />
-    <Compile Include="ZvsScheduledTask.cs" />
+    <Compile Include="ScheduledTask.cs" />
     <Compile Include="SceneSettingOption.cs" />
     <Compile Include="SceneSettingValue.cs" />
     <Compile Include="SceneSetting.cs" />
@@ -128,7 +128,6 @@
     <Compile Include="AdapterSetting.cs" />
     <Compile Include="Adapter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tasks\ScheduledTask.cs" />
     <Compile Include="Tasks\WeeklyScheduledTask.cs" />
     <Compile Include="zvsContext.cs" />
   </ItemGroup>

@@ -8,17 +8,17 @@ namespace zvs.WPF.ScheduledTaskControls
     /// </summary>
     public partial class DailyTaskUserControl
     {
-        public DailyScheduledTask DailyScheduledTask
+        public IDailyScheduledTask DailyScheduledTask
         {
-            get { return (DailyScheduledTask)GetValue(DailyScheduledTaskProperty); }
+            get { return (IDailyScheduledTask)GetValue(DailyScheduledTaskProperty); }
             set { SetValue(DailyScheduledTaskProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for DailyScheduledTask.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty DailyScheduledTaskProperty =
-            DependencyProperty.Register("DailyScheduledTask", typeof(DailyScheduledTask), typeof(DailyTaskUserControl), new PropertyMetadata(new DailyScheduledTask()));
+            DependencyProperty.Register("DailyScheduledTask", typeof(IDailyScheduledTask), typeof(DailyTaskUserControl), new PropertyMetadata(null));
 
-        public DailyTaskUserControl(DailyScheduledTask dailyScheduledTask)
+        public DailyTaskUserControl(IDailyScheduledTask dailyScheduledTask)
         {
             InitializeComponent();
             DailyScheduledTask = dailyScheduledTask;

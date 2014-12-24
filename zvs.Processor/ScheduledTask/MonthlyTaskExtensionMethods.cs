@@ -4,7 +4,7 @@ namespace zvs.Processor.ScheduledTask
 {
     public static class MonthlyTriggerExtensionMethods
     {
-        public static bool EvalTrigger(this MonthlyScheduledTask task, ITimeProvider timeProvider)
+        public static bool EvalMonthlyTrigger(this IMonthlyScheduledTask task, ITimeProvider timeProvider)
         {
             var monthsapart = ((timeProvider.Time.Year - task.StartTime.Year) * 12) + timeProvider.Time.Month - task.StartTime.Month;
 

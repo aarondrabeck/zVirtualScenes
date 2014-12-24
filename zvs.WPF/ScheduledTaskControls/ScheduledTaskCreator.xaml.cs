@@ -30,12 +30,12 @@ namespace zvs.WPF.ScheduledTaskControls
             _context = new ZvsContext(_app.EntityContextConnection);
             Log = new DatabaseFeedback(_app.EntityContextConnection) { Source = "Scheduled Task Editor" };
             InitializeComponent();
-            NotifyEntityChangeContext.ChangeNotifications<ZvsScheduledTask>.OnEntityAdded += ScheduledTaskCreator_onEntityAdded;
-            NotifyEntityChangeContext.ChangeNotifications<ZvsScheduledTask>.OnEntityDeleted += ScheduledTaskCreator_onEntityDeleted;
-            NotifyEntityChangeContext.ChangeNotifications<ZvsScheduledTask>.OnEntityUpdated += ScheduledTaskCreator_onEntityUpdated;
+            NotifyEntityChangeContext.ChangeNotifications<ScheduledTask>.OnEntityAdded += ScheduledTaskCreator_onEntityAdded;
+            NotifyEntityChangeContext.ChangeNotifications<ScheduledTask>.OnEntityDeleted += ScheduledTaskCreator_onEntityDeleted;
+            NotifyEntityChangeContext.ChangeNotifications<ScheduledTask>.OnEntityUpdated += ScheduledTaskCreator_onEntityUpdated;
         }
 
-        void ScheduledTaskCreator_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<ZvsScheduledTask>.EntityUpdatedArgs e)
+        void ScheduledTaskCreator_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<ScheduledTask>.EntityUpdatedArgs e)
         {
             if (_context == null)
                 return;
@@ -43,12 +43,12 @@ namespace zvs.WPF.ScheduledTaskControls
             Dispatcher.Invoke(new Action(async () =>
             {
                 //Reloads context from DB when modifications happen
-                foreach (var ent in _context.ChangeTracker.Entries<ZvsScheduledTask>())
+                foreach (var ent in _context.ChangeTracker.Entries<ScheduledTask>())
                     await ent.ReloadAsync();
             }));
         }
 
-        void ScheduledTaskCreator_onEntityDeleted(object sender, NotifyEntityChangeContext.ChangeNotifications<ZvsScheduledTask>.EntityDeletedArgs e)
+        void ScheduledTaskCreator_onEntityDeleted(object sender, NotifyEntityChangeContext.ChangeNotifications<ScheduledTask>.EntityDeletedArgs e)
         {
             if (_context == null)
                 return;
@@ -56,12 +56,12 @@ namespace zvs.WPF.ScheduledTaskControls
             Dispatcher.Invoke(new Action(async () =>
             {
                 //Reloads context from DB when modifications happen
-                foreach (var ent in _context.ChangeTracker.Entries<ZvsScheduledTask>())
+                foreach (var ent in _context.ChangeTracker.Entries<ScheduledTask>())
                     await ent.ReloadAsync();
             }));
         }
 
-        void ScheduledTaskCreator_onEntityAdded(object sender, NotifyEntityChangeContext.ChangeNotifications<ZvsScheduledTask>.EntityAddedArgs e)
+        void ScheduledTaskCreator_onEntityAdded(object sender, NotifyEntityChangeContext.ChangeNotifications<ScheduledTask>.EntityAddedArgs e)
         {
             if (_context == null)
                 return;
@@ -87,13 +87,12 @@ namespace zvs.WPF.ScheduledTaskControls
             sw.Start();
 #endif
             if (DesignerProperties.GetIsInDesignMode(this)) return;
-            await _context.ZvsScheduledTasks
-                .Include(o => o.ScheduledTask)
+            await _context.ScheduledTasks
                 .ToListAsync();
 
             //Load your data here and assign the result to the CollectionViewSource.
             var myCollectionViewSource = (CollectionViewSource)Resources["ScheduledTaskViewSource"];
-            myCollectionViewSource.Source = _context.ZvsScheduledTasks.Local;
+            myCollectionViewSource.Source = _context.ScheduledTasks.Local;
 
 #if DEBUG
             sw.Stop();
@@ -112,15 +111,15 @@ namespace zvs.WPF.ScheduledTaskControls
             var parent = Window.GetWindow(this);
             //Check if the parent window is closing  or if this is just being removed from the visual tree temporarily
             if (parent != null && parent.IsActive) return;
-            NotifyEntityChangeContext.ChangeNotifications<ZvsScheduledTask>.OnEntityAdded -= ScheduledTaskCreator_onEntityAdded;
-            NotifyEntityChangeContext.ChangeNotifications<ZvsScheduledTask>.OnEntityDeleted -= ScheduledTaskCreator_onEntityDeleted;
-            NotifyEntityChangeContext.ChangeNotifications<ZvsScheduledTask>.OnEntityUpdated -= ScheduledTaskCreator_onEntityUpdated;
+            NotifyEntityChangeContext.ChangeNotifications<ScheduledTask>.OnEntityAdded -= ScheduledTaskCreator_onEntityAdded;
+            NotifyEntityChangeContext.ChangeNotifications<ScheduledTask>.OnEntityDeleted -= ScheduledTaskCreator_onEntityDeleted;
+            NotifyEntityChangeContext.ChangeNotifications<ScheduledTask>.OnEntityUpdated -= ScheduledTaskCreator_onEntityUpdated;
         }
 
         private async void ScheduledTaskDataGrid_RowEditEnding_1(object sender, DataGridRowEditEndingEventArgs e)
         {
             if (e.EditAction != DataGridEditAction.Commit) return;
-            var task = e.Row.DataContext as ZvsScheduledTask;
+            var task = e.Row.DataContext as ScheduledTask;
             if (task != null)
             {
                 if (task.Name == null)
@@ -135,124 +134,36 @@ namespace zvs.WPF.ScheduledTaskControls
 
         private void ScheduledTaskDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var command = ScheduledTaskDataGrid.SelectedItem as ZvsScheduledTask;
-            if (command == null)
-                return;
-
-            if (command.ScheduledTask is OneTimeScheduledTask)
-                FrequencyCmbBx.SelectedItem = ScheduledTaskType.OneTime;
-            else if (command.ScheduledTask is DailyScheduledTask)
-                FrequencyCmbBx.SelectedItem = ScheduledTaskType.Daily;
-            else if (command.ScheduledTask is IntervalScheduledTask)
-                FrequencyCmbBx.SelectedItem = ScheduledTaskType.Interval;
-            else if (command.ScheduledTask is WeeklyScheduledTask)
-                FrequencyCmbBx.SelectedItem = ScheduledTaskType.Weekly;
-            else if (command.ScheduledTask is MonthlyScheduledTask)
-                FrequencyCmbBx.SelectedItem = ScheduledTaskType.Monthly;
-
             InsertScheduledTaskUserControl();
         }
 
         private void InsertScheduledTaskUserControl()
         {
-            var command = ScheduledTaskDataGrid.SelectedItem as ZvsScheduledTask;
+            var command = ScheduledTaskDataGrid.SelectedItem as ScheduledTask;
             if (command == null)
                 return;
 
             TaskUserControlGrid.Children.Clear();
-            if (command.ScheduledTask is OneTimeScheduledTask)
-                TaskUserControlGrid.Children.Add(new OneTimeTaskUserControl(command.ScheduledTask as OneTimeScheduledTask));
-            else if (command.ScheduledTask is IntervalScheduledTask)
-                TaskUserControlGrid.Children.Add(new IntervalTaskUserControl(command.ScheduledTask as IntervalScheduledTask));
-            else if (command.ScheduledTask is DailyScheduledTask)
-                TaskUserControlGrid.Children.Add(new DailyTaskUserControl(command.ScheduledTask as DailyScheduledTask));
-            else if (command.ScheduledTask is WeeklyScheduledTask)
-                TaskUserControlGrid.Children.Add(new WeeklyTaskUserControl(command.ScheduledTask as WeeklyScheduledTask));
-            else if (command.ScheduledTask is MonthlyScheduledTask)
-                TaskUserControlGrid.Children.Add(new MonthlyTaskUserControl(command.ScheduledTask as MonthlyScheduledTask));
+            if (command.TaskType == ScheduledTaskType.OneTime)
+                TaskUserControlGrid.Children.Add(new OneTimeTaskUserControl(command));
+            else if (command.TaskType == ScheduledTaskType.Interval)
+                TaskUserControlGrid.Children.Add(new IntervalTaskUserControl(command));
+            else if (command.TaskType == ScheduledTaskType.Daily)
+                TaskUserControlGrid.Children.Add(new DailyTaskUserControl(command));
+            else if (command.TaskType == ScheduledTaskType.Weekly)
+                TaskUserControlGrid.Children.Add(new WeeklyTaskUserControl(command));
+            else if (command.TaskType == ScheduledTaskType.Monthly)
+                TaskUserControlGrid.Children.Add(new MonthlyTaskUserControl(command));
         }
 
-        private async void FrequencyCmbBx_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void FrequencyCmbBx_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var command = ScheduledTaskDataGrid.SelectedItem as ZvsScheduledTask;
+            var command = ScheduledTaskDataGrid.SelectedItem as ScheduledTask;
             if (command == null)
                 return;
 
             var selectedType = FrequencyCmbBx.SelectedItem as ScheduledTaskType?;
             if (selectedType == null) return;
-
-            switch (selectedType)
-            {
-                case ScheduledTaskType.OneTime:
-                    {
-                        if (!(command.ScheduledTask is OneTimeScheduledTask))
-                        {
-                            if (command.ScheduledTask != null)
-                            {
-                                _context.ScheduledTasks.Remove(command.ScheduledTask);
-                                await SaveChangesAsync();
-                            }
-                            command.ScheduledTask = new OneTimeScheduledTask { StartTime = DateTime.Now };
-                        }
-                        break;
-                    }
-                case ScheduledTaskType.Interval:
-                    {
-                        if (!(command.ScheduledTask is IntervalScheduledTask))
-                        {
-                            if (command.ScheduledTask != null)
-                            {
-                                _context.ScheduledTasks.Remove(command.ScheduledTask);
-                                await SaveChangesAsync();
-                            }
-                            command.ScheduledTask = new IntervalScheduledTask { StartTime = DateTime.Now, RepeatIntervalInSeconds = 120 };
-                        }
-                        break;
-                    }
-                case ScheduledTaskType.Daily:
-                    {
-                        if (!(command.ScheduledTask is DailyScheduledTask))
-                        {
-                            if (command.ScheduledTask != null)
-                            {
-                                _context.ScheduledTasks.Remove(command.ScheduledTask);
-                                await SaveChangesAsync();
-                            }
-
-                            command.ScheduledTask = new DailyScheduledTask { StartTime = DateTime.Now, RepeatIntervalInDays = 2 };
-                        }
-                        break;
-                    }
-
-                case ScheduledTaskType.Weekly:
-                    {
-                        if (!(command.ScheduledTask is WeeklyScheduledTask))
-                        {
-                            if (command.ScheduledTask != null)
-                            {
-                                _context.ScheduledTasks.Remove(command.ScheduledTask);
-                                await SaveChangesAsync();
-                            }
-
-                            command.ScheduledTask = new WeeklyScheduledTask { StartTime = DateTime.Now, RepeatIntervalInWeeks = 1 };
-                        }
-                        break;
-                    }
-                case ScheduledTaskType.Monthly:
-                    {
-                        if (!(command.ScheduledTask is MonthlyScheduledTask))
-                        {
-                            if (command.ScheduledTask != null)
-                            {
-                                _context.ScheduledTasks.Remove(command.ScheduledTask);
-                                await SaveChangesAsync();
-                            }
-
-                            command.ScheduledTask = new MonthlyScheduledTask { StartTime = DateTime.Now, RepeatIntervalInMonths = 1 };
-                        }
-                        break;
-                    }
-            }
             InsertScheduledTaskUserControl();
         }
 
@@ -269,12 +180,12 @@ namespace zvs.WPF.ScheduledTaskControls
 
         private async void AddUpdateCommand_Click(object sender, RoutedEventArgs e)
         {
-            var zvsScheduledTask = ScheduledTaskDataGrid.SelectedItem as ZvsScheduledTask;
-            if (zvsScheduledTask == null)
+            var scheduledTask = ScheduledTaskDataGrid.SelectedItem as ScheduledTask;
+            if (scheduledTask == null)
                 return;
 
             //Send it to the command builder to get filled with a command
-            var cbWindow = new CommandBuilder(_context, zvsScheduledTask)
+            var cbWindow = new CommandBuilder(_context, scheduledTask)
             {
                 Owner = _app.ZvsWindow
             };
@@ -289,12 +200,12 @@ namespace zvs.WPF.ScheduledTaskControls
             await SaveChangesAsync();
         }
 
-        private async Task<bool> DeleteTask(ZvsScheduledTask task)
+        private async Task<bool> DeleteTask(ScheduledTask task)
         {
             if (MessageBox.Show(string.Format("Are you sure you want to delete the '{0}' scheduled task?", task.Name),
                     "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
                 return false;
-            _context.ZvsScheduledTasks.Local.Remove(task);
+            _context.ScheduledTasks.Local.Remove(task);
 
             await SaveChangesAsync();
 
@@ -304,11 +215,11 @@ namespace zvs.WPF.ScheduledTaskControls
 
         private async void ButtonDelete_OnClick(object sender, RoutedEventArgs e)
         {
-            var zvsScheduledTask = ScheduledTaskDataGrid.SelectedItem as ZvsScheduledTask;
-            if (zvsScheduledTask == null)
+            var scheduledTask = ScheduledTaskDataGrid.SelectedItem as ScheduledTask;
+            if (scheduledTask == null)
                 return;
 
-            await DeleteTask(zvsScheduledTask);
+            await DeleteTask(scheduledTask);
         }
     }
 }
