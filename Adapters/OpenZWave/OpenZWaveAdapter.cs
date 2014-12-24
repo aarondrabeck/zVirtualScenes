@@ -322,13 +322,13 @@ namespace OpenZWaveAdapter
                Description = "The frequency in which devices are polled for level status on your network.  Set high to avoid excessive network traffic. "
            };
 
-            var comPortSettingResult =  await settingBuilder.Adapter(this).RegisterAdapterSettingAsync(comSetting, o => o.ComportSetting);
+            var comPortSettingResult = await settingBuilder.Adapter(this).RegisterAdapterSettingAsync(comSetting, o => o.ComportSetting);
             if (comPortSettingResult.HasError)
                 await
                     Log.ReportErrorFormatAsync(CancellationToken,
                         "An error occured when registering the comport adapter setting. {0}", comPortSettingResult.Message);
 
-            var pollIntSettingResult =  await settingBuilder.Adapter(this).RegisterAdapterSettingAsync(pollIntSetting, o => o.PollingIntervalSetting);
+            var pollIntSettingResult = await settingBuilder.Adapter(this).RegisterAdapterSettingAsync(pollIntSetting, o => o.PollingIntervalSetting);
             if (pollIntSettingResult.HasError)
                 await
                     Log.ReportErrorFormatAsync(CancellationToken,
@@ -1127,7 +1127,7 @@ namespace OpenZWaveAdapter
                             }
 
                             //Values are 'unknown' at this point so don't report a value change. 
-                            var valueSaveResult =  await DeviceValueBuilder.RegisterAsync(new DeviceValue
+                            var valueSaveResult = await DeviceValueBuilder.RegisterAsync(new DeviceValue
                             {
                                 DeviceId = d.Id,
                                 UniqueIdentifier = vIdString,
@@ -1240,22 +1240,36 @@ namespace OpenZWaveAdapter
                                 await Log.ReportWarningAsync("ValueChanged called on a node id that was not found in the database", CancellationToken);
                                 break;
                             }
+                            var valueUId = vid.GetId().ToString(CultureInfo.InvariantCulture);
+                            var oldValue =
+                                await
+                                    context.DeviceValues.Where(
+                                        o => o.DeviceId == device.Id && o.UniqueIdentifier == valueUId)
+                                        .Select(o => o.Value).FirstOrDefaultAsync();
+
+                            if (oldValue != null && oldValue != data)
+                                await Log.ReportInfoFormatAsync(CancellationToken, "{0} {1} {2} changed from {3} to {4}", 
+                                    device.Location,
+                                    device.Name,
+                                    value.Label,
+                                    oldValue,
+                                    data);
 
                             //Update device value
-                           var deviceValueResult = await DeviceValueBuilder.RegisterAsync(new DeviceValue
-                            {
-                                DeviceId = device.Id,
-                                UniqueIdentifier = vid.GetId().ToString(CultureInfo.InvariantCulture),
-                                Name = value.Label,
-                                Genre = value.Genre,
-                                Index = value.Index,
-                                CommandClass = value.CommandClassID,
-                                Value = data,
-                                ValueType = ConvertType(vid),
-                                IsReadOnly = readOnly
-                            }, device, CancellationToken);
-                           if (deviceValueResult.HasError)
-                               await Log.ReportErrorFormatAsync(CancellationToken, "An error occured when updating device values. {0}", deviceValueResult.Message);
+                            var deviceValueResult = await DeviceValueBuilder.RegisterAsync(new DeviceValue
+                             {
+                                 DeviceId = device.Id,
+                                 UniqueIdentifier = valueUId,
+                                 Name = value.Label,
+                                 Genre = value.Genre,
+                                 Index = value.Index,
+                                 CommandClass = value.CommandClassID,
+                                 Value = data,
+                                 ValueType = ConvertType(vid),
+                                 IsReadOnly = readOnly
+                             }, device, CancellationToken);
+                            if (deviceValueResult.HasError)
+                                await Log.ReportErrorFormatAsync(CancellationToken, "An error occured when updating device values. {0}", deviceValueResult.Message);
 
                             #region Update Device Status Properties
                             //Update Current Status Field
@@ -1312,7 +1326,7 @@ namespace OpenZWaveAdapter
                                         var levelOnOff = state ? 100 : 0;
                                         var leveltxt = state ? "On" : "Off";
 
-                                        if (!device.CurrentLevelInt .Equals(levelOnOff))
+                                        if (!device.CurrentLevelInt.Equals(levelOnOff))
                                         {
                                             device.CurrentLevelInt = levelOnOff;
                                             changed = true;
@@ -1537,7 +1551,7 @@ namespace OpenZWaveAdapter
                                     await Log.ReportErrorFormatAsync(CancellationToken, "An error occured when updating product name value. {0}", productNameResult.Message);
 
 
-                                var nodeResult =  await DeviceValueBuilder.RegisterAsync(new DeviceValue
+                                var nodeResult = await DeviceValueBuilder.RegisterAsync(new DeviceValue
                                 {
                                     DeviceId = device.Id,
                                     UniqueIdentifier = nodeLocationValueId,
@@ -1585,7 +1599,8 @@ namespace OpenZWaveAdapter
 
                         using (var context = new ZvsContext(EntityContextConnection))
                         {
-                            var device = await context.Devices.FirstOrDefaultAsync(o => o.Type.Adapter.AdapterGuid == AdapterGuid &&
+                            var device = await context.Devices
+                                .FirstOrDefaultAsync(o => o.Type.Adapter.AdapterGuid == AdapterGuid &&
                                     o.NodeNumber == node.ID);
 
                             if (device == null)
