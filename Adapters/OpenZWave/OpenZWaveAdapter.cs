@@ -1150,7 +1150,6 @@ namespace OpenZWaveAdapter
 
                                 var dynamicDc = new DeviceCommand
                                 {
-                                    Device = d,
                                     DeviceId = d.Id,
                                     UniqueIdentifier = string.Format("DYNAMIC_CMD_{0}_{1}", value.Label.ToUpper(), vid.GetId()),
                                     Name = string.Format("Set {0}", value.Label),
