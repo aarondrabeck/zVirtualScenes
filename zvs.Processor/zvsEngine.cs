@@ -126,7 +126,7 @@ namespace zvs.Processor
             CancellationToken cancellationToken)
         {
             var commandProcessor = new CommandProcessor(AdapterManager, EntityContextConnection, Log);
-            return await commandProcessor.RunCommandAsync(commandId, argument, argument, cancellationToken);
+            return await commandProcessor.RunCommandAsync(commandId, argument, argument2, cancellationToken);
         }
     }
 }
