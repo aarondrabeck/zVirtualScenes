@@ -134,7 +134,7 @@ namespace zvs.WPF.DeviceControls
                                 },
                                     _icon, deviceTypeSetting.ValueType)
                             {
-                                Name = deviceTypeSetting.Name,
+                                Header = deviceTypeSetting.Name,
                                 Description = deviceTypeSetting.Description,
                                 Value = value
                             };

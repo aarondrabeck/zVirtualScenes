@@ -135,7 +135,7 @@ namespace zvs.WPF.SceneControls
                                 },
                                     icon, sceneSetting.ValueType)
                             {
-                                Name = sceneSetting.Name,
+                                Header = sceneSetting.Name,
                                 Description = string.Empty,
                                 Value = _default
                             };

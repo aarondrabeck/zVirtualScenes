@@ -13,7 +13,7 @@
             </Grid.ColumnDefinitions>
             <Button Cursor="Hand"  Style="{StaticResource MaterialLightButton}"  Name="ToggleButton" HorizontalAlignment="Left"  Click="ToggleButton_OnClick"
                               VerticalAlignment="Center" Content="{Binding ButtonContent, ElementName=This, FallbackValue='My Button'}"  Margin="0 5 25 5"/>
-            <Image Grid.Column="1" Name="SignalImg" Source="../Images/send_signal.png" Height="15" Width="15"  Opacity="1" />
+            <Image Grid.Column="1" Name="SignalImg" Source="../Images/send_signal.png" Height="15" Width="15"  Opacity="0" />
         </Grid>
     </StackPanel>
 </UserControl>

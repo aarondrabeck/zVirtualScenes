@@ -65,7 +65,7 @@ namespace zvs.WPF.DeviceControls
                                     await _app.ZvsEngine.RunCommandAsync(deviceCommand.Id, string.Empty, string.Empty, CancellationToken.None);
                                 }, _icon)
                                 {
-                                    Name = deviceCommand.Name,
+                                    Header = deviceCommand.Name,
                                     ButtonContent = deviceCommand.Name,
                                     Description = deviceCommand.Description
                                 };
@@ -112,7 +112,7 @@ namespace zvs.WPF.DeviceControls
                                     },
                                     _icon, deviceCommand.ArgumentType)
                                 {
-                                    Name = deviceCommand.Name,
+                                    Header = deviceCommand.Name,
                                     Description = deviceCommand.Description,
                                     Value = defaultValue
                                 };
@@ -186,7 +186,7 @@ namespace zvs.WPF.DeviceControls
                                     await _app.ZvsEngine.RunCommandAsync(deviceTypeCommand.Id, string.Empty, d.Id.ToString(CultureInfo.InvariantCulture), CancellationToken.None);
                                 }, _icon)
                                 {
-                                    Name = deviceTypeCommand.Name,
+                                    Header = deviceTypeCommand.Name,
                                     ButtonContent = deviceTypeCommand.Name,
                                     Description = deviceTypeCommand.Description
                                 };
@@ -236,7 +236,7 @@ namespace zvs.WPF.DeviceControls
                                    },
                                     _icon, deviceTypeCommand.ArgumentType)
                                 {
-                                    Name = deviceTypeCommand.Name,
+                                    Header = deviceTypeCommand.Name,
                                     Description = deviceTypeCommand.Description,
                                     Value = defaultValue
                                 };
