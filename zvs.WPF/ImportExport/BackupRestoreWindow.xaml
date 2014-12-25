@@ -4,98 +4,64 @@
             x:Name="this" 
         WindowStyle="ToolWindow"
         WindowStartupLocation="CenterOwner"
-        Title="Backup and Restore " Loaded="this_Loaded" MinHeight="500" MinWidth="500" Height="500" Width="500">
+        Title="Backup and Restore " Loaded="this_Loaded" MinHeight="600" MinWidth="500" Height="600" Width="500"  FontFamily="Roboto" Background="#FAFAFA">
 
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="60"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="60"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="35"/>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="60"/>
         </Grid.RowDefinitions>
 
-
-        <Grid Grid.Row="1" >
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <Grid>
-            <Rectangle Height="40" VerticalAlignment="Top" HorizontalAlignment="Stretch" >
-                <Rectangle.Fill>
-                    <LinearGradientBrush EndPoint="0,0" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
-                        <GradientStop Color="#FF8FAEEE" Offset="0"/>
-                        <GradientStop Color="#FF6687DC" Offset="1"/>
-                    </LinearGradientBrush>
-                </Rectangle.Fill>
-
-            </Rectangle>
-                
-            <TextBlock HorizontalAlignment="Left" FontSize="18" Foreground="White" Margin="10,8,0,0" TextWrapping="Wrap" 
-                       Text="Data to Backup/Restore" VerticalAlignment="Top"/>
-            </Grid>
-            <ListView Grid.Row="1" Margin="5 10 5 5" 
-                      HorizontalContentAlignment="Stretch" 
-                      x:Name="RestoreBackupListView" 
-                      BorderThickness="0" 
-                      Loaded="RestoreBackupListView_Loaded"></ListView>
+        <Grid Grid.Row="0" Background="#26C6DA">
+            <TextBlock Text="Location of Backup/Restore Files" Foreground="White" Margin="20 0" FontSize="26" VerticalAlignment="Center" />
         </Grid>
 
-        <StackPanel Grid.Row="0"  >
-            <Grid>
-                <Rectangle Height="40" VerticalAlignment="Top" HorizontalAlignment="Stretch" >
-                    <Rectangle.Fill>
-                        <LinearGradientBrush EndPoint="0,0" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
-                            <GradientStop Color="#FF8FAEEE" Offset="0"/>
-                            <GradientStop Color="#FF6687DC" Offset="1"/>
-                        </LinearGradientBrush>
-                    </Rectangle.Fill>
-                </Rectangle>
+        <Grid Grid.Row="1" Margin="10 15" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock FontSize="16" Margin="0 0 10 0" Text="{Binding BackupDirectory, ElementName=this, FallbackValue='C:\\'}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"></TextBlock>
+            <Button Style="{DynamicResource MaterialInlineButton}" Grid.Column="1" x:Name="BrowseBtn"  Content="BROWSE..." VerticalAlignment="Center" Click="BrowseBtn_Click" />
+        </Grid>
 
-                <TextBlock HorizontalAlignment="Left" FontSize="18" Foreground="White" Margin="10,8,0,0" TextWrapping="Wrap" 
-                       Text="Location of Backup/Restore Files" VerticalAlignment="Top"/>
-            </Grid>
-            <Grid Margin="5 5 5 5" Height="50">
+        <Grid Grid.Row="2" Background="#26C6DA">
+            <TextBlock Text="Data to Backup/Restore" Foreground="White" Margin="20 0" FontSize="26" VerticalAlignment="Center" />
+        </Grid>
+
+        <ListView Grid.Row="3" Margin="5 10 5 5"
+                  FontSize="16"
+                  FontFamily="Roboto"
+                    HorizontalContentAlignment="Stretch" 
+                    x:Name="RestoreBackupListView" 
+                    BorderThickness="0" 
+                    Loaded="RestoreBackupListView_Loaded" Background="#FAFAFA"/>
+
+        <Grid Grid.Row="4" Background="#26C6DA">
+            <TextBlock Text="Action" Foreground="White" Margin="20 0" FontSize="26" VerticalAlignment="Center" />
+        </Grid>
+
+        <StackPanel Grid.Row="5"  >
+
+            <Grid Margin="10 15" >
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="{Binding BackupDirectory, ElementName=this, FallbackValue='C:\\'}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"></TextBlock>
-                <Button Grid.Column="1" x:Name="BrowseBtn" Width="75" Margin="0 0 0 0" Content="Browse..." VerticalAlignment="Center" Click="BrowseBtn_Click" />
-            </Grid>
-        </StackPanel>
-        <StackPanel Grid.Row="2"  >
-            <Grid>
-                <Rectangle Height="40" VerticalAlignment="Top" HorizontalAlignment="Stretch" >
-                    <Rectangle.Fill>
-                        <LinearGradientBrush EndPoint="0,0" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
-                            <GradientStop Color="#FF8FAEEE" Offset="0"/>
-                            <GradientStop Color="#FF6687DC" Offset="1"/>
-                        </LinearGradientBrush>
-                    </Rectangle.Fill>
-
-                </Rectangle>
-
-                <TextBlock HorizontalAlignment="Left" FontSize="18" Foreground="White" Margin="10,8,0,0" TextWrapping="Wrap" 
-                       Text="Action" VerticalAlignment="Top"/>
-            </Grid>
-            <Grid Margin="5 5 5 5" Height="50">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="5 5 5 10"  >
-                    <Button x:Name="BackupBtn"  Margin="0 0 10 0" Content="Backup Selected" VerticalAlignment="Center" Padding="10 5"  Click="BackupBtn_Click" />
-                    <Button x:Name="RestoreBtn" Margin="0 0 0 0" Content="Restore Selected" VerticalAlignment="Center" Padding="10 5" Click="RestoreBtn_Click" />
+                <StackPanel HorizontalAlignment="Left" Orientation="Horizontal"   >
+                    <Button x:Name="BackupBtn" Style="{DynamicResource MaterialInlineButton}" Margin="0 0 18 0" Content="BACKUP SELECTED" VerticalAlignment="Center"   Click="BackupBtn_Click" />
+                    <Button x:Name="RestoreBtn" Style="{DynamicResource MaterialInlineButton}" Margin="0 0 0 0" Content="RESTORE SELECTED" VerticalAlignment="Center"  Click="RestoreBtn_Click" />
                 </StackPanel>
             </Grid>
-           
+
         </StackPanel>
 
-        <Grid Background="#FFF0F0F0" Grid.Row="3">
+        <Button Grid.Row="6" x:Name="DoneBtn" HorizontalAlignment="Right"  Margin="10" Content="DONE" Style="{DynamicResource MaterialFlatButton}"  Click="DoneBtn_Click" />
 
-            <Button x:Name="DoneBtn" HorizontalAlignment="Right" Margin="0 0 10 0" Content="Done" VerticalAlignment="Center" Width="75" Click="DoneBtn_Click" />
-            
-        </Grid>
     </Grid>
 </Window>
