@@ -1000,10 +1000,12 @@ namespace OpenZWaveAdapter
         {
             switch (genre)
             {
-                case "User":
+                case "Basic":
                     return 1;
-                case "Config":
+                case "User":
                     return 2;
+                case "Config":
+                    return 3;
                 default:
                     return 99;
             }

@@ -15,12 +15,12 @@ namespace zvs.WPF.DeviceControls
     /// <summary>
     /// Interaction logic for DeviceCommands.xaml
     /// </summary>
-    public partial class DeviceCommands : UserControl, IDisposable
+    public partial class DeviceCommands : IDisposable
     {
         readonly App _app = (App)Application.Current;
         private readonly BitmapImage _icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/send_signal.png"));
         private ZvsContext _context;
-        private readonly int _deviceId = 0;
+        private readonly int _deviceId;
 
         public DeviceCommands(int deviceId)
         {
@@ -55,7 +55,6 @@ namespace zvs.WPF.DeviceControls
                 foreach (var dc in d.Commands.OrderByDescending(c => c.SortOrder))
                 {
                     var deviceCommand = dc;
-                    var tip = string.Format("{0} (Device Id:{1},Command Id: {2})", deviceCommand.Description, deviceCommand.Device.Id, deviceCommand.Id);
                     switch (deviceCommand.ArgumentType)
                     {
                         case DataType.NONE:

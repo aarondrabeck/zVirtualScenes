@@ -88,7 +88,8 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ComboBox">
-                    <Grid>
+                    <Border BorderThickness="1" BorderBrush="LightGray">
+                    <Grid >
                         <ToggleButton Name="ToggleButton"
                 ClickMode="Press" Focusable="False"
                 IsChecked="{Binding Path=IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
@@ -127,6 +128,7 @@
                             </Grid>
                         </Popup>
                     </Grid>
+                    </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="ItemsControl.HasItems" Value="False">
                             <Setter Property="FrameworkElement.MinHeight" TargetName="DropDownBorder" Value="95"/>
@@ -325,6 +327,35 @@
             </Setter.Value>
         </Setter>
     </Style>
+    <Style x:Key="MaterialInlineButton" TargetType="Button">
+        <Setter Property="FontFamily" Value="Roboto" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Foreground" Value="#141414" />
+        <Setter Property="Background" Value="#FAFAFA" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border x:Name="PartBorder"  Cursor="Hand" Effect="{DynamicResource z-depth1}"  Background="{TemplateBinding Background}" Height="36" Padding="12 0" BorderThickness="0">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Background" Value="#CCCCCC" TargetName="PartBorder"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#DDDDDD" TargetName="PartBorder"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="#AFAFAF"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+
+            </Setter.Value>
+        </Setter>
+    </Style>
+  
     <Style x:Key="MaterialFlatButton" TargetType="Button">
         <Setter Property="FontFamily" Value="Roboto" />
         <Setter Property="FontSize" Value="14" />

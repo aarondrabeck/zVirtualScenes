@@ -364,7 +364,6 @@ namespace zvs.WPF.DeviceControls
             var result = await Context.TrySaveChangesAsync(_app.Cts.Token);
             if (result.HasError)
                 await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving device. {0}", result.Message);
-            ////device.CallOnContextUpdated();
         }
 
         private void OpenDeviceDetails(Device d)

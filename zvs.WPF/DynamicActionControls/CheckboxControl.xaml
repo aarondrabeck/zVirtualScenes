@@ -3,18 +3,18 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" MinWidth="203" Name="This" ToolTip="{Binding Description, ElementName=This, FallbackValue=' '}" FontFamily="Roboto" Margin="16 0 16 5">
+             mc:Ignorable="d" Name="This" ToolTip="{Binding Description, ElementName=This, FallbackValue=' '}" FontFamily="Roboto" Margin="16 0 0 10">
     <StackPanel Orientation="Vertical">
-        <TextBlock TextTrimming="CharacterEllipsis" Text="{Binding Header, ElementName=This, FallbackValue='Label Text'}" VerticalAlignment="Top" Margin="2 8 0 0" FontSize="12" Foreground="#919191" />
+        <TextBlock TextTrimming="CharacterEllipsis" Text="{Binding Header, ElementName=This, FallbackValue='Label Text'}" VerticalAlignment="Top"  FontSize="12" Foreground="#919191" />
         <Grid Margin="0 3 0 0">
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" MinWidth="50"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="30"/>
             </Grid.ColumnDefinitions>
             <ToggleButton Cursor="Hand"  Style="{StaticResource AnimatedSwitch}" Height="25" Name="ToggleButton" HorizontalAlignment="Left" 
                               VerticalAlignment="Center" Foreground="#B2B2B2"  FontSize="16" 
-                            IsChecked="{Binding Value, ElementName=This}" Content="More Details"  Margin="0 5 25 5" Checked="ToggleButton_OnChecked" Unchecked="ToggleButton_OnUnchecked"/>
-            <Image Grid.Column="1" Name="SignalImg" Source="../Images/send_signal.png" Height="15" Width="15"  Opacity="0"/>
+                            IsChecked="{Binding Value, ElementName=This}" Content="More Details" Checked="ToggleButton_OnChecked" Unchecked="ToggleButton_OnUnchecked"/>
+            <Image Grid.Column="1" Name="SignalImg" Source="../Images/send_signal.png" Height="15" Width="15" Margin="10"  Opacity="0"/>
         </Grid>
     </StackPanel>
 </UserControl>

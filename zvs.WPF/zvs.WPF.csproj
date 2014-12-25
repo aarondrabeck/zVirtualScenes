@@ -122,6 +122,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Backup\BackupRestoreControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Backup\BackupRestoreWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Groups\DeviceMultiselectWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -148,6 +156,12 @@
     </Page>
     <Compile Include="AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Backup\BackupRestoreControl.xaml.cs">
+      <DependentUpon>BackupRestoreControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Backup\BackupRestoreWindow.xaml.cs">
+      <DependentUpon>BackupRestoreWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\IsNewItemPlaceholderConverter.cs" />
     <Compile Include="DaysOfMonthValueConverter.cs" />
@@ -243,7 +257,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="DeviceDetailsWindow.xaml">
+    <Page Include="DeviceControls\DeviceDetailsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -327,7 +341,7 @@
     <Compile Include="DeviceControls\DeviceValues.xaml.cs">
       <DependentUpon>DeviceValues.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DeviceDetailsWindow.xaml.cs">
+    <Compile Include="DeviceControls\DeviceDetailsWindow.xaml.cs">
       <DependentUpon>DeviceDetailsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="DynamicActionControls\ButtonControl.xaml.cs">
@@ -544,9 +558,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Backup\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.1">
       <Visible>False</Visible>

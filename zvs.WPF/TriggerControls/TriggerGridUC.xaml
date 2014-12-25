@@ -83,8 +83,8 @@
 
             <DataGrid x:Name="TriggerGrid" Background="#FAFAFA" RowBackground="#FAFAFA" AlternatingRowBackground="#FAFAFA"  CellStyle="{DynamicResource NoSelectDataGridCell}" CanUserDeleteRows="False" ItemsSource="{Binding}"           
                   HorizontalGridLinesBrush="{DynamicResource TriggerNoFocusBrush}"  RowHeaderWidth="0" CanUserAddRows="False" 
-                 GridLinesVisibility="Horizontal" RowHeight="55" AutoGenerateColumns="False" SelectionUnit="FullRow" SelectionMode="Extended"
-                  HorizontalAlignment="Center" BorderThickness="0" >
+                 GridLinesVisibility="Horizontal" RowHeight="55" AutoGenerateColumns="False" RowEditEnding="TriggerGrid_OnRowEditEnding" SelectionUnit="FullRow" SelectionMode="Extended"
+                  HorizontalAlignment="Center" BorderThickness="0" LostFocus="TriggerGrid_OnLostFocus" >
                 <DataGrid.Resources>
                     <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="{DynamicResource TriggerSelectedColor}"/>
                     <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
@@ -141,7 +141,7 @@
 
 
                     <DataGridCheckBoxColumn HeaderStyle="{StaticResource SelectionDataGridHeader}" Header="Enabled" MinWidth="90" Width="90"  CellStyle="{StaticResource DataGridCellHozCenter}" 
-                                            Binding="{Binding IsEnabled, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False" >
+                                            Binding="{Binding IsEnabled, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False"  >
                     </DataGridCheckBoxColumn>
 
                    

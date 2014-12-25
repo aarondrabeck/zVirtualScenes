@@ -1,15 +1,12 @@
 ﻿using System;
+using System.Data.Entity;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media.Animation;
-using System.Windows.Media.Imaging;
-using zvs.WPF.DeviceControls;
 using zvs.DataModel;
-using System.Data.Entity;
 
-namespace zvs.WPF
+namespace zvs.WPF.DeviceControls
 {
     /// <summary>
     /// Interaction logic for DeviceDetails.xaml

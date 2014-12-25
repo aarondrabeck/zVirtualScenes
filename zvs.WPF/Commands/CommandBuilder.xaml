@@ -3,13 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
          xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-        xmlns:my="clr-namespace:zvs.DataModel;assembly=zvs.DataModel" mc:Ignorable="d"  FontFamily="Roboto"
+        xmlns:my="clr-namespace:zvs.DataModel;assembly=zvs.DataModel" mc:Ignorable="d"  FontFamily="Roboto" Background="#FAFAFA"
         Title="Command Builder" Height="350" Width="600" WindowStyle="ToolWindow" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" Loaded="Window_Loaded_1">
     <Window.Resources>
         <CollectionViewSource x:Key="JSCmdsViewSource" d:DesignSource="{d:DesignInstance my:JavaScriptCommand, CreateList=True}" />
     </Window.Resources>
     <Grid>
-        <TabControl Style="{StaticResource VerticalTabControl}" Margin="2,2,2,46">
+        <TabControl Style="{StaticResource VerticalTabControl}" Margin="2,2,2,46" Background="#FAFAFA">
             <TabItem Name="DeviceTab" Style="{StaticResource VerticalTabItem}"  Height="60"  >
                 <TabItem.Header >
                     <StackPanel HorizontalAlignment="Center"  >

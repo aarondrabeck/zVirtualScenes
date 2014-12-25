@@ -95,7 +95,6 @@
     <Compile Include="DatabaseObjectHelpers.cs" />
     <Compile Include="DeviceCommandBuilderTests.cs" />
     <Compile Include="DeviceTypeBuilderTests.cs" />
-    <Compile Include="FileIOTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SceneRunnerTests.cs" />
     <Compile Include="CommandProcessorTests.cs" />

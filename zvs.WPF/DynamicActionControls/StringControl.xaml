@@ -3,9 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" MinWidth="200" Name="This" ToolTip="{Binding Description, ElementName=This, FallbackValue='Please input a valid string.'}" FontFamily="Roboto" Margin="16 0 16 5">
+             mc:Ignorable="d" MinWidth="200" Name="This" ToolTip="{Binding Description, ElementName=This, FallbackValue='Please input a valid string.'}" FontFamily="Roboto" Margin="16 0 0 10">
     <StackPanel Orientation="Vertical">
-        <TextBlock TextTrimming="CharacterEllipsis" Text="{Binding Header, ElementName=This, FallbackValue='Label Text'}" VerticalAlignment="Top" Margin="2 8 0 0" FontSize="12" Foreground="#919191" />
+        <TextBlock TextTrimming="CharacterEllipsis" Text="{Binding Header, ElementName=This, FallbackValue='Label Text'}" VerticalAlignment="Top" FontSize="12" Foreground="#919191" />
         <TextBox FontSize="16" Style="{DynamicResource TextBoxMaterial}" Name="TextBox" Text="{Binding Value, ElementName=This, FallbackValue='Input Text'}" PreviewKeyDown="TextBox_PreviewKeyDown_1" LostFocus="TextBox_LostFocus_1" TextChanged="TextBox_TextChanged_1"  />
         <Grid Margin="0 3 0 0">
             <Grid.ColumnDefinitions>

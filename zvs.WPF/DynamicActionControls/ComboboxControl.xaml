@@ -3,19 +3,20 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" Name="This" ToolTip="{Binding Description, ElementName=This, FallbackValue=' '}" FontFamily="Roboto" Margin="16 0 16 5">
+             mc:Ignorable="d" Name="This" ToolTip="{Binding Description, ElementName=This, FallbackValue=' '}" FontFamily="Roboto" Margin="16 0 0 10">
     <StackPanel Orientation="Vertical">
-        <TextBlock TextTrimming="CharacterEllipsis" Text="{Binding Header, ElementName=This, FallbackValue='Label Text'}" VerticalAlignment="Top" Margin="2 8 0 0" FontSize="12" Foreground="#919191" />
+        <TextBlock TextTrimming="CharacterEllipsis" Text="{Binding Header, ElementName=This, FallbackValue='Label Text'}" VerticalAlignment="Top" FontSize="12" Foreground="#919191" />
         <Grid Margin="0 3 0 0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition MinWidth="180" Width="Auto"/>
-                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <ComboBox Grid.Column="0" Height="28" VerticalContentAlignment="Center" SelectedItem="{Binding SelectedItem, ElementName=This}" Name="ComboBox" Margin="0,0,5,0" Padding="5,1" SelectionChanged="ComboBox_SelectionChanged_1" Style="{StaticResource ComboBoxMaterialStyle}" >
+            <ComboBox Grid.Column="0" Height="28" VerticalContentAlignment="Center" SelectedItem="{Binding SelectedItem, ElementName=This}" Name="ComboBox" Padding="5,1" 
+                      SelectionChanged="ComboBox_SelectionChanged_1" Style="{StaticResource ComboBoxMaterialStyle}"  >
               
             </ComboBox>
             
-            <Image Grid.Column="1" Name="SignalImg" Source="../Images/send_signal.png" Height="15" Width="15"  Opacity="0"/>
+            <Image Grid.Column="1" Name="SignalImg" Source="../Images/send_signal.png" Height="15" Width="15"  Opacity="0" Margin="10 0"/>
         </Grid>
     </StackPanel>
 </UserControl>

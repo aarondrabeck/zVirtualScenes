@@ -656,10 +656,13 @@ namespace zvs.WPF.Commands
                     case DataType.SHORT:
                         {
                             //get the current value from the value table list
-                            var defaultValue = "0";
-                            var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == dCmd.CustomData2);
-                            if (dv != null)
-                                defaultValue = dv.Value;
+                            var defaultValue = StoredCommand.Argument;
+                            if (defaultValue == "0")
+                            {
+                                var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == dCmd.CustomData2);
+                                if (dv != null)
+                                    defaultValue = dv.Value;
+                            }
 
                             _selectedDeviceArg = defaultValue;
 
@@ -680,7 +683,7 @@ namespace zvs.WPF.Commands
                     case DataType.STRING:
                         {
                             //get the current value from the value table list
-                            var defaultValue = "0";
+                            var defaultValue = "";
                             if (!string.IsNullOrEmpty(StoredCommand.Argument))
                             {
                                 defaultValue = StoredCommand.Argument;

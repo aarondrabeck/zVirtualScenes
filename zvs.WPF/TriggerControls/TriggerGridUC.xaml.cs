@@ -4,6 +4,7 @@ using System.Data.Entity;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media.Animation;
 using zvs.DataModel;
@@ -155,13 +156,26 @@ namespace zvs.WPF.TriggerControls
         {
             var trigger = (DeviceValueTrigger)TriggerGrid.SelectedItem;
             if (trigger == null) return;
-           
+
             if (MessageBox.Show(string.Format("Are you sure you want to delete the '{0}' trigger?", trigger.Name),
                 "Are you sure?",
                 MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
             _context.DeviceValueTriggers.Local.Remove(trigger);
 
             await SaveChangesAsync();
+        }
+
+        private async void TriggerGrid_OnRowEditEnding(object sender, DataGridRowEditEndingEventArgs e)
+        {
+            if (e.EditAction != DataGridEditAction.Commit)
+                return;
+
+            await SaveChangesAsync();
+        }
+
+        private async void TriggerGrid_OnLostFocus(object sender, RoutedEventArgs e)
+        {
+          //  await SaveChangesAsync();
         }
     }
 }

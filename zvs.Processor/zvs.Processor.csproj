@@ -79,6 +79,16 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Backup\BackupRestore.cs" />
+    <Compile Include="Backup\DeviceBackupRestore.cs" />
+    <Compile Include="Backup\GroupBackupRestore.cs" />
+    <Compile Include="Backup\JavascriptBackupRestore.cs" />
+    <Compile Include="Backup\SceneBackupRestore.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Backup\ScheduledTaskBackupRestore.cs" />
+    <Compile Include="Backup\StoredCmdBackup.cs" />
+    <Compile Include="Backup\TriggerBackupRestore.cs" />
     <Compile Include="FeedbackExtensionMethods.cs" />
     <Compile Include="IRunner.cs" />
     <Compile Include="JavaScriptRunner.cs" />
@@ -133,9 +143,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Backup\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

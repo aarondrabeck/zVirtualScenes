@@ -14,6 +14,7 @@ using zvs.WPF.Groups;
 using zvs.WPF.AdapterManager;
 using System.Data.Entity;
 using zvs.DataModel;
+using zvs.WPF.Backup;
 using zvs.WPF.JavaScript;
 using zvs.WPF.PluginManager;
 
@@ -72,11 +73,6 @@ namespace zvs.WPF
 
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-        }
-
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
-        {
-          //  ShowOrCreateWindow<GroupEditor>();
         }
 
         private void MenuItem_Click_1(object sender, RoutedEventArgs e)
@@ -164,59 +160,14 @@ namespace zvs.WPF
             var settingWindow = new SettingWindow { Owner = this };
             settingWindow.ShowDialog();
         }
-       
+
         private void BackupRestoreMI_Click(object sender, RoutedEventArgs e)
         {
-            //TODO: RESTORE
-            //var window = new BackupRestoreWindow { Owner = this };
-            //  window.ShowDialog();
+            var log = new DatabaseFeedback(_app.EntityContextConnection) { Source = "Backup and Restore" };
+            var window = new BackupRestoreWindow(log, _app.EntityContextConnection) { Owner = this };
+            window.ShowDialog();
         }
 
-        private void RestoreWindowButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            AdjustWindowSize();
-        }
-
-        private void MaximizeWindowButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            AdjustWindowSize();
-        }
-
-        private void MinimizeWindowButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            WindowState = WindowState.Minimized;
-        }
-
-        private void CloseWindowButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            Close();
-        }
-
-        private void UIElement_OnMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            if (e.ChangedButton != MouseButton.Left) return;
-            if (e.ClickCount == 2)
-            {
-                AdjustWindowSize();
-            }
-            else
-            {
-                DragMove();
-            }
-        }
-
-        private void AdjustWindowSize()
-        {
-            switch (WindowState)
-            {
-                case WindowState.Maximized:
-                    WindowState = WindowState.Normal;
-                    break;
-                case WindowState.Normal:
-                    WindowState = WindowState.Maximized;
-                    break;
-            }
-        }
     }
     public class ContentToMarginConverter : IValueConverter
     {

@@ -4,7 +4,7 @@
         Title="Adapter Manager" Width="800" mc:Ignorable="d" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" FontFamily="Roboto"
         Loaded="Window_Loaded" Icon="/zVirtualScenes;component/Images/zvs-icon.ico"  MinHeight="300" MinWidth="675"  
-        WindowStyle="ToolWindow" d:DesignHeight="312" Height="500" WindowStartupLocation="CenterOwner" Closed="Window_Closed_1">
+        WindowStyle="ToolWindow" d:DesignHeight="312" Height="500" WindowStartupLocation="CenterOwner" Closed="Window_Closed_1" Background="#FAFAFA">
     <Window.Resources>
         <CollectionViewSource x:Key="ZvsEntities2AdapterViewSource"  />
     </Window.Resources>
@@ -18,7 +18,7 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <ListView Grid.Column="0" HorizontalAlignment="Left" Name="AdapterListView" Margin="10 10 10 0"  DisplayMemberPath="Name" BorderBrush="#B2EBF2" ItemsSource="{Binding}" 
+            <ListView Grid.Column="0" HorizontalAlignment="Left" Name="AdapterListView" Margin="10 10 10 0"  DisplayMemberPath="Name" Background="#FAFAFA" BorderBrush="#B2EBF2" ItemsSource="{Binding}" 
                   SelectedValuePath="Description" SelectionMode="Single" SelectionChanged="AdapterListView_SelectionChanged" MinWidth="200" FontSize="16" >
                 <ListView.ItemContainerStyle>
                     <Style TargetType="{x:Type ListViewItem}">
