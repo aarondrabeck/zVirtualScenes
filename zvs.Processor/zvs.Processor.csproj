@@ -79,16 +79,16 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Backup\BackupRestore.cs" />
-    <Compile Include="Backup\DeviceBackupRestore.cs" />
-    <Compile Include="Backup\GroupBackupRestore.cs" />
-    <Compile Include="Backup\JavascriptBackupRestore.cs" />
-    <Compile Include="Backup\SceneBackupRestore.cs">
+    <Compile Include="ImportExport\BackupRestore.cs" />
+    <Compile Include="ImportExport\DeviceBackupRestore.cs" />
+    <Compile Include="ImportExport\GroupBackupRestore.cs" />
+    <Compile Include="ImportExport\JavascriptBackupRestore.cs" />
+    <Compile Include="ImportExport\SceneBackupRestore.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Backup\ScheduledTaskBackupRestore.cs" />
-    <Compile Include="Backup\StoredCmdBackup.cs" />
-    <Compile Include="Backup\TriggerBackupRestore.cs" />
+    <Compile Include="ImportExport\ScheduledTaskBackupRestore.cs" />
+    <Compile Include="ImportExport\StoredCmdBackup.cs" />
+    <Compile Include="ImportExport\TriggerBackupRestore.cs" />
     <Compile Include="FeedbackExtensionMethods.cs" />
     <Compile Include="IRunner.cs" />
     <Compile Include="JavaScriptRunner.cs" />

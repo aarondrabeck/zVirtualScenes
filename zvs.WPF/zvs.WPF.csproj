@@ -122,11 +122,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Backup\BackupRestoreControl.xaml">
+    <Page Include="ImportExport\BackupRestoreControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Backup\BackupRestoreWindow.xaml">
+    <Page Include="ImportExport\BackupRestoreWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -157,10 +157,10 @@
     <Compile Include="AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Backup\BackupRestoreControl.xaml.cs">
+    <Compile Include="ImportExport\BackupRestoreControl.xaml.cs">
       <DependentUpon>BackupRestoreControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Backup\BackupRestoreWindow.xaml.cs">
+    <Compile Include="ImportExport\BackupRestoreWindow.xaml.cs">
       <DependentUpon>BackupRestoreWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\IsNewItemPlaceholderConverter.cs" />
