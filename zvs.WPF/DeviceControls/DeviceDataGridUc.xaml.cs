@@ -10,6 +10,7 @@ using System.Windows.Media.Media3D;
 using System.ComponentModel;
 using zvs.DataModel;
 using System.Data.Entity;
+using System.Threading;
 using System.Threading.Tasks;
 using zvs.Processor;
 
@@ -431,6 +432,40 @@ namespace zvs.WPF.DeviceControls
                     "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
                 await DeleteSelectedItemsAsync();
+            }
+        }
+
+        private async void ButtonOn_OnClick(object sender, RoutedEventArgs e)
+        {
+            var selectedItems = DeviceGrid.SelectedItems.OfType<Device>().Where(o => o.Type.UniqueIdentifier == "Dimmer" || o.Type.UniqueIdentifier == "Switch");
+
+            foreach (var device in selectedItems)
+            {
+                var device1 = device;
+                var commandId = await Context.DeviceTypeCommands
+                    .Where(o => o.DeviceTypeId == device1.DeviceTypeId && o.UniqueIdentifier == "TURNON")
+                    .Select(o => o.Id)
+                    .FirstOrDefaultAsync();
+
+                if (commandId > 0)
+                    await _app.ZvsEngine.RunCommandAsync(commandId, string.Empty, device1.Id.ToString(), CancellationToken.None);
+            }
+        }
+
+        private async void ButtonOff_OnClick(object sender, RoutedEventArgs e)
+        {
+            var selectedItems = DeviceGrid.SelectedItems.OfType<Device>().Where(o => o.Type.UniqueIdentifier == "Dimmer" || o.Type.UniqueIdentifier == "Switch");
+
+            foreach (var device in selectedItems)
+            {
+                var device1 = device;
+                var commandId = await Context.DeviceTypeCommands
+                    .Where(o => o.DeviceTypeId == device1.DeviceTypeId && o.UniqueIdentifier == "TURNOFF")
+                    .Select(o => o.Id)
+                    .FirstOrDefaultAsync();
+
+                if (commandId > 0)
+                    await _app.ZvsEngine.RunCommandAsync(commandId, string.Empty, device1.Id.ToString(), CancellationToken.None);
             }
         }
     }

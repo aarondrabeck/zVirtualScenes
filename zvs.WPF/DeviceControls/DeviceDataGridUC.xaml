@@ -231,8 +231,46 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <Button Grid.Column="0" 
+                        <Button Margin="0 0 10 0"  
+                             Content="&#xe01d;" FontFamily="zVirtualScenes"
+                             Click="ButtonOn_OnClick"
+                            ToolTip="Turn-on">
+                            <Button.Style>
+                                <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialToolbarButton}">
+                                    <Setter Property="IsEnabled" Value="False" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=DeviceGrid, Path=SelectedItem.Type.UniqueIdentifier}" Value="Switch">
+                                            <Setter Property="IsEnabled" Value="True" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding ElementName=DeviceGrid, Path=SelectedItem.Type.UniqueIdentifier}" Value="Dimmer">
+                                            <Setter Property="IsEnabled" Value="True" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                        <Button Grid.Column="1" Margin="0 0 10 0"  
+                               Content="&#xe01e;" FontFamily="zVirtualScenes"
+                            Click="ButtonOff_OnClick"
+                            ToolTip="Turn-off">
+                            <Button.Style>
+                                <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialToolbarButton}">
+                                    <Setter Property="IsEnabled" Value="False" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=DeviceGrid, Path=SelectedItem.Type.UniqueIdentifier}" Value="Switch">
+                                            <Setter Property="IsEnabled" Value="True" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding ElementName=DeviceGrid, Path=SelectedItem.Type.UniqueIdentifier}" Value="Dimmer">
+                                            <Setter Property="IsEnabled" Value="True" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                        <Button Grid.Column="2" 
                             Content="&#xe01a;" FontFamily="zVirtualScenes"
                             Click="ButtonDeleteDevice_OnClick"
                             ToolTip="Delete Device">
@@ -251,7 +289,7 @@
                                 </Style>
                             </Button.Style>
                         </Button>
-                        <Button  Grid.Column="1" Margin="10 0 0 0" 
+                        <Button  Grid.Column="3" Margin="10 0 0 0" 
                            Content="&#xe01f;" FontFamily="zVirtualScenes"
                             Click="SettingBtn_Click_1" 
                             ToolTip="Device Settings">
