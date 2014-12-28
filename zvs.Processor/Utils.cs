@@ -28,7 +28,7 @@ namespace zvs.Processor
             {
                 var assembly = System.Reflection.Assembly.GetExecutingAssembly();
                 var vrs = assembly.GetName().Version;
-                return string.Format("{0}.{1}.{2}", vrs.Major, vrs.Minor, vrs.Build);
+                return string.Format("{0}.{1}", vrs.Major, vrs.Minor);
             }
         }
 
@@ -38,12 +38,12 @@ namespace zvs.Processor
             get
             {
                 var Data = new StringBuilder();
-                Data.AppendLine(string.Format("OSVersion: {0}", System.Environment.OSVersion));
-                Data.AppendLine(string.Format("Is64BitOperatingSystem: {0}", System.Environment.Is64BitOperatingSystem));
-                Data.AppendLine(string.Format("MachineName: {0}", System.Environment.MachineName));
-                Data.AppendLine(string.Format("UserDomainName: {0}", System.Environment.UserDomainName));
-                Data.AppendLine(string.Format("UserName: {0}", System.Environment.UserName));
-                Data.AppendLine(string.Format("Version: {0}", System.Environment.Version));
+                Data.AppendLine(string.Format("OSVersion: {0}", Environment.OSVersion));
+                Data.AppendLine(string.Format("Is64BitOperatingSystem: {0}", Environment.Is64BitOperatingSystem));
+                Data.AppendLine(string.Format("MachineName: {0}", Environment.MachineName));
+                Data.AppendLine(string.Format("UserDomainName: {0}", Environment.UserDomainName));
+                Data.AppendLine(string.Format("UserName: {0}", Environment.UserName));
+                Data.AppendLine(string.Format("Version: {0}", Environment.Version));
                 return Data.ToString();
             }
         }

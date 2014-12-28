@@ -52,17 +52,13 @@ Name: "custom"; Description: "Custom installation"; Flags: iscustom
 [Components]
 Name: "core"; Description: "zVirtualScenes Core"; Types: full compact custom; Flags: fixed
 Name: "openzwave"; Description: "OpenZWave Adapter"; Types: full compact
-;Name: "jabber"; Description: "Jabber Plug-in"; Types: full
-;Name: "growl"; Description: "Growl Plug-in"; Types: full
-Name: "http"; Description: "HTTP API Plug-in"; Types: full
-Name: "webapi"; Description: "Web API Plug-in"; Types: full
+Name: "webapi"; Description: "WebApi2 Plug-in"; Types: full
 Name: "lightswitch"; Description: "LightSwitch Server Plug-in"; Types: full
 Name: "noaa"; Description: "NOAA Plug-in"; Types: full   
-;Name: "controlthink"; Description: "ControlThink Plug-in"; Types: full
 Name: "speech"; Description: "Speech Plug-in"; Types: full
-Name: "smartphone"; Description: "SmartPhone Plug-in"; Types: full
-Name: "tasker"; Description: "Android Tasker Plug-in"; Types: full
-Name: "scripts"; Description: "Additional JavaScript files."; Types: full
+Name: "thingspeak"; Description: "ThingSpeak.com Plug-in"; Types: full
+
+;Name: "scripts"; Description: "Additional JavaScript files."; Types: full
 
 [Files]
 Source: "..\bin\release\EntityFramework.dll"; DestDir: "{app}"; Flags: ignoreversion   
@@ -71,8 +67,6 @@ Source: "..\bin\release\EntityFramework.SqlServerCompact.dll"; DestDir: "{app}";
 Source: "..\bin\release\EntityFramework.xml"; DestDir: "{app}"; Flags: ignoreversion   
 Source: "..\bin\release\EntityFramework.SqlServer.xml"; DestDir: "{app}"; Flags: ignoreversion  
 Source: "..\bin\release\EntityFramework.SqlServerCompact.xml"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\release\log4net.dll"; DestDir: "{app}"; Flags: ignoreversion 
-Source: "..\bin\release\log4net.config"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\bin\release\Jint.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\bin\release\Microsoft.Data.Edm.dll"; DestDir: "{app}"; Flags: ignoreversion            
 Source: "..\bin\release\SciLexer.dll"; DestDir: "{app}"; Flags: ignoreversion
@@ -82,12 +76,13 @@ Source: "..\bin\release\ScintillaNET.xml"; DestDir: "{app}"; Flags: ignoreversio
 Source: "..\bin\release\System.Data.SqlServerCe.dll"; DestDir: "{app}"; Flags: ignoreversion 
 Source: "..\bin\release\WPFToolkit.Extended.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\bin\release\zvs.dll"; DestDir: "{app}"; Flags: ignoreversion 
-Source: "..\bin\release\zvs.Entities.dll"; DestDir: "{app}"; Flags: ignoreversion 
-Source: "..\bin\release\zvs.Entities.dll.config"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\bin\release\zvs.DataModel.dll"; DestDir: "{app}"; Flags: ignoreversion 
+Source: "..\bin\release\zvs.DataModel.dll.config"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\bin\release\zvs.zVirtualScenes.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\bin\release\zVirtualScenes.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\bin\release\zVirtualScenes.exe.config"; DestDir: "{app}"; Flags: ignoreversion 
 Source: "..\bin\release\WpfAnimatedGif.dll"; DestDir: "{app}"; Flags: ignoreversion 
+Source: "..\zvs.WPF\fonts\zVirtualScenes.ttf"; DestDir: "{fonts}"; FontInstall: "zVirtualScenes"; Flags: onlyifdoesntexist uninsneveruninstall
 
 ;ADAPTERS BASE
 Source: "..\bin\release\adapters\EntityFramework.dll"; DestDir: "{app}\adapters"; Flags: ignoreversion  
@@ -95,9 +90,8 @@ Source: "..\bin\release\adapters\EntityFramework.dll"; DestDir: "{app}\adapters"
 Source: "..\bin\release\adapters\EntityFramework.SqlServer.dll"; DestDir: "{app}\adapters"; Flags: ignoreversion  
 ;Source: "..\bin\release\adapters\EntityFramework.SqlServer.xml"; DestDir: "{app}\adapters"; Flags: ignoreversion
 Source: "..\bin\release\adapters\Jint.dll"; DestDir: "{app}\adapters"; Flags: ignoreversion
-Source: "..\bin\release\adapters\log4net.dll"; DestDir: "{app}\adapters"; Flags: ignoreversion
 Source: "..\bin\release\adapters\zvs.dll"; DestDir: "{app}\adapters"; Flags: ignoreversion
-Source: "..\bin\release\adapters\zvs.Entities.dll"; DestDir: "{app}\adapters"; Flags: ignoreversion
+Source: "..\bin\release\adapters\zvs.DataModel.dll"; DestDir: "{app}\adapters"; Flags: ignoreversion
 
 ;OPENZWAVE ADAPTER
 Source: "..\bin\release\adapters\OpenZWaveDotNet.dll"; DestDir: "{app}\adapters"; Flags: ignoreversion  ; Components: openzwave
@@ -106,29 +100,16 @@ Source: "..\bin\release\adapters\OpenZWaveAdapter.dll.config"; DestDir: "{app}\a
 Source: "..\bin\release\adapters\config\*"; DestDir: "{app}\adapters\config"; Flags: ignoreversion recursesubdirs    ; Components: openzwave
 
 ;SCRIPTS
-Source: "..\bin\release\scripts\*.js"; DestDir: "{app}\scripts"; Flags: ignoreversion  ; Components: scripts
+;Source: "..\bin\release\scripts\*.js"; DestDir: "{app}\scripts"; Flags: ignoreversion  ; Components: scripts
 
 
  ;PLUGINS BASE
 Source: "..\bin\release\plugins\EntityFramework.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion         
 Source: "..\bin\release\plugins\EntityFramework.SqlServer.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion   
 Source: "..\bin\release\plugins\Jint.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
-Source: "..\bin\release\plugins\log4net.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
 Source: "..\bin\release\plugins\zvs.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
-Source: "..\bin\release\plugins\zvs.Entities.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
+Source: "..\bin\release\plugins\zvs.DataModel.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
 Source: "..\bin\release\plugins\zvs.zVirtualScenes.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion             
-    
-;Source: "..\bin\release\plugins\jabber-net.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion; Components: jabber  
-;Source: "..\bin\release\plugins\JabberPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion; Components: jabber  
-;Source: "..\bin\release\plugins\JabberPlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion; Components: jabber
-
-;Source: "..\bin\release\plugins\Growl.Connector.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion; Components: growl
-;Source: "..\bin\release\plugins\Growl.CoreLibrary.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion; Components: growl
-;Source: "..\bin\release\plugins\GrowlPlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion; Components: growl
-;Source: "..\bin\release\plugins\GrowlPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion; Components: growl
-
-Source: "..\bin\release\plugins\HttpAPI.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion ; Components: http
-Source: "..\bin\release\plugins\HttpAPI.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion; Components: http 
 
 Source: "..\bin\release\plugins\LightSwitchPlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion ; Components: lightswitch
 Source: "..\bin\release\plugins\LightSwitchPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: lightswitch
@@ -139,32 +120,23 @@ Source: "..\bin\release\plugins\NOAAPlugin.dll"; DestDir: "{app}\plugins"; Flags
 Source: "..\bin\release\plugins\NOAAPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion ; Components: noaa
 
 Source: "..\bin\release\plugins\SpeechPlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion      ; Components: speech
-Source: "..\bin\release\plugins\SpeechPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion   ; Components: speech
-                                                                            
+Source: "..\bin\release\plugins\SpeechPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion   ; Components: speech                                                                              
 																			
-Source: "..\bin\release\plugins\SmartPhonePlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion      ; Components: smartphone
-Source: "..\bin\release\plugins\SmartPhonePlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion   ; Components: smartphone
-																			
-Source: "..\bin\release\plugins\AndroidTaskerPlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion      ; Components: tasker																
-																			
-;Source: "..\bin\release\plugins\ControlThink.ZWave.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion      ; Components: controlthink
-;Source: "..\bin\release\plugins\ThinkStickHIDPlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion     ; Components: controlthink
-;Source: "..\bin\release\plugins\ThinkStickHIDPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: controlthink
+Source: "..\bin\release\plugins\ThingSpeak.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion      ; Components: thingspeak
+Source: "..\bin\release\plugins\ThingSpeak.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion   ; Components: thingspeak
 
-
-Source: "..\bin\release\plugins\WebAPIPlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion      ; Components: webapi
-Source: "..\bin\release\plugins\WebAPIPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion     ; Components: webapi
-Source: "..\bin\release\plugins\Microsoft.Data.Edm.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
-Source: "..\bin\release\plugins\Microsoft.Data.OData.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
+Source: "..\bin\release\plugins\zvsWebApi2Plugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion      ; Components: webapi
+Source: "..\bin\release\plugins\zvsWebApi2Plugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion      ; Components: webapi
+Source: "..\bin\release\plugins\Microsoft.OData.Core.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion     ; Components: webapi
+Source: "..\bin\release\plugins\Microsoft.OData.Edm.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
+Source: "..\bin\release\plugins\Microsoft.Spatial.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
 Source: "..\bin\release\plugins\Newtonsoft.Json.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
 Source: "..\bin\release\plugins\System.Net.Http.Formatting.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
-Source: "..\bin\release\plugins\System.Spatial.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
 Source: "..\bin\release\plugins\System.Web.Cors.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
 Source: "..\bin\release\plugins\System.Web.Http.Cors.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
 Source: "..\bin\release\plugins\System.Web.Http.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
-Source: "..\bin\release\plugins\System.Web.Http.OData.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
 Source: "..\bin\release\plugins\System.Web.Http.SelfHost.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
-Source: "..\bin\release\plugins\System.Web.Http.WebHost.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
+Source: "..\bin\release\plugins\System.Web.OData.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
 
 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files

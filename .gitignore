@@ -229,3 +229,4 @@ $RECYCLE.BIN/
 *.msi
 *.msm
 *.msp
+/setup/output

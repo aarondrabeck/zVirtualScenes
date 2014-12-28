@@ -31,7 +31,6 @@ namespace zvs.WPF.Groups
 
             NotifyEntityChangeContext.ChangeNotifications<Device>.OnEntityAdded += GroupEditor_onEntityAdded;
 
-            NotifyEntityChangeContext.ChangeNotifications<Group>.OnEntityAdded += GroupEditorUserControl_OnEntityAdded;
             NotifyEntityChangeContext.ChangeNotifications<Group>.OnEntityDeleted += ChangeNotificationsOnOnEntityDeleted;
             NotifyEntityChangeContext.ChangeNotifications<Group>.OnEntityUpdated += GroupEditorUserControl_OnEntityUpdated;
         }
@@ -77,7 +76,6 @@ namespace zvs.WPF.Groups
         {
             NotifyEntityChangeContext.ChangeNotifications<Device>.OnEntityAdded -= GroupEditor_onEntityAdded;
 
-            NotifyEntityChangeContext.ChangeNotifications<Group>.OnEntityAdded -= GroupEditorUserControl_OnEntityAdded;
             NotifyEntityChangeContext.ChangeNotifications<Group>.OnEntityDeleted -= ChangeNotificationsOnOnEntityDeleted;
             NotifyEntityChangeContext.ChangeNotifications<Group>.OnEntityUpdated -= GroupEditorUserControl_OnEntityUpdated;
             Context.Dispose();
@@ -229,18 +227,7 @@ namespace zvs.WPF.Groups
             }));
         }
 
-        void GroupEditorUserControl_OnEntityAdded(object sender, NotifyEntityChangeContext.ChangeNotifications<Group>.EntityAddedArgs e)
-        {
-            if (Context == null)
-                return;
-
-            Dispatcher.Invoke(() =>
-            {
-                Context.Groups.Local.Add(e.AddedEntity);
-                Context.Entry(e.AddedEntity).State = EntityState.Unchanged;
-
-            });
-        }
+       
 
         public void Dispose()
         {
