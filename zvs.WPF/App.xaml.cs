@@ -166,91 +166,91 @@ namespace zvs.WPF
                         await Log.ReportErrorAsync(registerLogDirectionResult.Message, Cts.Token);
                 }
             }
-            using (var context = new ZvsContext(new ZvsEntityContextConnection()))
-            {
-                var adapter = CreateFakeAdapter();
-                context.Devices.Add(new Device
-                {
-                    Name = "Light Switch",
-                    Location = "Living Room",
-                    Type = new DeviceType
-                    {
-                        Name = "Switch Device Type",
-                        UniqueIdentifier = "Switch",
-                        Adapter = adapter
-                    }
-                });
+            //using (var context = new ZvsContext(new ZvsEntityContextConnection()))
+            //{
+            //    var adapter = CreateFakeAdapter();
+            //    context.Devices.Add(new Device
+            //    {
+            //        Name = "Light Switch",
+            //        Location = "Living Room",
+            //        Type = new DeviceType
+            //        {
+            //            Name = "Switch Device Type",
+            //            UniqueIdentifier = "Switch",
+            //            Adapter = adapter
+            //        }
+            //    });
 
-                context.Devices.Add(new Device
-                {
-                    Name = "Main Controller",
-                    Location = "Utility",
-                    Type = new DeviceType
-                    {
-                        Name = "Controller Type",
-                        UniqueIdentifier = "Controller",
-                        Adapter = adapter
-                    }
-                });
+            //    context.Devices.Add(new Device
+            //    {
+            //        Name = "Main Controller",
+            //        Location = "Utility",
+            //        Type = new DeviceType
+            //        {
+            //            Name = "Controller Type",
+            //            UniqueIdentifier = "Controller",
+            //            Adapter = adapter
+            //        }
+            //    });
 
-                context.Devices.Add(new Device
-                {
-                    Name = "Can Lights",
-                    Location = "Kitchen",
-                    Type = new DeviceType
-                    {
-                        Name = "Dimmer Type",
-                        UniqueIdentifier = "Dimmer",
-                        Adapter = adapter
-                    }
-                });
+            //    context.Devices.Add(new Device
+            //    {
+            //        Name = "Can Lights",
+            //        Location = "Kitchen",
+            //        Type = new DeviceType
+            //        {
+            //            Name = "Dimmer Type",
+            //            UniqueIdentifier = "Dimmer",
+            //            Adapter = adapter
+            //        }
+            //    });
 
-                context.Devices.Add(new Device
-                {
-                    Name = "Thermostat",
-                    Location = "Kitchen",
-                    Type = new DeviceType
-                    {
-                        Name = "Thermostat Type",
-                        UniqueIdentifier = "Thermostat",
-                        Adapter = adapter
-                    }
-                });
+            //    context.Devices.Add(new Device
+            //    {
+            //        Name = "Thermostat",
+            //        Location = "Kitchen",
+            //        Type = new DeviceType
+            //        {
+            //            Name = "Thermostat Type",
+            //            UniqueIdentifier = "Thermostat",
+            //            Adapter = adapter
+            //        }
+            //    });
 
-                context.Devices.Add(new Device
-                {
-                    Name = "Front Door",
-                    Location = "Entry",
-                    Type = new DeviceType
-                    {
-                        Name = "Doorlock Type",
-                        UniqueIdentifier = "Doorlock",
-                        Adapter = adapter
-                    }
-                });
-                var sensorDt = new DeviceType
-                {
-                    Name = "Sensor Type",
-                    UniqueIdentifier = "Sensor",
-                    Adapter = adapter
-                };
-                var device = new Device
-                {
-                    Name = "Motion Sensor",
-                    Location = "Entry",
-                    Type = sensorDt,
-                };
-                var value = new DeviceValue
-                {
-                    Name = "Level",
-                    ValueType = DataType.BYTE,
-                    Value = "255"
-                };
-                device.Values.Add(value);
-                context.Devices.Add(device);
+            //    context.Devices.Add(new Device
+            //    {
+            //        Name = "Front Door",
+            //        Location = "Entry",
+            //        Type = new DeviceType
+            //        {
+            //            Name = "Doorlock Type",
+            //            UniqueIdentifier = "Doorlock",
+            //            Adapter = adapter
+            //        }
+            //    });
+            //    var sensorDt = new DeviceType
+            //    {
+            //        Name = "Sensor Type",
+            //        UniqueIdentifier = "Sensor",
+            //        Adapter = adapter
+            //    };
+            //    var device = new Device
+            //    {
+            //        Name = "Motion Sensor",
+            //        Location = "Entry",
+            //        Type = sensorDt,
+            //    };
+            //    var value = new DeviceValue
+            //    {
+            //        Name = "Level",
+            //        ValueType = DataType.BYTE,
+            //        Value = "255"
+            //    };
+            //    device.Values.Add(value);
+            //    context.Devices.Add(device);
 
-                 //context.SaveChanges();
-            }
+            //     //context.SaveChanges();
+            //}
 
             #region Create Logger
 

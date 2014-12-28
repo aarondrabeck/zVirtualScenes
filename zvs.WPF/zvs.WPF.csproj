@@ -504,9 +504,6 @@
     <Resource Include="Images\arrow_up.png" />
   </ItemGroup>
   <ItemGroup>
-    <SplashScreen Include="SplashScreen1222.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="ScintillaNET.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
