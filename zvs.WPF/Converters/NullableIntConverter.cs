@@ -14,14 +14,10 @@ namespace zvs.WPF.Converters
 
             if (string.IsNullOrEmpty(strVal))
                 return null;
-            else
-            {            
-                var v = 0;
-                if (int.TryParse(strVal, out v))
-                    return v;
-                else
-                    return null;
-            }
+            int v;
+            if (int.TryParse(strVal, out v))
+                return v;
+            return null;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
