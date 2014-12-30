@@ -1,0 +1,309 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Zvirtualscenes : Free open-source home automation tool for Windows, Android, iOS, Blackberry and the Web">
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+    <link href="stylesheets/menu-styles.css" rel="stylesheet" />
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="javascripts/menu-script.js"></script>
+    <script>
+        $(function () {
+            $("#headerPlaceholder").load("header.html");
+        });
+    </script>
+    <title>zVirtualScenes - Free open-source home automation</title>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <div id="headerPlaceholder"></div>
+    <div id="main_content_wrap" class="outer">
+        <section id="main_content" class="inner">
+            <div class="vt" id="wikimaincol">
+                <h2>Release History</h2>
+                <h3>8.0 (12-28-14)</h3>
+                <ul>
+                    <li>Complete UI Refresh with added functionality</li>
+                    <li>New WebApi2 Plug-in using odata4 </li>
+                    <li>zvsEngine rewritten with unit tests</li>
+                    <li>New location property on all devices to help organize devices</li>
+                    <li>Much more!</li>
+                </ul>
+
+                <h3>7.0.949 (11-20-13)</h3>
+                <ul>
+                    <li>Refreshed GUI (Chrome-less Design) </li>
+                    <li>Plug-ins split into Adapters and Plugins </li>
+                    <li>New backup and restore window </li>
+                    <li>Reorganized menu </li>
+                    <li>Major performance gains </li>
+                    <li>New Smartphone plug-in (Thx! bob3695) </li>
+                    <li>See SVN log for other changes... </li>
+                </ul>
+
+                <h3>6.2 (4-15-13)</h3>
+                <ul>
+                    <li>Fix to scene and zone formatting...broke IOS app </li>
+                    <li>
+                        Allow Speeching from zvirtalscenes scripts Issue 93
+                    </li>
+                    <li>Updated to latest openzwave configs </li>
+                </ul>
+
+                <h3>
+                    6.1 (4-01-13)
+                </h3>
+                <ul>
+                    <li>
+                        Rebuilt LightSwitch server with Async patterns and with better separation of code.
+                    </li>
+                    <li>
+                        Fixed DeviceValue id not showing in ZVS GUI
+                    </li>
+                    <li>Fixed command unique Id's execution from mobile platforms including zvsMobile </li>
+                    <li>Updated Copywrite </li>
+                    <li>Updated version number when building locally </li>
+                    <li>Tweaked spacing on JS editor and added Tooltip text to buttons </li>
+                    <li>
+                        Other minor bug fixes
+                    </li>
+                </ul>
+
+                <h3>
+                    6.0.10.0 (2-16-13)
+                </h3>
+                <ul>
+                    <li>Numerous bug fixes. See SVN log for detials. </li>
+                    <li>IMPORTANT: Export your settings and delete your existing db to </li>
+                </ul>
+                avoid duplicate device commands in this release
+
+                <h3>
+                    6.0.4.0 (1-24-13)
+                </h3>
+                <ul>
+                    <li>Per node isReady tracking for faster start-up </li>
+                    <li>Openzwave.dll speed fix </li>
+                </ul>
+
+                <h3>
+                    6.0.1.0 (1-23-13)
+                </h3>
+                <ul>
+                    <li>Updated to comply with latest Openzwave dll </li>
+                    <li>Added Intermatic switch support </li>
+                    <li>
+                        Restored proper logging in OpenZwave Plug-in
+                    </li>
+                    <li>Disabling Signing for now...we do not have a verified certificate </li>
+                    <li>Added C++ 2012 checking to app and installer </li>
+                    <li>Added new openzwave notification events </li>
+                </ul>
+
+                <h3>
+                    5.0.42.0 (12-17-12)
+                </h3>
+                <ul>
+                    <li>Crash Fixes </li>
+                    <li>Latest OpenZWave Build </li>
+                </ul>
+
+                <h3>
+                    5.0.3.0 (12-02-12)
+                </h3>
+                <ul>
+                    <li>Included dependency for WebAPI </li>
+                    <li>Signed executable and installer </li>
+                </ul>
+
+                <h3>
+                    5.0 (12-02-12)
+                </h3>
+                <h3>
+                    Upgrading from 4.x Instuctions
+                    Export Devices, Scenes, Triggers, JavaScript, Tasks, and Group from 4.X. Import them into 5.0.
+                </h3>
+                <ul>
+                    <li>New WebAPI plug-in (HTTPS not working yet) </li>
+                    <li>New .Net 4.5 async patterns on the core processor </li>
+                    <li>
+                        Simplified Command Queue. Removed DeviceCommandQueue
+                       , DeviceTypeCommandQueue
+                        , JavaScriptCommandQueue
+                       , etc... All commands use the context.CommandQueues
+                        for queued commands. See Web API CommandQueuesController
+                        for more info on how to POST new commands for processing.
+                    </li>
+                    <li>Latest OpenZwave build and configs </li>
+                    <li>Bug Fixes </li>
+                </ul>
+                <h3>
+                    4.1 (10-14-12)
+                </h3>
+                <ul>
+                    <li>Bug fixes. See SVN notes. </li>
+                </ul>
+
+                <h3>
+                    4.0 (10-08-12)
+                </h3>
+                <ul>
+                    <li>Scheduled tasks and triggers can launch any command! </li>
+                    <li>New command creator UI </li>
+                    <li>Much improved command processing </li>
+                    <li>Upgraded to Sencha touch 2.1 RC1 </li>
+                    <li>Improved CORS in HTTP API </li>
+                    <li>Logging improvments </li>
+                    <li>Added token system to new API </li>
+                    <li>HTTP API - Added some defensive coding around output streams in the plugin </li>
+                    <li>Moved all allowed for the DELETE verb on the http api plugin for the log, added an event to the eventlog class, and subscribed to the event in the ui, that way the UI log is updated if the log is cleared over http or any other method </li>
+                    <li>Main window to clear the log in the UI </li>
+                    <li>See SVN log for further details </li>
+                    <li>Native Android and Windows Mobile apps! </li>
+                </ul>
+
+                <h3>
+                    3.7 (9-17-12)
+                </h3>
+                <ul>
+                    <li>
+                        Added Jabber Plug-in to Installer. Fixed Issue 66
+                    </li>
+                    <li>Only load the plug-in options for the plug-ins that are currently loaded. </li>
+                    <li>checking isVisible for un-subscribing to events as well </li>
+                    <li>Added custom and compact install options </li>
+                    <li>
+                        added OpenZwave to compact
+                    </li>
+                    <li>
+                        Fixed Issue 61 - Added dependency checks when deleting devices
+                    </li>
+                    <li>Renamed unknown trigger description </li>
+                    <li>added a js require/include button on the button bar for the jseditor window </li>
+                    <li>added helper.js to the project, so it is build/included in the deploy package </li>
+                    <li>added a new helper class, which can be imported into projects to include a bunch of useful/helpful methods for script authors </li>
+                    <li>
+                        Issue 67 and Issue 68 resolved.
+                    </li>
+                    <li>Unintended double event subscription fixed for controls used within tab controls. </li>
+                </ul>
+
+                <h3>
+                    3.6 (9-11-12)
+                </h3>
+                <ul>
+                    <li>
+                        Issue 64: Fixed null exception on invalid plug-in. FYI: You must remove the Global Hot-key plug-in from prior version of Zvs!
+                    </li>
+                    <li>Force Migrations in code </li>
+                    <li>GUI menu organization tweak </li>
+                </ul>
+
+                <h3>
+                    3.5 (9-9-12)
+                </h3>
+                <ul>
+                    <li>Migrated to Entity Framework Code First (NEW DATABASE WILL BE GENERATED. USE BACKUP AND RESTORE FEATURE TO SAVE OLD SETTINGS!) </li>
+                    <li>Updated to .Net 4.5 RTM and EF 5.0 </li>
+                    <li>Jabber Plug-in working </li>
+                    <li>Add command line options to replace global hotkeys </li>
+                    <ul>
+                        <li>
+                            zVirtualScene.exe -StartScene 1
+                        </li>
+                        <li>
+                            zVirtualScene.exe -StartScene "Movie Mode"
+                        </li>
+                    </ul>
+                    <li>Removed Global Hotkey Plug-in </li>
+                    <li>
+                        Added JavaScript Commands to Scenes with JavaScript editor window
+                    </li>
+                    <li>Latest OpenZWave Build </li>
+                </ul>
+
+                <h3>
+                    3.4 (7-10-12)
+                </h3>
+                <ul>
+                    <li>Added sunrise and sunset delays in NOAA plug-in </li>
+                    <li>Fixed spelling Reccur to Recur on task tab </li>
+                    <li>Added Enhancement #43: Option for default logging direction </li>
+                    <li>Added Enhancement #49: Option to exclude devices and scenes from HTTP API </li>
+                    <li>Added Disable Authentication option for HTTP API </li>
+                    <li>Fixed installer installing x64 c++ redis rather than x86 on x64 OS's </li>
+                </ul>
+
+                <h3>
+                    3.3 (7-9-12)
+                </h3>
+                <ul>
+                    <li>
+                        ThinkStick Plug-in Optimizations
+                    </li>
+                    <li>Fixed scheduled task UI bug </li>
+                    <li>Changed plug-in methods to void </li>
+                    <li>zvsMobile Added Log Tab </li>
+                    <li>Improved logging message in core and HTTPAPI </li>
+                    <li>Upgrade zvsMobile to Sencha 2.0.1.1 </li>
+                </ul>
+
+                <h3>
+                    3.2 (6-29-12)
+                </h3>
+                <ul>
+                    <li>Added a status bar with last log entry displayed </li>
+                    <li>Added backup and restore options for ease of upgrading to new databases </li>
+                    <li>Fixed application startup failures not prompting uses properly </li>
+                    <li>Changed foreign key for device_value_trigger to set default on scene delete </li>
+                    <li>
+                        Added new ControlThink plug-in. Users can choose not to use the OpenZwave library and use the ControlThink HID .Net wrapper with HID sticks
+                    </li>
+                    <li>
+                        Updated LightSwitch and zvsMobile to use new ControlThink plug-in
+                    </li>
+                </ul>
+
+                <h3>
+                    3.1 (6-24-12)
+                </h3>
+                <ul>
+                    <li>Fixed installer dependency on 64 bit OS </li>
+                    <li>Added check for installer if app is running you must close it before install </li>
+                    <li>Added check for app if app is already running. Only one instance of the app is allowed. </li>
+                    <li>Log now show device name when processing commands </li>
+                </ul>
+
+                <h3>
+                    3.0 (6-22-12)
+                </h3>
+                <ul>
+                    <li>Removed SQL Lite for SQLCE (Fixed multi-threading crashes) </li>
+                    <li>UI completely separated from zvsCore which does all the processing. (GUI does not have to run for program to work) </li>
+                    <li>
+                        Entirely rebuilt UI (WinForms replaced with WPF)
+                    </li>
+                    <li>Major stability improvements </li>
+                    <li>Better crash reporting </li>
+                    <li>UI can be closed and disposed and app will still function. </li>
+                </ul>
+                <p></p>
+            </div>
+        </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+        <footer class="inner">
+            <p class="copyright">Zvirtualscenes maintained by <a href="https://github.com/aarondrabeck">aarondrabeck</a></p>
+            <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+        </footer>
+    </div>
+
+
+
+</body>
+</html>

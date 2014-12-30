@@ -1,0 +1,53 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Zvirtualscenes : Free open-source home automation tool for Windows, Android, iOS, Blackberry and the Web">
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+    <link href="stylesheets/menu-styles.css" rel="stylesheet" />
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="javascripts/menu-script.js"></script>
+    <script>
+        $(function () {
+            $("#headerPlaceholder").load("header.html");
+        });
+    </script>
+    <title>zVirtualScenes - Free open-source home automation</title>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <div id="headerPlaceholder"></div>
+    <div id="main_content_wrap" class="outer">
+        <section id="main_content" class="inner">
+            <h3>Getting Started</h3>
+            <ul>
+                <li>Download and install the latest zVirtualScenes installer <a href="https://github.com/aarondrabeck/zVirtualScenes/releases/latest">here</a>                                                                         </li>
+                <li>If you plan on using the HTTP Web API plug-in, run zvs as Administrator otherwise run as a standard user account</li>
+                <li>Double-click the ZVS ICON in the task bar to open the main user interface</li>
+                <li>Click the settings tile in the main menu and select: Tools --> Manager Adapters...</li>
+                <li>Select the adapter called "OpenZWave Adapter for ZVS"</li>
+                <li>Enter your COM port your USB compatible z-stick is running on in the COM port box                                                                               </li>
+                <li>Check the enable plugin check box                                                                                                                               </li>
+                <li>Click done to close the Adapter Manager window                                                                                                                  </li>
+                <li>You should now start to see your devices appear on the main window devices tab. You can double click on the devices to edit settings and run commands.          </li>
+                <li>Please note, until the device is initially queried, you will not be able to issue commands.                                                                     </li>
+                <li>Click the log tile and review the log in order to help debug any problems                                                                                       </li>
+            </ul>
+        </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+        <footer class="inner">
+            <p class="copyright">Zvirtualscenes maintained by <a href="https://github.com/aarondrabeck">aarondrabeck</a></p>
+            <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+        </footer>
+    </div>
+
+
+
+</body>
+</html>

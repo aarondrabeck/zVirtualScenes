@@ -1,87 +1,86 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
-
-  <head>
+<head>
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <meta name="description" content="Zvirtualscenes : Free open-source home automation tool for Windows, Android, iOS, Blackberry and the Web">
-
     <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+    <link href="stylesheets/menu-styles.css" rel="stylesheet"/>
+    <link href="stylesheets/stylesheet.css" rel="stylesheet"/>
+    <link href="stylesheets/js-image-slider.css" rel="stylesheet" />
 
+  
+
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="javascripts/js-image-slider.js"></script>
+    <script>
+        $(function () {
+            $("#headerPlaceholder").load("header.html");
+        });
+    </script>
     <title>zVirtualScenes - Free open-source home automation</title>
-  </head>
+</head>
 
-  <body>
+<body>
 
     <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/aarondrabeck/zVirtualScenes">View on GitHub</a>
-		  <img src="images/zvs-icon-1024.png" class="mainlogo">
-          <h1 id="project_title">zVirtualScenes</h1>
-          <h2 id="project_tagline">Free open-source home automation tool for Windows, Android, iOS, Blackberry and the Web</h2>
-
-            <section id="downloads">              
-              <a class="tar_download_link" href="https://github.com/aarondrabeck/zVirtualScenes/zipball/master ">Download this project source code as a zip file</a>
-			  <a class="zip_download_link" href="https://github.com/aarondrabeck/zVirtualScenes/releases/latest">Download this projects latest windows installer</a>
-            </section>
-        </header>
-    </div>
+    <div id="headerPlaceholder"></div>
 
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <h3>
-<h3>zVirtualScenes 8.0 is comming soon...</h3>
-<img src="images/zvs-8-device-list-UI.png" alt="ZvirtualScenes for Windows 8.0"/>
+        <section id="main_content" class="inner">
+           
 
-<h3>Project Overview</h3>
-<p>zVirtualScenes is a software-based ZWave Scene Controller where you can create custom ZWave scenes to be played back via GUI, HTTP Commands or Smartphone.</p>
+            <h3>Project Overview</h3><div id="sliderFrame">
+    <div id="slider">
+        <img src="images/slideshow/1.png" />
+        <img src="images/slideshow/2.png" />
+        <img src="images/slideshow/3.png" />
+        <img src="images/slideshow/4.png" />
+        <img src="images/slideshow/5.png" />
+        <img src="images/slideshow/6.png" />
+        <img src="images/slideshow/7.png" />
+        <img src="images/slideshow/8.png" />
+        <img src="images/slideshow/9.png" />
 
-<ul>
-<li>Take Full control of your ZWave Compatible Device in a simple GUI interface.</li>
-<li>Control your ZWave devices from your smart phone (Android and IPhone).</li>
-<li>ZVirtualScenes monitors your ZWave devices for state changes and can send notifications to Jabber/Google Talk. For example, get notified via Instant Message if the temperature drops below a customizable limit. Get notified when a switch level changes or a thermostat is turned on.</li>
-<li>Easily create custom scenes controlling thermostats, switches and more in one simple action. Activate them via your Smartphone, HTTP or GUI.</li>
-<li>Use zVirtualScenes Mobile a full HTML5/JS based Sencha mobile application to take full control of your devices from anywhere.</li>
-<li>Using the Web API Plug-in you can interact with nearly every aspect of zVirtualScenes using a RESTful API. Create scenes, rename devices, execute commands, etc..</li>
-<li>Fully tested with Trane ZWave Remote Energy Management Thermostat.</li>
-<li>zVirtualScenes has a plug-in system with a full API. Developers can easily create custom plug-ins in Visual C#.</li>
-</ul>
+    </div>
+    <div id="htmlcaption" style="display: none;">
+        <em>HTML</em> caption. Link to <a href="http://www.google.com/">Google</a>.
+    </div>
+</div>
+            <p>zVirtualScenes is a software-based ZWave Scene Controller where you can create custom ZWave scenes to be played back via GUI, HTTP Commands or Smartphone.</p>
 
-<h3>Native Mobile Apps</h3>
+            <ul>
+                <li>Take Full control of your ZWave Compatible Device in a simple GUI interface.</li>
+                <li>Control your ZWave devices from your smart phone (Android and IPhone).</li>
+                <li>ZVirtualScenes monitors your ZWave devices for state changes and can send notifications to Jabber/Google Talk. For example, get notified via Instant Message if the temperature drops below a customizable limit. Get notified when a switch level changes or a thermostat is turned on.</li>
+                <li>Easily create custom scenes controlling thermostats, switches and more in one simple action. Activate them via your Smartphone, HTTP or GUI.</li>
+                <li>Use zVirtualScenes Mobile a full HTML5/JS based Sencha mobile application to take full control of your devices from anywhere.</li>
+                <li>Using the Web API Plug-in you can interact with nearly every aspect of zVirtualScenes using a RESTful API. Create scenes, rename devices, execute commands, etc..</li>
+                <li>Fully tested with Trane ZWave Remote Energy Management Thermostat.</li>
+                <li>zVirtualScenes has a plug-in system with a full API. Developers can easily create custom plug-ins in Visual C#.</li>
+            </ul>
 
-<ul>
-<li><a href="https://play.google.com/store/apps/details?id=com.noncelabs.zvsmobile&amp;feature=nav_result#?t=W251bGwsMSwyLDNd" rel="nofollow">zvsMobile Home Automation for Android </a></br><img src="http://aarondrabeck.com/images/zVirtualScenes/zvsMobileQRsm.png"></li>
-<li><a href="http://www.windowsphone.com/en-ca/store/app/zvirtualscenes-client/c5bf75c1-d12b-405b-aa7d-52a6da8591ed" rel="nofollow">zVirtualScenes Client for Windows Phone Mobile</a></li>
-</ul>
+            <h3>Native Mobile Apps</h3>
 
-<h3>Getting Started</h3>
-<ul>
-<li>Download and install the latest zVirtualScenes installer <a href="https://github.com/aarondrabeck/zVirtualScenes/releases/latest">here</a>                                                                         </li>
-<li>If you plan on using the HTTP Web API plug-in, run zvs as Administrator otherwise run as a standard user account</li>
-<li>Double-click the ZVS ICON in the task bar to open the main user interface</li>
-<li>Click the settings tile in the main menu and select: Tools --> Manager Adapters...</li>
-<li>Select the adapter called "OpenZWave Adapter for ZVS"</li>
-<li>Enter your COM port your USB compatible z-stick is running on in the COM port box                                                                               </li>
-<li>Check the enable plugin check box                                                                                                                               </li>
-<li>Click done to close the Adapter Manager window                                                                                                                  </li>
-<li>You should now start to see your devices appear on the main window devices tab. You can double click on the devices to edit settings and run commands.          </li>
-<li>Please note, until the device is initially queried, you will not be able to issue commands.                                                                     </li>
-<li>Click the log tile and review the log in order to help debug any problems                                                                                       </li>
-</ul>
-   </section>
+            <ul>
+                <li><a href="https://play.google.com/store/apps/details?id=com.noncelabs.zvsmobile&amp;feature=nav_result#?t=W251bGwsMSwyLDNd" rel="nofollow">zvsMobile Home Automation for Android </a></br><img src="https://raw.githubusercontent.com/aarondrabeck/zvsMobile/master/zvsMobile/images/marketQR.png"></li>
+                <li><a href="http://www.windowsphone.com/en-ca/store/app/zvirtualscenes-client/c5bf75c1-d12b-405b-aa7d-52a6da8591ed" rel="nofollow">zVirtualScenes Client for Windows Phone Mobile</a></li>
+            </ul>
+
+          
+        </section>
     </div>
 
     <!-- FOOTER  -->
     <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Zvirtualscenes maintained by <a href="https://github.com/aarondrabeck">aarondrabeck</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
-      </footer>
+        <footer class="inner">
+            <p class="copyright">Zvirtualscenes maintained by <a href="https://github.com/aarondrabeck">aarondrabeck</a></p>
+            <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+        </footer>
     </div>
 
-    
 
-  </body>
+
+</body>
 </html>
