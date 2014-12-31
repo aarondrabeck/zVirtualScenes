@@ -1,0 +1,138 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Zvirtualscenes : Free open-source home automation tool for Windows, Android, iOS, Blackberry and the Web">
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+    <link href="stylesheets/menu-styles.css" rel="stylesheet" />
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="javascripts/menu-script.js"></script>
+    <script>
+        $(function () {
+            $("#headerPlaceholder").load("header.html");
+        });
+    </script>
+    <title>zVirtualScenes - Free open-source home automation</title>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <div id="headerPlaceholder"></div>
+    <div id="main_content_wrap" class="outer">
+        <section id="main_content" class="inner">
+            <h1>WebApi2 Plug-in</h1>
+            <h2>Overview</h2>
+            <p>This page will outline the way in which the server was created in order to expose Devices, Scenes, Groups and the Log to clients over HTTP.</p>
+
+            <h2>Authentication</h2>
+            <p>You must include a valid token with each query to the API. It is very import that you change the allowed X-zvsToken's away from the default in the plugin-manager in zVirtualScenes. This should be done prior to exposing the API to a public facing IP.</p>
+            <h5>Token Header</h5>
+            <pre>X-zvsToken: CC2D226814CBC713134BD9D09B892F10A9</pre>
+            <h5>jQuery Example</h5>
+            <pre>beforeSend: function (xhr) { xhr.setRequestHeader (“X-zvsToken”, “CC2D226814CBC713134BD9D09B892F10A9”); },</pre>
+
+            <h2>Conventions</h2>
+            <p>Content-type should be supplied with each request.</p>
+            <pre>Content-Type: application/json</pre>
+            <p>
+                <strong>oData: </strong> defines parameters that can be used to modify an OData query. The client sends these parameters in the query string of the request URI.
+                For example, to sort the results, a client uses the $orderby parameter:
+            </p>
+            <pre>http://localhost/odata4/Devices?$orderby=Name</pre>
+            <p>
+                <a href="http://www.asp.net/web-api/overview/odata-support-in-aspnet-web-api/supporting-odata-query-options">All Supported OData Query Options</a>
+            </p>
+
+            <h2>Metadata</h2>
+            <p>Clients can use the metadata to discover the type information and relationships for the data set.</p>
+            <h4>Viewing the metadata - GET</h4>
+            <pre>/odata4/$metadata</pre>
+            <h5>Example output</h5>
+            <pre>
+&lt;edmx:edmx xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx" version="4.0">
+&lt;edmx:dataservices>
+&lt;schema xmlns="http://docs.oasis-open.org/odata/ns/edm" namespace="zvs.DataModel">
+&lt;entitytype name="ScheduledTask">
+&lt;key>
+&lt;propertyref name="Id" />
+&lt;/key>
+&lt;property name="StartTime" type="Edm.DateTimeOffset" nullable="false" />
+&lt;property name="Id" type="Edm.Int32" nullable="false" />
+&lt;property name="TaskType" type="zvs.DataModel.Tasks.ScheduledTaskType" nullable="false" />
+&lt;property name="RepeatIntervalInSeconds" type="Edm.Double" nullable="false" />
+&lt;property name="RepeatIntervalInWeeks" type="Edm.Int32" nullable="false" />
+&lt;property name="DaysOfWeekToActivate" type="zvs.DataModel.Tasks.DaysOfWeek" nullable="false" />
+&lt;property name="RepeatIntervalInMonths" type="Edm.Int32" nullable="false" />
+&lt;property name="DaysOfMonthToActivate" type="zvs.DataModel.Tasks.DaysOfMonth" nullable="false" />
+&lt;property name="RepeatIntervalInDays" type="Edm.Int32" nullable="false" />
+&lt;property name="Name" type="Edm.String" />
+&lt;property name="IsEnabled" type="Edm.Boolean" nullable="false" />
+&lt;property name="SortOrder" type="Edm.Int32" />
+&lt;property name="CommandId" type="Edm.Int32" />
+&lt;property name="Argument" type="Edm.String" />
+&lt;property name="Argument2" type="Edm.String" />
+&lt;property name="TargetObjectName" type="Edm.String" />
+&lt;property name="Description" type="Edm.String" />
+&lt;navigationproperty name="Command" type="zvs.DataModel.Command" />
+&lt;/entitytype>
+&lt;entitytype name="DeviceValueHistory">...
+</pre>
+
+            <h2>Query Examples</h2>
+            <h5>Find the level of device 3 - GET</h5>
+
+            <pre>/odata4/DeviceValues?$filter=Name eq 'Level' and DeviceId eq 3</pre>
+            <h5>Show the first 5 commands - GET</h5>
+            <pre>/odata4/Commands?$top=5</pre>
+            <h5>Skip the first 100 commands - GET</h5>
+            <pre>/odata4/Commands?$skip=100</pre>
+            <h5>Find the command to Set Comfort Mode on any OpenZWave Thermostats - GET</h5>
+            <pre>/odata4/DeviceTypeCommands?$filter=UniqueIdentifier eq 'SETCONFORTMODE' and DeviceTypeId eq 4</pre>
+            <h5>Find the device named Office Light - GET</h5>
+            <pre>/odata4/Devices/?$filter=Name eq 'Office Light'</pre>
+            <h5>Change name of Scheduled Task with id 1 - PATCH</h5>
+            <pre>/odata4/ScheduledTask(1)</pre>
+
+            <p>Request Body</p><pre>{
+  Name: 'Cool Task'
+}
+</pre>
+
+            <h5>Change name of the Scheduled Task with id of 1 - PATCH</h5>
+            <pre>/odata4/ScheduledTask(1)</pre>
+
+            <p>Request Body</p><pre>{
+  Name: 'Cool Task'
+}
+</pre>
+
+            <h5>Execute Command - POST</h5>
+            <pre>/odata4/Commands(2)/Actions.Execute</pre>
+
+            <p>Request Body</p><pre>{
+    Argument: "50",
+    Argument2: ""
+}
+</pre>
+
+
+
+
+
+        </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+        <footer class="inner">
+            <p class="copyright">Zvirtualscenes maintained by <a href="https://github.com/aarondrabeck">aarondrabeck</a></p>
+            <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+        </footer>
+    </div>
+
+
+
+</body>
+</html>

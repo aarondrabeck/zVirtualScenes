@@ -1,0 +1,170 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Zvirtualscenes : Free open-source home automation tool for Windows, Android, iOS, Blackberry and the Web">
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+    <link href="stylesheets/menu-styles.css" rel="stylesheet" />
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="javascripts/menu-script.js"></script>
+    <script>
+        $(function () {
+            $("#headerPlaceholder").load("header.html");
+        });
+    </script>
+    <title>zVirtualScenes - Free open-source home automation</title>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <div id="headerPlaceholder"></div>
+    <div id="main_content_wrap" class="outer">
+        <section id="main_content" class="inner">
+            <h1>Scripting</h1>
+            <h2>Introduction</h2>
+            <p>As of version 3.5 we have enabled support for JavaScript to be used in Scenes as commands. This page will give you an overview of how to leverage this new and exciting feature.</p>
+
+            <h2> Usage Overview</h2>
+            <p>Primary access to EDIT Scripts can be found in the Main Menu, Commands, JavaScript Add/Edit Menu item.</p>
+            <p>
+                In order to associate a specific script with a Scene, edit your scene and on the bottom right you can hit the "Add Commands",
+                "Add JavaScript Command" which will allow you to choose the script which you edited previously.
+            </p>
+
+            <h2>Available Functions</h2>
+
+            <h5>Run Command (commandId, Arg1, Arg2)</h5>
+            <pre>runCommand(1, 2, '99');</pre>
+
+            <h5>Set Timeout / Delay (callback, delay in milliseconds)</h5>
+            <pre>setTimeout("logInfo("3 seconds have gone by!");", 3000);</pre>
+
+            <h5>Execute Shell Script or .exe (command, parameter)</h5>
+            <pre>shell("http://google.com", "");</pre>
+
+            <h5>Log message of type error</h5>
+            <pre>logError("Oh Snap!");</pre>
+
+            <h5>Log message of type warning</h5>
+            <pre>logWarn("Warning file missing!");</pre>
+
+            <h5>Log message of type information</h5>
+            <pre>logInfo("All done!");</pre>
+
+            <h5>Require (use file dialog in app to browse to script)</h5>
+            <pre>require('myScript.js')</pre>
+
+
+
+            <h2>Scripting Support</h2>
+            <p>There are two methods to use scripts. The firstwould be to edit the script in the UI directly, and perform whatever actions you need to take there. The underlying library we are using can be found here: http://jint.codeplex.com. Notice that you do have full access to the .NET Namespaces, so this would be valid:</p>
+            <pre>logInfo(System.DateTime.Now);</pre>
+
+
+
+            <p>The second method to use scripts would be through the require() function. In the installation folder for the application you will find a "scripts" folder. Place .js files here, and import them into your main script like:</p>
+            <pre>require("gmail.js");</pre>
+
+
+            <p>Here is a complete example on how to use the default settings.js and gmail.js scripts:</p>
+            <pre>//import the default settings.js file
+//be sure to edit this file on your computer and provide your own values
+require("settings.js");
+var g = new gmail(settings);
+//or you can just specify them in the script directly and not call require as above.
+settings = {
+        Email : "MY.EMAIL.ADDRESS@gmail.com",
+        EmailPassword : "MY PASSWORD",
+        Name : "MY NAME"
+}
+var g = new gmail(settings);
+g.Send("TO.ADDRESS@foo.com", "TO NAME", "Hi There", "This is the body\n\nBye.");</pre>
+
+            <h2>Sample Scripts</h2>
+
+            <h4>TriggerSceneEmail.js</h4>
+            <p>
+                Pre-formatted email depending if the script has both triggers and scenes available. Consider it as a template you can work from.
+            </p>
+            <p>
+                <strong>Usage:</strong> require("TriggerSceneEmail.js");
+            </p>
+
+            <h4>gmail.js</h4>
+            <p>
+                A script to send email through GMAIL, relies on correct settings
+            </p>
+            <p>
+                <strong>Usage:</strong> require("gmail.js");
+            </p>
+
+            <h4>settings.js</h4>
+            <p>
+                Some basic settings which can be share across plugins, or whatever edit the file, and add any settings you wish to have available
+            </p>
+            <p>
+                <strong>Usage:</strong> require("settings.js");
+            </p>
+
+
+            <h4>helper.js</h4>
+            <p>
+                Starting of a class to assist with access to the zvs Class libraries in the javascript world
+            </p>
+            <p>
+                <strong>Usage:</strong> require("helper.js");
+            </p>
+
+            <h2>Sample: Triggering Remote URL for Windows</h2>
+            <ol>
+                <li>
+                    Go get and install cURL from here: http://www.confusedbycode.com/curl/
+                </li>
+
+                <li>
+                    Scripting -> Double-click emtpy row to Add new script
+                </li>
+
+                <li>
+                    Supply a name that makes sense to you
+                </li>
+
+                <li>
+                    Enter this single line, changing the actual URL to your own:
+
+                    <pre>shell("curl.exe",'--url "http://yoursite.com/YourRemoteAlertingScript.cgi?YourVariable1=100&YourVariable2=SomeDeviceNameMaybe&YourVariable3=On"');</pre>
+                </li>
+                <li>
+                    Click the Save Button
+                </li>
+
+                <li>
+                    Triggers -> + button (Add) -> Select Command -> JavaScript
+                </li>
+
+                <li>
+                    Choose your JavaScript as the Command and hit "OK"
+                </li>
+
+                <li>
+                    Add your "Select Device and Trigger" information to trigger this script and click "OK"
+                </li>
+
+            </ol>
+        </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+        <footer class="inner">
+            <p class="copyright">Zvirtualscenes maintained by <a href="https://github.com/aarondrabeck">aarondrabeck</a></p>
+            <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+        </footer>
+    </div>
+
+
+
+</body>
+</html>

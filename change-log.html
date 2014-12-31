@@ -131,9 +131,9 @@
                     <li>New .Net 4.5 async patterns on the core processor </li>
                     <li>
                         Simplified Command Queue. Removed DeviceCommandQueue
-                       , DeviceTypeCommandQueue
+                        , DeviceTypeCommandQueue
                         , JavaScriptCommandQueue
-                       , etc... All commands use the context.CommandQueues
+                        , etc... All commands use the context.CommandQueues
                         for queued commands. See Web API CommandQueuesController
                         for more info on how to POST new commands for processing.
                     </li>
@@ -205,12 +205,13 @@
                 <h3>
                     3.5 (9-9-12)
                 </h3>
-                <ul>
-                    <li>Migrated to Entity Framework Code First (NEW DATABASE WILL BE GENERATED. USE BACKUP AND RESTORE FEATURE TO SAVE OLD SETTINGS!) </li>
-                    <li>Updated to .Net 4.5 RTM and EF 5.0 </li>
-                    <li>Jabber Plug-in working </li>
-                    <li>Add command line options to replace global hotkeys </li>
-                    <ul>
+            <ul>
+                <li>Migrated to Entity Framework Code First (NEW DATABASE WILL BE GENERATED. USE BACKUP AND RESTORE FEATURE TO SAVE OLD SETTINGS!) </li>
+                <li>Updated to .Net 4.5 RTM and EF 5.0 </li>
+                <li>Jabber Plug-in working </li>
+                <li>Add command line options to replace global hotkeys </li>
+                    
+                <li><ul>
                         <li>
                             zVirtualScene.exe -StartScene 1
                         </li>
@@ -218,14 +219,15 @@
                             zVirtualScene.exe -StartScene "Movie Mode"
                         </li>
                     </ul>
-                    <li>Removed Global Hotkey Plug-in </li>
-                    <li>
-                        Added JavaScript Commands to Scenes with JavaScript editor window
-                    </li>
-                    <li>Latest OpenZWave Build </li>
-                </ul>
+                </li>
+                <li>Removed Global Hotkey Plug-in </li>
+                <li>
+                    Added JavaScript Commands to Scenes with JavaScript editor window
+                </li>
+                <li>Latest OpenZWave Build </li>
+            </ul>
 
-                <h3>
+            <h3>
                     3.4 (7-10-12)
                 </h3>
                 <ul>
@@ -290,7 +292,248 @@
                     <li>Better crash reporting </li>
                     <li>UI can be closed and disposed and app will still function. </li>
                 </ul>
-                <p></p>
+
+                <h3>3.0</h3>
+                <ul>
+                    <li>Removed SQL Lite for SQLCE (Fixed multi-threading crashes) </li>
+                    <li>All processing and plug-in manager moved to zvsProcessor dll project.  (GUI does not have to run for program to work now) </li>
+                    <li>All plug-ins run in their own threads. </li>
+                    <li>All Managers run in their own threads.  </li>
+                    <li>Removed WinForms project...Recreating GUI in WPF. This will be a considerable effort to finish </li>
+                </ul>
+                <h3></h3>
+                <h3>2.6.1 (05-28-2012) </h3> <ul>
+                    <li>Fixed: Openzwave log path was not being created if not present. </li>
+                    <li>HID Support </li>
+                    <li>Fixed momentary switch feature </li>
+                </ul>
+                <h3></h3>
+                <h3>2.6 Final (05-01-2012) </h3>
+                <ul>
+                    <li>BUG FIX 48: Sunday not working as directed </li>
+                    <li>Appdata now saves to UserData path </li>
+                    <li>Added an installer (INNO Setup) </li>
+                    <li>Started service console app...not ready for prime time but is included for the brave. </li>
+                    <li>Latest OpenZwave Build r525</li>
+                    <li>Upgraded to Sencha 2.0.1 </li>
+                    <li>Sencha app complete </li>
+                    <li>Temperture data type changed float (thanks to Karl A. ) </li>
+                    <li>Improved support for Thermostats including HRT4ZW (thanks to Karl A. )   </li>
+                </ul>
+                <h3></h3>
+                <h3>2.6 Beta 1 (02-18-2012) </h3> <ul>
+                    <li>Fixed bug that prevented certain events from firing </li>
+                    <li>Added option in scene properties to allow user to reset the isSceneActive bool if it get stuck on. IE app crash while scene is executing. </li>
+                    <li>Scene Execution changes to minimize concurrent db connections. </li>
+                    <li>Fixed NOAAPlugin scene execution failing </li>
+                    <li>Sencha App: Bug fixes to tabpanel switching </li>
+                    <li>Sencha App: Added ability to swipe between tabbar items. </li>
+                    <li>Sencha App: Resolved tabbar swipe direction animation being overridden </li>
+                    <li>Sencha App: Added pull to refresh </li>
+                    <li>Sencha App: Fixed Scrolling issues on device details </li>
+                </ul>
+                <h3></h3>
+                <h3>2.6 Alpha 2 (02-17-2012) </h3> <ul>
+                    <li>OpenZWave updated to r435 </li>
+                    <li>Sencha Touch 2.0 Beta 3 </li>
+                    <li>OpenZwave plugin tweaks </li>
+                </ul>
+                <h3></h3>
+                <h3>2.6 Alpha 1 (01-22-2012) </h3> <ul>
+                    <li>Remove shared entity context to improve int term performance. This is a major change! Not all plugins are updated fully. Lots of testing needs to be done. </li>
+                    <li>Optional dimmer repoll delay upped to 5 seconds. </li>
+                    <li>Added a read_only col to device values. Values are properly displayed in GUI now if they are read only. </li>
+                    <li>Added 'Routing Multilevel Sensor' support </li>
+                    <li>Fixed scene delete error. MIssing cascade delete in entity model. </li>
+                    <li>Support for Event based triggers mostly used in sensors. </li>
+                    <li>Added a Monthly frequency for you where you can select what days of the month and every x months. </li>
+                    <li>Sencha app changed to support new RESTful webserver </li>
+                    <li>HTTP server tweaks </li>
+                    <li>XML SERIALZATION in HTTPAPI </li>
+                    <li>Improved Drag and Drop Sorting </li>
+                    <li>
+                        DB CHANGES:<pre> CREATE TABLE program_options (
+          id     integer PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,
+          name   string,
+          value  string
+        );
+  
+  ALTER TABLE device_values
+    ADD COLUMN read_only boolean NOT NULL DEFAULT true;
+                   ALTER TABLE scheduled_tasks
+                 ADD COLUMN RecurEven boolean NOT NULL DEFAULT true; 
+          ALTER TABLE scheduled_tasks
+          ADD COLUMN RecurDay01 boolean DEFAULT NULL;
+          ALTER TABLE scheduled_tasks
+          ADD COLUMN RecurDay02 boolean DEFAULT NULL;
+          ALTER TABLE scheduled_tasks
+          ADD COLUMN RecurDay03 boolean DEFAULT NULL;
+          ALTER TABLE scheduled_tasks
+          ADD COLUMN RecurDay04 boolean DEFAULT NULL;
+          ALTER TABLE scheduled_tasks
+          ADD COLUMN RecurDay05 boolean DEFAULT NULL;
+          ALTER TABLE scheduled_tasks
+          ADD COLUMN RecurDay06 boolean DEFAULT NULL;
+          ALTER TABLE scheduled_tasks
+          ADD COLUMN RecurDay07 boolean DEFAULT NULL;
+          ALTER TABLE scheduled_tasks
+          ADD COLUMN RecurDay08 boolean DEFAULT NULL;
+          ALTER TABLE scheduled_tasks
+          ADD COLUMN RecurDay09 boolean DEFAULT NULL;
+          ALTER TABLE scheduled_tasks
+          ADD COLUMN RecurDay10 boolean DEFAULT NULL;
+          ALTER TABLE scheduled_tasks
+          ADD COLUMN RecurDay11 boolean DEFAULT NULL;
+          ALTER TABLE scheduled_tasks
+          ADD COLUMN RecurDay12 boolean DEFAULT NULL;
+          ALTER TABLE scheduled_tasks
+          ADD COLUMN RecurDay13 boolean DEFAULT NULL;
+          ALTER TABLE scheduled_tasks
+          ADD COLUMN RecurDay14 boolean DEFAULT NULL;
+          ALTER TABLE scheduled_tasks
+          ADD COLUMN RecurDay15 boolean DEFAULT NULL;
+          ALTER TABLE scheduled_tasks
+          ADD COLUMN RecurDay16 boolean DEFAULT NULL;
+          ALTER TABLE scheduled_tasks
+          ADD COLUMN RecurDay17 boolean DEFAULT NULL;
+          ALTER TABLE scheduled_tasks
+          ADD COLUMN RecurDay18 boolean DEFAULT NULL;
+          ALTER TABLE scheduled_tasks
+          ADD COLUMN RecurDay19 boolean DEFAULT NULL;
+          ALTER TABLE scheduled_tasks
+          ADD COLUMN RecurDay20 boolean DEFAULT NULL;
+          ALTER TABLE scheduled_tasks
+          ADD COLUMN RecurDay21 boolean DEFAULT NULL;
+          ALTER TABLE scheduled_tasks
+          ADD COLUMN RecurDay22 boolean DEFAULT NULL;
+          ALTER TABLE scheduled_tasks
+          ADD COLUMN RecurDay23 boolean DEFAULT NULL;
+          ALTER TABLE scheduled_tasks
+          ADD COLUMN RecurDay24 boolean DEFAULT NULL;
+          ALTER TABLE scheduled_tasks
+          ADD COLUMN RecurDay25 boolean DEFAULT NULL;
+          ALTER TABLE scheduled_tasks
+          ADD COLUMN RecurDay26 boolean DEFAULT NULL;
+          ALTER TABLE scheduled_tasks
+          ADD COLUMN RecurDay27 boolean DEFAULT NULL;
+          ALTER TABLE scheduled_tasks
+          ADD COLUMN RecurDay28 boolean DEFAULT NULL;
+          ALTER TABLE scheduled_tasks
+          ADD COLUMN RecurDay29 boolean DEFAULT NULL;
+          ALTER TABLE scheduled_tasks
+          ADD COLUMN RecurDay30 boolean DEFAULT NULL;
+          ALTER TABLE scheduled_tasks
+          ADD COLUMN RecurDay31 boolean DEFAULT NULL;
+        ALTER TABLE device_value_triggers
+          ADD COLUMN trigger_type integer NOT NULL DEFAULT 0;
+        ALTER TABLE device_value_triggers
+          ADD COLUMN trigger_script text;
+        CREATE TABLE db_info (
+          id          integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+          info_name   varchar(50) NOT NULL UNIQUE,
+          info_value  varchar(50) NOT NULL
+        );</pre>
+                    </li>
+
+                </ul>
+                <h3> </h3>
+                <h3>2.5 Beta 9 (12-21-11) </h3> <ul><li>Fixed com port not saving </li><li>Removed HID option on zwave pulgin until it works as to not confuse people </li></ul>
+                <h3></h3>
+                <h3>2.5 Beta 8 (12-21-11) </h3> <ul>
+                    <li>Added Openzwave Sensor support </li>
+                    <li>Fixed scheduler not firing at midnight </li>
+                    <li>Added Manufacturer, Product, nodelocation and nodename as device value </li>
+                    <li>Limited Com port to 0 - 100 </li>
+                    <li>Tweaks here and there </li>
+                    <li>Changed PreReq. of .net client to .net full </li>
+                    <li>Added DB exist and integrity check on program launch </li>
+                    <li>Added check for C++ redis to mainform plugin </li>
+                    <li>bindingRedirect of sqllite.dll 1.x to 1.0.66.0 to solve GAC mislabeled versions (<a href="http://sqlite.phxsoftware.com/forums/p/2333/9615.aspx" rel="nofollow">http://sqlite.phxsoftware.com/forums/p/2333/9615.aspx</a>) </li>
+                </ul>
+                <h3></h3>
+                <h3>2.5 Beta 6 (12-13-11) </h3> <ul>
+                    <li>Refreshed openzwave version</li>
+                    <li>Rearranged Scheduling tab for smaller resolutions </li>
+                    <li>Changed default device repolling to off  </li>
+                    <li>Added Minimize to the toolbar </li>
+                    <li>Added Basic Triggers  -  Create triggers to activate scenes when a device value changes.  IE. Sensor 1 basic value &gt; 5 launch scene 1  </li>
+                </ul>
+                <h3>DB change. - Added trigger table. </h3> <pre>CREATE TABLE device_value_triggers (
+  id                integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+  device_value_id   integer NOT NULL,
+  trigger_operator  int,
+  trigger_value     varchar(255),
+  enabled           boolean NOT NULL,
+  Name              varchar(255),
+  scene_id          integer,
+  /* Foreign keys */
+  FOREIGN KEY (scene_id)
+    REFERENCES scenes(id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION, 
+  FOREIGN KEY (device_value_id)
+    REFERENCES device_values(id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+);</pre>
+                <h3>2.5 Beta 3 (10-16-11) </h3> <ul>
+                    <li>Resolved the SQLLite dependency issues. No supplemental installs needed. </li>
+                </ul>
+                <h3></h3>
+                <h3>2.5 Beta 1 (09-09-11) </h3> <ul>
+                    <li>Moved to SQLLite </li>
+                    <li>Now using Entites to SQL </li>
+                    <li>API commands moved to Entity objects and Plugin class directly. </li>
+                    <li>Device List on the scene tab to allow multiple devices to be drag-and-dropped to scenes. </li>
+                    <li>Plugin now need a reference to System.Entity and the zVSCommon project or DLL. </li>
+                </ul>
+                <h3></h3>
+                <h3>Beta 7 (08-12-11) </h3> <ul>
+                    <li>Database Update Bug Fixed </li>
+                    <li>Removed data from base sql file </li>
+                    <li>Made the database dialog "smarter" </li>
+                    <li>Added the following Controller Commands in the OpenZWave plugin: </li>
+                    <li>"RESET", </li>
+                    <li>"ADDDEVICE", </li>
+                    <li>"AddController", </li>
+                    <li>"CreateNewPrimary", </li>
+                    <li>"ReceiveConfiguration", </li>
+                    <li>"RemoveController", </li>
+                    <li>"RemoveDevice", </li>
+                    <li>"TransferPrimaryRole", </li>
+                    <li>"HasNodeFailed", </li>
+                    <li>"RemoveFailedNode", </li>
+                    <li>"ReplaceFailedNode", </li>
+                </ul>
+                <h3></h3>
+                <h3>Beta 5 (08-07-11) </h3> <ul>
+                    <li>Added Growl Plugin </li>
+                    <li>Added Global Hotkey Plugin </li>
+                    <li>Added per scene installable properties </li>
+                    <li>Scene Scheduling is now finished. </li>
+                    <li>Added NOAA plugin activate scene on sunrise and sunset. </li>
+                    <li>Minor Code cleanup </li>
+                    <li>probably a lot more I forgot... </li>
+                </ul>
+                <h3></h3>
+                <h3>Beta 2 (7-21-11) </h3> <ul>
+                    <li>For the brave only! </li>
+                    <li>Finished Scene Implementation with Full GUI </li>
+                    <li>Added Scenes in LightSwitch Plugin </li>
+                    <li>Added Event Notification to Connected LightSwitch Users </li>
+                    <li>Event based command execution   </li>
+                    <li>New API commands and structs  </li>
+                    <li>and much more... </li>
+                </ul>
+                <h3></h3>
+                <h3>Beta 1 (7-10-11) </h3>
+                <ul>
+                    <li>For the brave only! </li>
+                    <li>Full Plugin System API (write your own plugins!) </li>
+                    <li>Scenes/Events not finished yet. </li>
+                    <li>Launch the program, give it a MySQL username and password, then use the GUI to install the database.   </li>
+                </ul>
+
             </div>
         </section>
     </div>

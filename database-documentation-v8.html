@@ -1,0 +1,1834 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Zvirtualscenes : Free open-source home automation tool for Windows, Android, iOS, Blackberry and the Web">
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+    <link href="stylesheets/menu-styles.css" rel="stylesheet" />
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="javascripts/menu-script.js"></script>
+    <script>
+        $(function() {
+            $("#headerPlaceholder").load("header.html");
+        });
+    </script>
+    <style type="text/css">
+        body {
+            background-color: #fff;
+            color: #000;
+            font-family: Consolas, monospace;
+        }
+
+        a:link {
+            color: #03d;
+        }
+
+        a:visited {
+            color: #039;
+        }
+
+        a:hover {
+            color: #09f;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+            table caption {
+                color: #666;
+                text-align: right;
+                font-size: 65%;
+                margin-bottom: .5ex;
+            }
+
+            table td, table th {
+                border: solid 1px #666;
+                border-collapse: collapse;
+                padding: .3ex .5ex;
+                vertical-align: top;
+            }
+
+            table tbody tr:hover {
+                background-color: #ffc;
+            }
+
+            table thead th {
+                text-align: left;
+                background-color: #ccc;
+            }
+
+            table tbody th {
+                text-align: left;
+                white-space: nowrap;
+            }
+
+        .table {
+            page-break-inside: avoid;
+        }
+
+        .pk {
+            float: right;
+            cursor: arrow;
+            color: #999;
+        }
+
+        .type {
+            white-space: nowrap;
+        }
+
+        .null {
+            text-align: center;
+        }
+
+        .flag {
+            white-space: nowrap;
+            font-size: 70%;
+            display: inline-block;
+            border: solid 1px #ccc;
+            padding: .25ex .5ex;
+            background-color: #ddd;
+            margin-right: 1ex;
+        }
+
+        .tocref {
+            float: right;
+            text-decoration: none;
+            font-weight: normal;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 1em;
+            font-size: 80%;
+        }
+
+        li.view:before {
+            content: "VIEW";
+            font-size: 70%;
+            display: inline-block;
+            border: solid 1px #ccc;
+            padding: .25ex .5ex;
+            background-color: #ddd;
+            margin-right: 1ex;
+        }
+
+        @media print {
+            body {
+                font-size: .8em;
+            }
+
+            #toc, .tocref {
+                display: none;
+            }
+
+            a:link, a:visited {
+                color: #000;
+                text-decoration: none;
+            }
+        }
+    </style>
+    <title>zVirtualScenes - Free open-source home automation</title>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <div id="headerPlaceholder"></div>
+    <div id="main_content_wrap" class="outer">
+        <section id="main_content" class="inner">
+            <div id="toc">
+                <ul>
+                    <li class="table"><a href="#Adapters">Adapters</a></li>
+                    <li class="table"><a href="#AdapterSettingOptions">AdapterSettingOptions</a></li>
+                    <li class="table"><a href="#AdapterSettings">AdapterSettings</a></li>
+                    <li class="table"><a href="#CommandOptions">CommandOptions</a></li>
+                    <li class="table"><a href="#Commands">Commands</a></li>
+                    <li class="table"><a href="#DbInfo">DbInfo</a></li>
+                    <li class="table"><a href="#Devices">Devices</a></li>
+                    <li class="table"><a href="#DeviceSettingOptions">DeviceSettingOptions</a></li>
+                    <li class="table"><a href="#DeviceSettings">DeviceSettings</a></li>
+                    <li class="table"><a href="#DeviceSettingValues">DeviceSettingValues</a></li>
+                    <li class="table"><a href="#DeviceToGroups">DeviceToGroups</a></li>
+                    <li class="table"><a href="#DeviceTypes">DeviceTypes</a></li>
+                    <li class="table"><a href="#DeviceTypeSettingOptions">DeviceTypeSettingOptions</a></li>
+                    <li class="table"><a href="#DeviceTypeSettings">DeviceTypeSettings</a></li>
+                    <li class="table"><a href="#DeviceTypeSettingValues">DeviceTypeSettingValues</a></li>
+                    <li class="table"><a href="#DeviceValueHistories">DeviceValueHistories</a></li>
+                    <li class="table"><a href="#DeviceValues">DeviceValues</a></li>
+                    <li class="table"><a href="#DeviceValueTriggers">DeviceValueTriggers</a></li>
+                    <li class="table"><a href="#Groups">Groups</a></li>
+                    <li class="table"><a href="#LogEntries">LogEntries</a></li>
+                    <li class="table"><a href="#Plugins">Plugins</a></li>
+                    <li class="table"><a href="#PluginSettingOptions">PluginSettingOptions</a></li>
+                    <li class="table"><a href="#PluginSettings">PluginSettings</a></li>
+                    <li class="table"><a href="#ProgramOptions">ProgramOptions</a></li>
+                    <li class="table"><a href="#Scenes">Scenes</a></li>
+                    <li class="table"><a href="#SceneSettingOptions">SceneSettingOptions</a></li>
+                    <li class="table"><a href="#SceneSettings">SceneSettings</a></li>
+                    <li class="table"><a href="#SceneSettingValues">SceneSettingValues</a></li>
+                    <li class="table"><a href="#SceneStoredCommands">SceneStoredCommands</a></li>
+                    <li class="table"><a href="#ScheduledTasks">ScheduledTasks</a></li>
+                </ul>
+            </div>
+            <div class="table">
+                <h2 id="">
+                    <a href="#toc" class="tocref">⇧</a>
+                    Database Properties
+                </h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Property</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="type">Locale Identifier</td>
+                            <td class="type">1033</td>
+                        </tr>
+                        <tr>
+                            <td class="type">Encryption Mode</td>
+                            <td class="type"></td>
+                        </tr>
+                        <tr>
+                            <td class="type">Case Sensitive</td>
+                            <td class="type">False</td>
+                        </tr>
+                        <tr>
+                            <td class="type">Database</td>
+                            <td class="type">C:\Users\aaron-drabeck\AppData\Roaming\zVirtualScenes\zvsDBEFCF8.sdf</td>
+                        </tr>
+                        <tr>
+                            <td class="type">ServerVersion</td>
+                            <td class="type">4.0.8876.1</td>
+                        </tr>
+                        <tr>
+                            <td class="type">DatabaseSize</td>
+                            <td class="type">896 KB</td>
+                        </tr>
+                        <tr>
+                            <td class="type">Created</td>
+                            <td class="type">12/27/2014 10:58 PM</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="table">
+                <h2 id="Adapters"><a href="#toc" class="tocref">⇧</a>Table Adapters</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:30ex">Name</th>
+                            <th style="width:20ex">Type</th>
+                            <th style="width:4ex">NULL</th>
+                            <th>Comment</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th><span class="pk" title="PRIMARY KEY PK_ZVS.Adapters">◆</span>Id</th>
+                            <td class="type">int</td>
+                            <td class="null">☐</td>
+                            <td><span class="flag">IDENTITY (1,1)</span></td>
+                        </tr>
+                        <tr>
+                            <th>Name</th>
+                            <td class="type">nvarchar (255)</td>
+                            <td class="null">☒</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <th>AdapterGuid</th>
+                            <td class="type">uniqueidentifier</td>
+                            <td class="null">☐</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <th>IsEnabled</th>
+                            <td class="type">bit</td>
+                            <td class="null">☐</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <th>Description</th>
+                            <td class="type">nvarchar (1024)</td>
+                            <td class="null">☒</td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="table">
+                <h2 id="AdapterSettingOptions"><a href="#toc" class="tocref">⇧</a>Table AdapterSettingOptions</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:30ex">Name</th>
+                            <th style="width:20ex">Type</th>
+                            <th style="width:4ex">NULL</th>
+                            <th>Comment</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th><span class="pk" title="PRIMARY KEY PK_ZVS.AdapterSettingOptions">◆</span>Id</th>
+                            <td class="type">int</td>
+                            <td class="null">☐</td>
+                            <td><span class="flag">IDENTITY (1,1)</span></td>
+                        </tr>
+                        <tr>
+                            <th>AdapterSettingId</th>
+                            <td class="type">int</td>
+                            <td class="null">☐</td>
+                            <td><span class="flag" title="FK_ZVS.AdapterSettingOptions_ZVS.AdapterSettings_AdapterSettingId">⇨ <a href="#AdapterSettings">AdapterSettings</a>.Id</span></td>
+                        </tr>
+                        <tr>
+                            <th>Name</th>
+                            <td class="type">nvarchar (512)</td>
+                            <td class="null">☒</td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+    <div class="table">
+      <h2 id="AdapterSettings"><a href="#toc" class="tocref">⇧</a>Table AdapterSettings</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:30ex">Name</th>
+            <th style="width:20ex">Type</th>
+            <th style="width:4ex">NULL</th>
+            <th>Comment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th><span class="pk" title="PRIMARY KEY PK_ZVS.AdapterSettings">◆</span>Id</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag">IDENTITY (1,1)</span></td>
+          </tr>
+          <tr>
+            <th>AdapterId</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag" title="FK_ZVS.AdapterSettings_ZVS.Adapters_AdapterId">⇨ <a href="#Adapters">Adapters</a>.Id</span></td>
+          </tr>
+          <tr>
+            <th>Name</th>
+            <td class="type">nvarchar (255)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>UniqueIdentifier</th>
+            <td class="type">nvarchar (255)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>Value</th>
+            <td class="type">nvarchar (512)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>ValueType</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>Description</th>
+            <td class="type">nvarchar (1024)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table">
+      <h2 id="CommandOptions"><a href="#toc" class="tocref">⇧</a>Table CommandOptions</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:30ex">Name</th>
+            <th style="width:20ex">Type</th>
+            <th style="width:4ex">NULL</th>
+            <th>Comment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th><span class="pk" title="PRIMARY KEY PK_ZVS.CommandOptions">◆</span>Id</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag">IDENTITY (1,1)</span></td>
+          </tr>
+          <tr>
+            <th>CommandId</th>
+            <td class="type">int</td>
+            <td class="null">☒</td>
+            <td><span class="flag" title="FK_ZVS.CommandOptions_ZVS.Commands_CommandId">⇨ <a href="#Commands">Commands</a>.Id</span></td>
+          </tr>
+          <tr>
+            <th>Name</th>
+            <td class="type">nvarchar (512)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table">
+      <h2 id="Commands"><a href="#toc" class="tocref">⇧</a>Table Commands</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:30ex">Name</th>
+            <th style="width:20ex">Type</th>
+            <th style="width:4ex">NULL</th>
+            <th>Comment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th><span class="pk" title="PRIMARY KEY PK_ZVS.Commands">◆</span>Id</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag">IDENTITY (1,1)</span></td>
+          </tr>
+          <tr>
+            <th>Name</th>
+            <td class="type">nvarchar (255)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>UniqueIdentifier</th>
+            <td class="type">nvarchar (255)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>Value</th>
+            <td class="type">nvarchar (512)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>ArgumentType</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>Description</th>
+            <td class="type">nvarchar (1024)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>CustomData1</th>
+            <td class="type">nvarchar (255)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>CustomData2</th>
+            <td class="type">nvarchar (255)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>SortOrder</th>
+            <td class="type">int</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>Help</th>
+            <td class="type">nvarchar (1024)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>DeviceTypeId</th>
+            <td class="type">int</td>
+            <td class="null">☒</td>
+            <td><span class="flag" title="FK_ZVS.Commands_ZVS.DeviceTypes_DeviceTypeId">⇨ <a href="#DeviceTypes">DeviceTypes</a>.Id</span></td>
+          </tr>
+          <tr>
+            <th>DeviceId</th>
+            <td class="type">int</td>
+            <td class="null">☒</td>
+            <td><span class="flag" title="FK_ZVS.Commands_ZVS.Devices_DeviceId">⇨ <a href="#Devices">Devices</a>.Id</span></td>
+          </tr>
+          <tr>
+            <th>Script</th>
+            <td class="type">nvarchar (4000)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>Discriminator</th>
+            <td class="type">nvarchar (128)</td>
+            <td class="null">☐</td>
+            <td>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table">
+      <h2 id="DbInfo"><a href="#toc" class="tocref">⇧</a>Table DbInfo</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:30ex">Name</th>
+            <th style="width:20ex">Type</th>
+            <th style="width:4ex">NULL</th>
+            <th>Comment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th><span class="pk" title="PRIMARY KEY PK_ZVS.DbInfo">◆</span>Id</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag">IDENTITY (1,1)</span></td>
+          </tr>
+          <tr>
+            <th>UniqueIdentifier</th>
+            <td class="type">nvarchar (255)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>Value</th>
+            <td class="type">nvarchar (512)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table">
+      <h2 id="Devices"><a href="#toc" class="tocref">⇧</a>Table Devices</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:30ex">Name</th>
+            <th style="width:20ex">Type</th>
+            <th style="width:4ex">NULL</th>
+            <th>Comment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th><span class="pk" title="PRIMARY KEY PK_ZVS.Devices">◆</span>Id</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag">IDENTITY (1,1)</span></td>
+          </tr>
+          <tr>
+            <th>Name</th>
+            <td class="type">nvarchar (255)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>NodeNumber</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>CurrentLevelText</th>
+            <td class="type">nvarchar (255)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>CurrentLevelInt</th>
+            <td class="type">float (53, 0)</td>
+            <td class="null">☐</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>DeviceTypeId</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag" title="FK_ZVS.Devices_ZVS.DeviceTypes_DeviceTypeId">⇨ <a href="#DeviceTypes">DeviceTypes</a>.Id</span></td>
+          </tr>
+          <tr>
+            <th>Location</th>
+            <td class="type">nvarchar (4000)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table">
+      <h2 id="DeviceSettingOptions"><a href="#toc" class="tocref">⇧</a>Table DeviceSettingOptions</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:30ex">Name</th>
+            <th style="width:20ex">Type</th>
+            <th style="width:4ex">NULL</th>
+            <th>Comment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th><span class="pk" title="PRIMARY KEY PK_ZVS.DeviceSettingOptions">◆</span>Id</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag">IDENTITY (1,1)</span></td>
+          </tr>
+          <tr>
+            <th>DeviceSettingId</th>
+            <td class="type">int</td>
+            <td class="null">☒</td>
+            <td><span class="flag" title="FK_ZVS.DeviceSettingOptions_ZVS.DeviceSettings_DeviceSettingId">⇨ <a href="#DeviceSettings">DeviceSettings</a>.Id</span></td>
+          </tr>
+          <tr>
+            <th>Name</th>
+            <td class="type">nvarchar (512)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table">
+      <h2 id="DeviceSettings"><a href="#toc" class="tocref">⇧</a>Table DeviceSettings</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:30ex">Name</th>
+            <th style="width:20ex">Type</th>
+            <th style="width:4ex">NULL</th>
+            <th>Comment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th><span class="pk" title="PRIMARY KEY PK_ZVS.DeviceSettings">◆</span>Id</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag">IDENTITY (1,1)</span></td>
+          </tr>
+          <tr>
+            <th>Name</th>
+            <td class="type">nvarchar (255)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>UniqueIdentifier</th>
+            <td class="type">nvarchar (255)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>Value</th>
+            <td class="type">nvarchar (512)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>ValueType</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>Description</th>
+            <td class="type">nvarchar (1024)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table">
+      <h2 id="DeviceSettingValues"><a href="#toc" class="tocref">⇧</a>Table DeviceSettingValues</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:30ex">Name</th>
+            <th style="width:20ex">Type</th>
+            <th style="width:4ex">NULL</th>
+            <th>Comment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th><span class="pk" title="PRIMARY KEY PK_ZVS.DeviceSettingValues">◆</span>Id</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag">IDENTITY (1,1)</span></td>
+          </tr>
+          <tr>
+            <th>DeviceId</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag" title="FK_ZVS.DeviceSettingValues_ZVS.Devices_DeviceId">⇨ <a href="#Devices">Devices</a>.Id</span></td>
+          </tr>
+          <tr>
+            <th>DeviceSettingId</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag" title="FK_ZVS.DeviceSettingValues_ZVS.DeviceSettings_DeviceSettingId">⇨ <a href="#DeviceSettings">DeviceSettings</a>.Id</span></td>
+          </tr>
+          <tr>
+            <th>Value</th>
+            <td class="type">nvarchar (512)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table">
+      <h2 id="DeviceToGroups"><a href="#toc" class="tocref">⇧</a>Table DeviceToGroups</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:30ex">Name</th>
+            <th style="width:20ex">Type</th>
+            <th style="width:4ex">NULL</th>
+            <th>Comment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th><span class="pk" title="PRIMARY KEY PK_ZVS.DeviceToGroups">◆</span>Device_Id</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag" title="FK_ZVS.DeviceToGroups_ZVS.Devices_Device_Id">⇨ <a href="#Devices">Devices</a>.Id</span></td>
+          </tr>
+          <tr>
+            <th><span class="pk" title="PRIMARY KEY PK_ZVS.DeviceToGroups">◆</span>Group_Id</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag" title="FK_ZVS.DeviceToGroups_ZVS.Groups_Group_Id">⇨ <a href="#Groups">Groups</a>.Id</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table">
+      <h2 id="DeviceTypes"><a href="#toc" class="tocref">⇧</a>Table DeviceTypes</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:30ex">Name</th>
+            <th style="width:20ex">Type</th>
+            <th style="width:4ex">NULL</th>
+            <th>Comment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th><span class="pk" title="PRIMARY KEY PK_ZVS.DeviceTypes">◆</span>Id</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag">IDENTITY (1,1)</span></td>
+          </tr>
+          <tr>
+            <th>AdapterId</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag" title="FK_ZVS.DeviceTypes_ZVS.Adapters_AdapterId">⇨ <a href="#Adapters">Adapters</a>.Id</span></td>
+          </tr>
+          <tr>
+            <th>Name</th>
+            <td class="type">nvarchar (255)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>UniqueIdentifier</th>
+            <td class="type">nvarchar (255)</td>
+            <td class="null">☐</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>ShowInList</th>
+            <td class="type">bit</td>
+            <td class="null">☐</td>
+            <td>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table">
+      <h2 id="DeviceTypeSettingOptions"><a href="#toc" class="tocref">⇧</a>Table DeviceTypeSettingOptions</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:30ex">Name</th>
+            <th style="width:20ex">Type</th>
+            <th style="width:4ex">NULL</th>
+            <th>Comment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th><span class="pk" title="PRIMARY KEY PK_ZVS.DeviceTypeSettingOptions">◆</span>Id</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag">IDENTITY (1,1)</span></td>
+          </tr>
+          <tr>
+            <th>DeviceTypeSettingId</th>
+            <td class="type">int</td>
+            <td class="null">☒</td>
+            <td><span class="flag" title="FK_ZVS.DeviceTypeSettingOptions_ZVS.DeviceTypeSettings_DeviceTypeSettingId">⇨ <a href="#DeviceTypeSettings">DeviceTypeSettings</a>.Id</span></td>
+          </tr>
+          <tr>
+            <th>Name</th>
+            <td class="type">nvarchar (512)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table">
+      <h2 id="DeviceTypeSettings"><a href="#toc" class="tocref">⇧</a>Table DeviceTypeSettings</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:30ex">Name</th>
+            <th style="width:20ex">Type</th>
+            <th style="width:4ex">NULL</th>
+            <th>Comment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th><span class="pk" title="PRIMARY KEY PK_ZVS.DeviceTypeSettings">◆</span>Id</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag">IDENTITY (1,1)</span></td>
+          </tr>
+          <tr>
+            <th>DeviceTypeId</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag" title="FK_ZVS.DeviceTypeSettings_ZVS.DeviceTypes_DeviceTypeId">⇨ <a href="#DeviceTypes">DeviceTypes</a>.Id</span></td>
+          </tr>
+          <tr>
+            <th>Name</th>
+            <td class="type">nvarchar (255)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>UniqueIdentifier</th>
+            <td class="type">nvarchar (255)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>Value</th>
+            <td class="type">nvarchar (512)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>ValueType</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>Description</th>
+            <td class="type">nvarchar (1024)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table">
+      <h2 id="DeviceTypeSettingValues"><a href="#toc" class="tocref">⇧</a>Table DeviceTypeSettingValues</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:30ex">Name</th>
+            <th style="width:20ex">Type</th>
+            <th style="width:4ex">NULL</th>
+            <th>Comment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th><span class="pk" title="PRIMARY KEY PK_ZVS.DeviceTypeSettingValues">◆</span>Id</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag">IDENTITY (1,1)</span></td>
+          </tr>
+          <tr>
+            <th>DeviceId</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag" title="FK_ZVS.DeviceTypeSettingValues_ZVS.Devices_DeviceId">⇨ <a href="#Devices">Devices</a>.Id</span></td>
+          </tr>
+          <tr>
+            <th>DeviceTypeSettingId</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag" title="FK_ZVS.DeviceTypeSettingValues_ZVS.DeviceTypeSettings_DeviceTypeSettingId">⇨ <a href="#DeviceTypeSettings">DeviceTypeSettings</a>.Id</span></td>
+          </tr>
+          <tr>
+            <th>Value</th>
+            <td class="type">nvarchar (512)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table">
+      <h2 id="DeviceValueHistories"><a href="#toc" class="tocref">⇧</a>Table DeviceValueHistories</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:30ex">Name</th>
+            <th style="width:20ex">Type</th>
+            <th style="width:4ex">NULL</th>
+            <th>Comment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th><span class="pk" title="PRIMARY KEY PK_ZVS.DeviceValueHistories">◆</span>Id</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag">IDENTITY (1,1)</span></td>
+          </tr>
+          <tr>
+            <th>DeviceValueId</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag" title="FK_ZVS.DeviceValueHistories_ZVS.DeviceValues_DeviceValueId">⇨ <a href="#DeviceValues">DeviceValues</a>.Id</span></td>
+          </tr>
+          <tr>
+            <th>Value</th>
+            <td class="type">nvarchar (512)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>DateTime</th>
+            <td class="type">datetime</td>
+            <td class="null">☐</td>
+            <td>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table">
+      <h2 id="DeviceValues"><a href="#toc" class="tocref">⇧</a>Table DeviceValues</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:30ex">Name</th>
+            <th style="width:20ex">Type</th>
+            <th style="width:4ex">NULL</th>
+            <th>Comment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th><span class="pk" title="PRIMARY KEY PK_ZVS.DeviceValues">◆</span>Id</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag">IDENTITY (1,1)</span></td>
+          </tr>
+          <tr>
+            <th>DeviceId</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag" title="FK_ZVS.DeviceValues_ZVS.Devices_DeviceId">⇨ <a href="#Devices">Devices</a>.Id</span></td>
+          </tr>
+          <tr>
+            <th>Genre</th>
+            <td class="type">nvarchar (255)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>Index</th>
+            <td class="type">nvarchar (255)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>CommandClass</th>
+            <td class="type">nvarchar (255)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>IsReadOnly</th>
+            <td class="type">bit</td>
+            <td class="null">☐</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>CustomData1</th>
+            <td class="type">nvarchar (255)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>CustomData2</th>
+            <td class="type">nvarchar (255)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>Name</th>
+            <td class="type">nvarchar (255)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>UniqueIdentifier</th>
+            <td class="type">nvarchar (255)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>Value</th>
+            <td class="type">nvarchar (512)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>ValueType</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>Description</th>
+            <td class="type">nvarchar (1024)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table">
+      <h2 id="DeviceValueTriggers"><a href="#toc" class="tocref">⇧</a>Table DeviceValueTriggers</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:30ex">Name</th>
+            <th style="width:20ex">Type</th>
+            <th style="width:4ex">NULL</th>
+            <th>Comment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th><span class="pk" title="PRIMARY KEY PK_ZVS.DeviceValueTriggers">◆</span>Id</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag">IDENTITY (1,1)</span></td>
+          </tr>
+          <tr>
+            <th>DeviceValueId</th>
+            <td class="type">int</td>
+            <td class="null">☒</td>
+            <td><span class="flag" title="FK_ZVS.DeviceValueTriggers_ZVS.DeviceValues_DeviceValueId">⇨ <a href="#DeviceValues">DeviceValues</a>.Id</span></td>
+          </tr>
+          <tr>
+            <th>Operator</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>IsEnabled</th>
+            <td class="type">bit</td>
+            <td class="null">☐</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>Name</th>
+            <td class="type">nvarchar (255)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>Value</th>
+            <td class="type">nvarchar (512)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>CommandId</th>
+            <td class="type">int</td>
+            <td class="null">☒</td>
+            <td><span class="flag" title="FK_ZVS.DeviceValueTriggers_ZVS.Commands_CommandId">⇨ <a href="#Commands">Commands</a>.Id</span></td>
+          </tr>
+          <tr>
+            <th>Argument</th>
+            <td class="type">nvarchar (512)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>Argument2</th>
+            <td class="type">nvarchar (512)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>TargetObjectName</th>
+            <td class="type">nvarchar (4000)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>Description</th>
+            <td class="type">nvarchar (4000)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>TriggerDescription</th>
+            <td class="type">nvarchar (4000)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table">
+      <h2 id="Groups"><a href="#toc" class="tocref">⇧</a>Table Groups</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:30ex">Name</th>
+            <th style="width:20ex">Type</th>
+            <th style="width:4ex">NULL</th>
+            <th>Comment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th><span class="pk" title="PRIMARY KEY PK_ZVS.Groups">◆</span>Id</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag">IDENTITY (1,1)</span></td>
+          </tr>
+          <tr>
+            <th>Name</th>
+            <td class="type">nvarchar (255)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>Description</th>
+            <td class="type">nvarchar (1024)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table">
+      <h2 id="LogEntries"><a href="#toc" class="tocref">⇧</a>Table LogEntries</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:30ex">Name</th>
+            <th style="width:20ex">Type</th>
+            <th style="width:4ex">NULL</th>
+            <th>Comment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th><span class="pk" title="PRIMARY KEY PK_ZVS.LogEntries">◆</span>Id</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag">IDENTITY (1,1)</span></td>
+          </tr>
+          <tr>
+            <th>Datetime</th>
+            <td class="type">datetime</td>
+            <td class="null">☐</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>Message</th>
+            <td class="type">nvarchar (4000)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>Source</th>
+            <td class="type">nvarchar (4000)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>Level</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table">
+      <h2 id="Plugins"><a href="#toc" class="tocref">⇧</a>Table Plugins</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:30ex">Name</th>
+            <th style="width:20ex">Type</th>
+            <th style="width:4ex">NULL</th>
+            <th>Comment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th><span class="pk" title="PRIMARY KEY PK_ZVS.Plugins">◆</span>Id</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag">IDENTITY (1,1)</span></td>
+          </tr>
+          <tr>
+            <th>Name</th>
+            <td class="type">nvarchar (255)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>PluginGuid</th>
+            <td class="type">uniqueidentifier</td>
+            <td class="null">☐</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>IsEnabled</th>
+            <td class="type">bit</td>
+            <td class="null">☐</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>Description</th>
+            <td class="type">nvarchar (1024)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table">
+      <h2 id="PluginSettingOptions"><a href="#toc" class="tocref">⇧</a>Table PluginSettingOptions</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:30ex">Name</th>
+            <th style="width:20ex">Type</th>
+            <th style="width:4ex">NULL</th>
+            <th>Comment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th><span class="pk" title="PRIMARY KEY PK_ZVS.PluginSettingOptions">◆</span>Id</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag">IDENTITY (1,1)</span></td>
+          </tr>
+          <tr>
+            <th>PluginSettingId</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag" title="FK_ZVS.PluginSettingOptions_ZVS.PluginSettings_PluginSettingId">⇨ <a href="#PluginSettings">PluginSettings</a>.Id</span></td>
+          </tr>
+          <tr>
+            <th>Name</th>
+            <td class="type">nvarchar (512)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table">
+      <h2 id="PluginSettings"><a href="#toc" class="tocref">⇧</a>Table PluginSettings</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:30ex">Name</th>
+            <th style="width:20ex">Type</th>
+            <th style="width:4ex">NULL</th>
+            <th>Comment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th><span class="pk" title="PRIMARY KEY PK_ZVS.PluginSettings">◆</span>Id</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag">IDENTITY (1,1)</span></td>
+          </tr>
+          <tr>
+            <th>PluginId</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag" title="FK_ZVS.PluginSettings_ZVS.Plugins_PluginId">⇨ <a href="#Plugins">Plugins</a>.Id</span></td>
+          </tr>
+          <tr>
+            <th>Name</th>
+            <td class="type">nvarchar (255)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>UniqueIdentifier</th>
+            <td class="type">nvarchar (255)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>Value</th>
+            <td class="type">nvarchar (512)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>ValueType</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>Description</th>
+            <td class="type">nvarchar (1024)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table">
+      <h2 id="ProgramOptions"><a href="#toc" class="tocref">⇧</a>Table ProgramOptions</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:30ex">Name</th>
+            <th style="width:20ex">Type</th>
+            <th style="width:4ex">NULL</th>
+            <th>Comment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th><span class="pk" title="PRIMARY KEY PK_ZVS.ProgramOptions">◆</span>Id</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag">IDENTITY (1,1)</span></td>
+          </tr>
+          <tr>
+            <th>UniqueIdentifier</th>
+            <td class="type">nvarchar (255)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>Value</th>
+            <td class="type">nvarchar (512)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table">
+      <h2 id="Scenes"><a href="#toc" class="tocref">⇧</a>Table Scenes</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:30ex">Name</th>
+            <th style="width:20ex">Type</th>
+            <th style="width:4ex">NULL</th>
+            <th>Comment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th><span class="pk" title="PRIMARY KEY PK_ZVS.Scenes">◆</span>Id</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag">IDENTITY (1,1)</span></td>
+          </tr>
+          <tr>
+            <th>Name</th>
+            <td class="type">nvarchar (255)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>IsRunning</th>
+            <td class="type">bit</td>
+            <td class="null">☐</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>SortOrder</th>
+            <td class="type">int</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table">
+      <h2 id="SceneSettingOptions"><a href="#toc" class="tocref">⇧</a>Table SceneSettingOptions</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:30ex">Name</th>
+            <th style="width:20ex">Type</th>
+            <th style="width:4ex">NULL</th>
+            <th>Comment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th><span class="pk" title="PRIMARY KEY PK_ZVS.SceneSettingOptions">◆</span>Id</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag">IDENTITY (1,1)</span></td>
+          </tr>
+          <tr>
+            <th>SceneSettingId</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag" title="FK_ZVS.SceneSettingOptions_ZVS.SceneSettings_SceneSettingId">⇨ <a href="#SceneSettings">SceneSettings</a>.Id</span></td>
+          </tr>
+          <tr>
+            <th>Name</th>
+            <td class="type">nvarchar (512)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table">
+      <h2 id="SceneSettings"><a href="#toc" class="tocref">⇧</a>Table SceneSettings</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:30ex">Name</th>
+            <th style="width:20ex">Type</th>
+            <th style="width:4ex">NULL</th>
+            <th>Comment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th><span class="pk" title="PRIMARY KEY PK_ZVS.SceneSettings">◆</span>Id</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag">IDENTITY (1,1)</span></td>
+          </tr>
+          <tr>
+            <th>Name</th>
+            <td class="type">nvarchar (255)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>UniqueIdentifier</th>
+            <td class="type">nvarchar (255)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>Value</th>
+            <td class="type">nvarchar (512)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>ValueType</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>Description</th>
+            <td class="type">nvarchar (1024)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table">
+      <h2 id="SceneSettingValues"><a href="#toc" class="tocref">⇧</a>Table SceneSettingValues</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:30ex">Name</th>
+            <th style="width:20ex">Type</th>
+            <th style="width:4ex">NULL</th>
+            <th>Comment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th><span class="pk" title="PRIMARY KEY PK_ZVS.SceneSettingValues">◆</span>Id</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag">IDENTITY (1,1)</span></td>
+          </tr>
+          <tr>
+            <th>SceneId</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag" title="FK_ZVS.SceneSettingValues_ZVS.Scenes_SceneId">⇨ <a href="#Scenes">Scenes</a>.Id</span></td>
+          </tr>
+          <tr>
+            <th>SceneSettingId</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag" title="FK_ZVS.SceneSettingValues_ZVS.SceneSettings_SceneSettingId">⇨ <a href="#SceneSettings">SceneSettings</a>.Id</span></td>
+          </tr>
+          <tr>
+            <th>Value</th>
+            <td class="type">nvarchar (512)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table">
+      <h2 id="SceneStoredCommands"><a href="#toc" class="tocref">⇧</a>Table SceneStoredCommands</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:30ex">Name</th>
+            <th style="width:20ex">Type</th>
+            <th style="width:4ex">NULL</th>
+            <th>Comment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th><span class="pk" title="PRIMARY KEY PK_ZVS.SceneStoredCommands">◆</span>Id</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag">IDENTITY (1,1)</span></td>
+          </tr>
+          <tr>
+            <th>SceneId</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag" title="FK_ZVS.SceneStoredCommands_ZVS.Scenes_SceneId">⇨ <a href="#Scenes">Scenes</a>.Id</span></td>
+          </tr>
+          <tr>
+            <th>SortOrder</th>
+            <td class="type">int</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>CommandId</th>
+            <td class="type">int</td>
+            <td class="null">☒</td>
+            <td><span class="flag" title="FK_ZVS.SceneStoredCommands_ZVS.Commands_CommandId">⇨ <a href="#Commands">Commands</a>.Id</span></td>
+          </tr>
+          <tr>
+            <th>Argument</th>
+            <td class="type">nvarchar (512)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>Argument2</th>
+            <td class="type">nvarchar (512)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>TargetObjectName</th>
+            <td class="type">nvarchar (4000)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>Description</th>
+            <td class="type">nvarchar (4000)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table">
+      <h2 id="ScheduledTasks"><a href="#toc" class="tocref">⇧</a>Table ScheduledTasks</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:30ex">Name</th>
+            <th style="width:20ex">Type</th>
+            <th style="width:4ex">NULL</th>
+            <th>Comment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th><span class="pk" title="PRIMARY KEY PK_ZVS.ScheduledTasks">◆</span>Id</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td><span class="flag">IDENTITY (1,1)</span></td>
+          </tr>
+          <tr>
+            <th>TaskType</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>StartTime</th>
+            <td class="type">datetime</td>
+            <td class="null">☐</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>RepeatIntervalInSeconds</th>
+            <td class="type">float (53, 0)</td>
+            <td class="null">☐</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>RepeatIntervalInWeeks</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>DaysOfWeekToActivate</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>RepeatIntervalInMonths</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>DaysOfMonthToActivate</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>RepeatIntervalInDays</th>
+            <td class="type">int</td>
+            <td class="null">☐</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>Name</th>
+            <td class="type">nvarchar (255)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>IsEnabled</th>
+            <td class="type">bit</td>
+            <td class="null">☐</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>SortOrder</th>
+            <td class="type">int</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>CommandId</th>
+            <td class="type">int</td>
+            <td class="null">☒</td>
+            <td><span class="flag" title="FK_ZVS.ScheduledTasks_ZVS.Commands_CommandId">⇨ <a href="#Commands">Commands</a>.Id</span></td>
+          </tr>
+          <tr>
+            <th>Argument</th>
+            <td class="type">nvarchar (512)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>Argument2</th>
+            <td class="type">nvarchar (512)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>TargetObjectName</th>
+            <td class="type">nvarchar (4000)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <th>Description</th>
+            <td class="type">nvarchar (4000)</td>
+            <td class="null">☒</td>
+            <td>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+        </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+        <footer class="inner">
+            <p class="copyright">Zvirtualscenes maintained by <a href="https://github.com/aarondrabeck">aarondrabeck</a></p>
+            <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+        </footer>
+    </div>
+
+
+
+</body>
+</html>

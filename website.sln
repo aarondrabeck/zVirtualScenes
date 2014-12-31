@@ -8,20 +8,20 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "zVirtualScenes", "http://lo
 		UseIISExpress = "true"
 		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
 		Debug.AspNetCompiler.VirtualPath = "/localhost_61413"
-		Debug.AspNetCompiler.PhysicalPath = "M:\zVirtualScenes\"
+		Debug.AspNetCompiler.PhysicalPath = "..\zVirtualScenes\"
 		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_61413\"
 		Debug.AspNetCompiler.Updateable = "true"
 		Debug.AspNetCompiler.ForceOverwrite = "true"
 		Debug.AspNetCompiler.FixedNames = "false"
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.VirtualPath = "/localhost_61413"
-		Release.AspNetCompiler.PhysicalPath = "M:\zVirtualScenes\"
+		Release.AspNetCompiler.PhysicalPath = "..\zVirtualScenes\"
 		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_61413\"
 		Release.AspNetCompiler.Updateable = "true"
 		Release.AspNetCompiler.ForceOverwrite = "true"
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
-		SlnRelativePath = "M:\zVirtualScenes\"
+		SlnRelativePath = "..\zVirtualScenes\"
 	EndProjectSection
 EndProject
 Global

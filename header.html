@@ -10,17 +10,32 @@
                 <li class="has-sub">
                     <a href="#">Adapters</a>
                     <ul>
-                        <li><a href="adapters-standard.html">Standard</a></li>
-                    </ul>
-                </li>
-                <li class="has-sub">
-                    <a href="#">Plug-in</a>
-                    <ul>
-                        <li><a href="plugins-standard.html">Standard</a></li>
+                        <li><a href="adapters-overview.html">Overview</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="compatable-zsticks.html">Compatable Controllers</a>
+                    <a href="database-documentation-v8.html">Database Layout</a>
+                </li>
+             
+                <li class="has-sub">
+                    <a href="#">Plug-ins</a>
+                    <ul>
+                        <li><a href="plugins-overview.html">Overview</a></li>
+                        <li><a href="plugin-webapi2.html">WebApi2</a></li>
+                        <li><a href="plugin-lightswitch.html">LightSwitch</a></li>
+                        
+                    </ul>
+                </li>
+                
+               
+                <li>
+                    <a href="scripting.html">Scripting</a>
+                </li>
+                <li>
+                    <a href="supported-controllers.html">Supported Controllers</a>
+                </li>
+                <li>
+                    <a href="https://github.com/aarondrabeck/zvsMobile#setup">zvsMobile Setup</a>
                 </li>
 
             </ul>
@@ -40,18 +55,47 @@
             </ul>
         </li>
         <li><a href="https://github.com/aarondrabeck/zVirtualScenes/issues/new">Report Bug</a></li>
+        <li><a href="https://github.com/aarondrabeck/zVirtualScenes">View on GitHub</a></li>
+        
     </ul>
 </div>
+<script src="javascripts/menu-script.js"></script>
+<script>
+    $.getJSON("https://api.github.com/repos/aarondrabeck/zVirtualScenes/releases", function (data) {
+
+        if (data[0] && data[0].assets[0] && data[0].assets[0].download_count) {
+            var count = data[0].assets[0].download_count;
+            var version = data[0].tag_name;
+            $("#download-count").text(count + ' downloads');
+            $("#download-version").text('v' + version);
+        }
+
+    });
+</script>
 <div id="header_wrap" class="outer">
     <header class="inner">
-        <a id="forkme_banner" href="https://github.com/aarondrabeck/zVirtualScenes">View on GitHub</a>
-        <img src="images/zvs-icon-1024.png" class="mainlogo">
+        <img src="images/zvs-icon-193.png" class="mainlogo">
         <h1 id="project_title">zVirtualScenes</h1>
         <h2 id="project_tagline">Free open-source home automation tool for Windows, Android, iOS, Blackberry and the Web</h2>
 
         <section id="downloads">
-            <a class="tar_download_link" href="https://github.com/aarondrabeck/zVirtualScenes/zipball/master ">Download this project source code as a zip file</a>
-            <a class="zip_download_link" href="https://github.com/aarondrabeck/zVirtualScenes/releases/latest">Download this projects latest windows installer</a>
+            <a href="https://github.com/aarondrabeck/zVirtualScenes/releases/latest">
+                <span class="download-title">Free Download</span>
+                <span id="download-count"></span>
+                <span id="download-version"></span>
+            </a>
         </section>
     </header>
 </div>
+<script>
+    (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+            (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date(); a = s.createElement(o),
+            m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+    ga('create', 'UA-3917940-12', 'auto');
+    ga('send', 'pageview');
+
+</script>
