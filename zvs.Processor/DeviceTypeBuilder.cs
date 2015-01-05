@@ -55,7 +55,7 @@ namespace zvs.Processor
                     var dtc1 = dtc;
                     var existingDtc = await context.DeviceTypeCommands
                         .Include(o => o.Options)
-                        .SingleOrDefaultAsync(o =>
+                        .FirstOrDefaultAsync(o =>
                             o.DeviceTypeId == existingDt.Id &&
                             o.UniqueIdentifier == dtc1.UniqueIdentifier, cancellationToken);
 

@@ -14,9 +14,7 @@ namespace MiLightAdapter
 {
 
     /// <summary>
-    /// This plugin will connect up to 4 milight wifi controllers, each of which have 4 scene buttons
-    /// each button will appear as a node in ZVS
-    /// This means you will see 4 nodes per wifi controller
+    /// This plugin will connect up to 4 milight wifi controllers, each of which have 4 scene options
     /// </summary>
     [Export(typeof (ZvsAdapter))]
     public class Adapter : ZvsAdapter
@@ -67,8 +65,9 @@ namespace MiLightAdapter
             var miCommand = command.CustomData1;
             var zone = command.CustomData2;
             var ip = (from d in device.Values where d.Name == "IPAddress" select d.Value).FirstOrDefault();
-
-            controller.Send(ip, miCommand, zone);
+            decimal level = 0;
+            decimal.TryParse(argument, out level);
+            controller.Send(ip, miCommand, zone, level);
 
             await Log.ReportInfoAsync("ProcessDeviceTypeCommandAsync", CancellationToken);
         }
@@ -95,7 +94,6 @@ namespace MiLightAdapter
         }
 
         private string _wifi1Setting = "";
-
         public string WiFi1Setting
         {
             get { return _wifi1Setting; }
@@ -106,7 +104,6 @@ namespace MiLightAdapter
                 NotifyPropertyChanged();
             }
         }
-
 
         public override async Task OnSettingsCreating(AdapterSettingBuilder settingBuilder)
         {
@@ -168,13 +165,61 @@ namespace MiLightAdapter
             });
             dimmerDt.Commands.Add(new DeviceTypeCommand
             {
-                UniqueIdentifier = "Z1TURNOFF",
+                UniqueIdentifier = "Z2TURNOFF",
                 Name = "Zone 2, Turn Off",
                 CustomData1 = "Off",
                 CustomData2 = "Two",
                 ArgumentType = DataType.NONE,
                 Description = "Turns Zone 2 Off."
             });
+
+
+
+
+            dimmerDt.Commands.Add(new DeviceTypeCommand
+            {
+                UniqueIdentifier = "Z3TURNON",
+                Name = "Zone 3, Turn On",
+                ArgumentType = DataType.NONE,
+                CustomData1 = "On",
+                CustomData2 = "Three",
+                Description = "Turns Zone 3 On."
+            });
+            dimmerDt.Commands.Add(new DeviceTypeCommand
+            {
+                UniqueIdentifier = "Z3TURNOFF",
+                Name = "Zone 3, Turn Off",
+                CustomData1 = "Off",
+                CustomData2 = "Three",
+                ArgumentType = DataType.NONE,
+                Description = "Turns Zone 3 Off."
+            });
+
+            dimmerDt.Commands.Add(new DeviceTypeCommand
+            {
+                UniqueIdentifier = "Z4TURNON",
+                Name = "Zone 4, Turn On",
+                ArgumentType = DataType.NONE,
+                CustomData1 = "On",
+                CustomData2 = "Four",
+                Description = "Turns Zone 4 On."
+            });
+            dimmerDt.Commands.Add(new DeviceTypeCommand
+            {
+                UniqueIdentifier = "Z4TURNOFF",
+                Name = "Zone 4, Turn Off",
+                CustomData1 = "Off",
+                CustomData2 = "Four",
+                ArgumentType = DataType.NONE,
+                Description = "Turns Zone 4 Off."
+            });
+
+
+
+
+
+
+
 
             dimmerDt.Commands.Add(new DeviceTypeCommand
             {
@@ -196,6 +241,72 @@ namespace MiLightAdapter
                 ArgumentType = DataType.NONE,
                 Description = "Turns All Zones On."
             });
+
+
+
+
+            dimmerDt.Commands.Add(new DeviceTypeCommand
+            {
+                UniqueIdentifier = "HUE",
+                Name = "Hue",
+                CustomData1 = "Hue",
+                CustomData2 = "",
+                ArgumentType = DataType.DECIMAL,
+                Description = "Changes the current zone the specified hue."
+            });
+
+
+            dimmerDt.Commands.Add(new DeviceTypeCommand
+            {
+                UniqueIdentifier = "SETBRIGHTNESS",
+                Name = "SetBrightness",
+                CustomData1 = "SetBrightness",
+                CustomData2 = "",
+                ArgumentType = DataType.INTEGER,
+                Description = "Changes the current zone the specified brightness."
+            });
+
+
+            dimmerDt.Commands.Add(new DeviceTypeCommand
+            {
+                UniqueIdentifier = "EFFECTDOWN",
+                Name = "Previous effect",
+                ArgumentType = DataType.NONE,
+                CustomData1 = "EffectDown",
+                CustomData2 = "",
+                Description = "Changes the current zone to the previous effect."
+            });
+            dimmerDt.Commands.Add(new DeviceTypeCommand
+            {
+                UniqueIdentifier = "EFFECTUP",
+                Name = "Next Effect",
+                CustomData1 = "EffectUp",
+                CustomData2 = "",
+                ArgumentType = DataType.NONE,
+                Description = "Changes the current zone to the next effect."
+            });
+
+
+
+            dimmerDt.Commands.Add(new DeviceTypeCommand
+            {
+                UniqueIdentifier = "SPEEDDOWN",
+                Name = "Slower speed",
+                ArgumentType = DataType.NONE,
+                CustomData1 = "SpeedDown",
+                CustomData2 = "",
+                Description = "Changes the current effect to a slower speed."
+            });
+            dimmerDt.Commands.Add(new DeviceTypeCommand
+            {
+                UniqueIdentifier = "SPEEDUP",
+                Name = "Faster Speed",
+                CustomData1 = "SpeedUp",
+                CustomData2 = "",
+                ArgumentType = DataType.NONE,
+                Description = "Changes the current effect to a faster speed."
+            });
+
 
 
 
