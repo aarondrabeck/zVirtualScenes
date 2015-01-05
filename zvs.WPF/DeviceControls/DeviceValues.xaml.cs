@@ -125,5 +125,9 @@ namespace zvs.WPF.DeviceControls
             _context.Dispose();
         }
 
+        public void RepollDevice_OnClick(object sender, EventArgs e)
+        {
+            RepollLnk_MouseDown_1(sender, null);
+        }
     }
 }

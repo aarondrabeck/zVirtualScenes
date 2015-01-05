@@ -64,6 +64,14 @@ namespace MiLightAdapter
             return (from x in Controllers where x.IPAddress == ipAddress select x).FirstOrDefault();
         }
 
+        public void RemoveController(string ipAddress)
+        {
+            var c = GetController(ipAddress);
+            if (c != null)
+            {
+                Controllers.Remove(c);
+            }
+        }
         public void AddController(string ipAddress)
         {
             var c = GetController(ipAddress);

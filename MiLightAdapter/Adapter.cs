@@ -38,24 +38,24 @@ namespace MiLightAdapter
 
         public override async Task StartAsync()
         {
-            await Log.ReportInfoAsync("Started", CancellationToken);
+            await Log.ReportInfoAsync(string.Format("{0} Started", this.Name), CancellationToken);
             await AddNewWifiControllerToDatabase(WiFi1Setting);
             controller.AddController(WiFi1Setting);
-            PropertyChanged += Adapter_PropertyChanged;
-        }
 
-        private void Adapter_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == "WiFi1Setting")
-            {
+            await AddNewWifiControllerToDatabase(WiFi2Setting);
+            controller.AddController(WiFi2Setting);
 
+            await AddNewWifiControllerToDatabase(WiFi3Setting);
+            controller.AddController(WiFi3Setting);
 
-            }
+            await AddNewWifiControllerToDatabase(WiFi4Setting);
+            controller.AddController(WiFi4Setting);
+        
         }
 
         public override async Task StopAsync()
         {
-            await Log.ReportInfoAsync("Stopped", CancellationToken);
+            await Log.ReportInfoAsync(string.Format("{0} Stopped", this.Name), CancellationToken);
         }
 
         public override async Task ProcessDeviceTypeCommandAsync(DeviceType deviceType, Device device,
@@ -69,28 +69,26 @@ namespace MiLightAdapter
             decimal.TryParse(argument, out level);
             controller.Send(ip, miCommand, zone, level);
 
-            await Log.ReportInfoAsync("ProcessDeviceTypeCommandAsync", CancellationToken);
+            await Log.ReportInfoAsync(string.Format("{0} Command Sent Command:{1}, Zone:{2}, IP:{3}, Level:{4}", this.Name, miCommand, zone, ip, level), CancellationToken);
         }
 
-        public override async Task ProcessDeviceCommandAsync(Device device, DeviceCommand command, string argument,
-            string argument2)
+        public async override Task ProcessDeviceCommandAsync(Device device, DeviceCommand command, string argument, string argument2)
         {
-            await Log.ReportInfoAsync("ProcessDeviceCommandAsync", CancellationToken);
+            
         }
 
-        public override async Task RepollAsync(Device device)
+        public async override Task RepollAsync(Device device)
         {
-            await Log.ReportInfoAsync("RepollAsync", CancellationToken);
+            
         }
 
-        public override async Task ActivateGroupAsync(Group @group)
+        public async override Task ActivateGroupAsync(Group @group)
         {
-            await Log.ReportInfoAsync("ActivateGroupAsync", CancellationToken);
-        }
+       }
 
-        public override async Task DeactivateGroupAsync(Group @group)
+        public async override Task DeactivateGroupAsync(Group @group)
         {
-            await Log.ReportInfoAsync("DeactivateGroupAsync", CancellationToken);
+            
         }
 
         private string _wifi1Setting = "";
@@ -104,6 +102,42 @@ namespace MiLightAdapter
                 NotifyPropertyChanged();
             }
         }
+
+        private string _wifi2Setting = "";
+        public string WiFi2Setting
+        {
+            get { return _wifi2Setting; }
+            set
+            {
+                if (value == _wifi2Setting) return;
+                _wifi2Setting = value;
+                NotifyPropertyChanged();
+            }
+        }
+        private string _wifi3Setting = "";
+        public string WiFi3Setting
+        {
+            get { return _wifi3Setting; }
+            set
+            {
+                if (value == _wifi3Setting) return;
+                _wifi3Setting = value;
+                NotifyPropertyChanged();
+            }
+        }
+        private string _wifi4Setting = "";
+        public string WiFi4Setting
+        {
+            get { return _wifi4Setting; }
+            set
+            {
+                if (value == _wifi4Setting) return;
+                _wifi4Setting = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+
 
         public override async Task OnSettingsCreating(AdapterSettingBuilder settingBuilder)
         {
@@ -123,6 +157,64 @@ namespace MiLightAdapter
                     Log.ReportErrorFormatAsync(CancellationToken,
                         "An error occured when registering the wifi controller 1 setting. {0}",
                         wifi1SettingResult.Message);
+
+
+
+            var wifi2IPSetting = new AdapterSetting
+            {
+                Name = "WiFi Controller 2 IP Address",
+                Value = "",
+                ValueType = DataType.STRING,
+                Description = "The IP Address of the second WiFi Controller."
+            };
+
+            var wifi2SettingResult =
+                await settingBuilder.Adapter(this).RegisterAdapterSettingAsync(wifi2IPSetting, o => o.WiFi2Setting);
+
+            if (wifi2SettingResult.HasError)
+                await
+                    Log.ReportErrorFormatAsync(CancellationToken,
+                        "An error occured when registering the wifi controller 2 setting. {0}",
+                        wifi2SettingResult.Message);
+
+            var wifi3IPSetting = new AdapterSetting
+            {
+                Name = "WiFi Controller 3 IP Address",
+                Value = "",
+                ValueType = DataType.STRING,
+                Description = "The IP Address of the third WiFi Controller."
+            };
+
+            var wifi3SettingResult =
+                await settingBuilder.Adapter(this).RegisterAdapterSettingAsync(wifi3IPSetting, o => o.WiFi3Setting);
+
+            if (wifi3SettingResult.HasError)
+                await
+                    Log.ReportErrorFormatAsync(CancellationToken,
+                        "An error occured when registering the wifi controller 1 setting. {0}",
+                        wifi3SettingResult.Message);
+
+            var wifi4IPSetting = new AdapterSetting
+            {
+                Name = "WiFi Controller 4 IP Address",
+                Value = "",
+                ValueType = DataType.STRING,
+                Description = "The IP Address of the fourth WiFi Controller."
+            };
+
+            var wifi4SettingResult =
+                await settingBuilder.Adapter(this).RegisterAdapterSettingAsync(wifi4IPSetting, o => o.WiFi4Setting);
+
+            if (wifi4SettingResult.HasError)
+                await
+                    Log.ReportErrorFormatAsync(CancellationToken,
+                        "An error occured when registering the wifi controller 4 setting. {0}",
+                        wifi4SettingResult.Message);
+
+
+
+
+
 
             await base.OnSettingsCreating(settingBuilder);
         }
@@ -393,7 +485,7 @@ namespace MiLightAdapter
                             Log.ReportErrorFormatAsync(CancellationToken, "Failed to save new device. {0}",
                                 result.Message);
 
-
+                    await Log.ReportInfoAsync(string.Format("{0} New Controller added to the database, IP:{1}", this.Name, ipAddress), CancellationToken);
                 }
 
 
