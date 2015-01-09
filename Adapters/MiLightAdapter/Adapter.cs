@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Data.Entity;
-using System.Globalization;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 using zvs;
 using zvs.DataModel;
@@ -16,10 +13,10 @@ namespace MiLightAdapter
     /// <summary>
     /// This plugin will connect up to 4 milight wifi controllers, each of which have 4 scene options
     /// </summary>
-    [Export(typeof (ZvsAdapter))]
+    [Export(typeof(ZvsAdapter))]
     public class Adapter : ZvsAdapter
     {
-        private Controller controller = new Controller();
+        private readonly Controller _controller = new Controller();
 
         public override Guid AdapterGuid
         {
@@ -38,24 +35,24 @@ namespace MiLightAdapter
 
         public override async Task StartAsync()
         {
-            await Log.ReportInfoAsync(string.Format("{0} Started", this.Name), CancellationToken);
+            await Log.ReportInfoAsync(string.Format("{0} Started", Name), CancellationToken);
             await AddNewWifiControllerToDatabase(WiFi1Setting);
-            controller.AddController(WiFi1Setting);
+            _controller.AddController(WiFi1Setting);
 
             await AddNewWifiControllerToDatabase(WiFi2Setting);
-            controller.AddController(WiFi2Setting);
+            _controller.AddController(WiFi2Setting);
 
             await AddNewWifiControllerToDatabase(WiFi3Setting);
-            controller.AddController(WiFi3Setting);
+            _controller.AddController(WiFi3Setting);
 
             await AddNewWifiControllerToDatabase(WiFi4Setting);
-            controller.AddController(WiFi4Setting);
-        
+            _controller.AddController(WiFi4Setting);
+
         }
 
         public override async Task StopAsync()
         {
-            await Log.ReportInfoAsync(string.Format("{0} Stopped", this.Name), CancellationToken);
+            await Log.ReportInfoAsync(string.Format("{0} Stopped", Name), CancellationToken);
         }
 
         public override async Task ProcessDeviceTypeCommandAsync(DeviceType deviceType, Device device,
@@ -65,30 +62,31 @@ namespace MiLightAdapter
             var miCommand = command.CustomData1;
             var zone = command.CustomData2;
             var ip = (from d in device.Values where d.Name == "IPAddress" select d.Value).FirstOrDefault();
-            decimal level = 0;
+            decimal level;
             decimal.TryParse(argument, out level);
-            controller.Send(ip, miCommand, zone, level);
+            await _controller.Send(ip, miCommand, zone, level);
 
-            await Log.ReportInfoAsync(string.Format("{0} Command Sent Command:{1}, Zone:{2}, IP:{3}, Level:{4}", this.Name, miCommand, zone, ip, level), CancellationToken);
+            await Log.ReportInfoAsync(string.Format("{0} Command Sent Command:{1}, Zone:{2}, IP:{3}, Level:{4}", Name, miCommand, zone, ip, level), CancellationToken);
         }
 
-        public async override Task ProcessDeviceCommandAsync(Device device, DeviceCommand command, string argument, string argument2)
+        public override Task ProcessDeviceCommandAsync(Device device, DeviceCommand command, string argument, string argument2)
         {
-            
+            return Task.FromResult(0);
         }
 
-        public async override Task RepollAsync(Device device)
+        public override Task RepollAsync(Device device)
         {
-            
+            return Task.FromResult(0);
         }
 
-        public async override Task ActivateGroupAsync(Group @group)
+        public override Task ActivateGroupAsync(Group @group)
         {
-       }
+            return Task.FromResult(0);
+        }
 
-        public async override Task DeactivateGroupAsync(Group @group)
+        public override Task DeactivateGroupAsync(Group @group)
         {
-            
+            return Task.FromResult(0);
         }
 
         private string _wifi1Setting = "";
@@ -141,7 +139,7 @@ namespace MiLightAdapter
 
         public override async Task OnSettingsCreating(AdapterSettingBuilder settingBuilder)
         {
-            var wifi1IPSetting = new AdapterSetting
+            var wifi1IpSetting = new AdapterSetting
             {
                 Name = "WiFi Controller 1 IP Address",
                 Value = "",
@@ -150,7 +148,7 @@ namespace MiLightAdapter
             };
 
             var wifi1SettingResult =
-                await settingBuilder.Adapter(this).RegisterAdapterSettingAsync(wifi1IPSetting, o => o.WiFi1Setting);
+                await settingBuilder.Adapter(this).RegisterAdapterSettingAsync(wifi1IpSetting, o => o.WiFi1Setting);
 
             if (wifi1SettingResult.HasError)
                 await
@@ -160,7 +158,7 @@ namespace MiLightAdapter
 
 
 
-            var wifi2IPSetting = new AdapterSetting
+            var wifi2IpSetting = new AdapterSetting
             {
                 Name = "WiFi Controller 2 IP Address",
                 Value = "",
@@ -169,7 +167,7 @@ namespace MiLightAdapter
             };
 
             var wifi2SettingResult =
-                await settingBuilder.Adapter(this).RegisterAdapterSettingAsync(wifi2IPSetting, o => o.WiFi2Setting);
+                await settingBuilder.Adapter(this).RegisterAdapterSettingAsync(wifi2IpSetting, o => o.WiFi2Setting);
 
             if (wifi2SettingResult.HasError)
                 await
@@ -177,7 +175,7 @@ namespace MiLightAdapter
                         "An error occured when registering the wifi controller 2 setting. {0}",
                         wifi2SettingResult.Message);
 
-            var wifi3IPSetting = new AdapterSetting
+            var wifi3IpSetting = new AdapterSetting
             {
                 Name = "WiFi Controller 3 IP Address",
                 Value = "",
@@ -186,7 +184,7 @@ namespace MiLightAdapter
             };
 
             var wifi3SettingResult =
-                await settingBuilder.Adapter(this).RegisterAdapterSettingAsync(wifi3IPSetting, o => o.WiFi3Setting);
+                await settingBuilder.Adapter(this).RegisterAdapterSettingAsync(wifi3IpSetting, o => o.WiFi3Setting);
 
             if (wifi3SettingResult.HasError)
                 await
@@ -194,7 +192,7 @@ namespace MiLightAdapter
                         "An error occured when registering the wifi controller 1 setting. {0}",
                         wifi3SettingResult.Message);
 
-            var wifi4IPSetting = new AdapterSetting
+            var wifi4IpSetting = new AdapterSetting
             {
                 Name = "WiFi Controller 4 IP Address",
                 Value = "",
@@ -203,7 +201,7 @@ namespace MiLightAdapter
             };
 
             var wifi4SettingResult =
-                await settingBuilder.Adapter(this).RegisterAdapterSettingAsync(wifi4IPSetting, o => o.WiFi4Setting);
+                await settingBuilder.Adapter(this).RegisterAdapterSettingAsync(wifi4IpSetting, o => o.WiFi4Setting);
 
             if (wifi4SettingResult.HasError)
                 await
@@ -265,9 +263,6 @@ namespace MiLightAdapter
                 Description = "Turns Zone 2 Off."
             });
 
-
-
-
             dimmerDt.Commands.Add(new DeviceTypeCommand
             {
                 UniqueIdentifier = "Z3TURNON",
@@ -277,6 +272,7 @@ namespace MiLightAdapter
                 CustomData2 = "Three",
                 Description = "Turns Zone 3 On."
             });
+
             dimmerDt.Commands.Add(new DeviceTypeCommand
             {
                 UniqueIdentifier = "Z3TURNOFF",
@@ -296,6 +292,7 @@ namespace MiLightAdapter
                 CustomData2 = "Four",
                 Description = "Turns Zone 4 On."
             });
+
             dimmerDt.Commands.Add(new DeviceTypeCommand
             {
                 UniqueIdentifier = "Z4TURNOFF",
@@ -305,13 +302,6 @@ namespace MiLightAdapter
                 ArgumentType = DataType.NONE,
                 Description = "Turns Zone 4 Off."
             });
-
-
-
-
-
-
-
 
             dimmerDt.Commands.Add(new DeviceTypeCommand
             {
@@ -323,7 +313,6 @@ namespace MiLightAdapter
                 Description = "Turns All Zones Off."
             });
 
-
             dimmerDt.Commands.Add(new DeviceTypeCommand
             {
                 UniqueIdentifier = "ALLON",
@@ -333,9 +322,6 @@ namespace MiLightAdapter
                 ArgumentType = DataType.NONE,
                 Description = "Turns All Zones On."
             });
-
-
-
 
             dimmerDt.Commands.Add(new DeviceTypeCommand
             {
@@ -347,7 +333,6 @@ namespace MiLightAdapter
                 Description = "Changes the current zone the specified hue."
             });
 
-
             dimmerDt.Commands.Add(new DeviceTypeCommand
             {
                 UniqueIdentifier = "SETBRIGHTNESS",
@@ -358,7 +343,6 @@ namespace MiLightAdapter
                 Description = "Changes the current zone the specified brightness."
             });
 
-
             dimmerDt.Commands.Add(new DeviceTypeCommand
             {
                 UniqueIdentifier = "EFFECTDOWN",
@@ -368,6 +352,7 @@ namespace MiLightAdapter
                 CustomData2 = "",
                 Description = "Changes the current zone to the previous effect."
             });
+
             dimmerDt.Commands.Add(new DeviceTypeCommand
             {
                 UniqueIdentifier = "EFFECTUP",
@@ -377,8 +362,6 @@ namespace MiLightAdapter
                 ArgumentType = DataType.NONE,
                 Description = "Changes the current zone to the next effect."
             });
-
-
 
             dimmerDt.Commands.Add(new DeviceTypeCommand
             {
@@ -399,18 +382,12 @@ namespace MiLightAdapter
                 Description = "Changes the current effect to a faster speed."
             });
 
-
-
-
-
             var dimmerSaveResult = await deviceTypeBuilder.RegisterAsync(AdapterGuid, dimmerDt, CancellationToken);
             if (dimmerSaveResult.HasError)
                 await
                     Log.ReportErrorFormatAsync(CancellationToken,
                         "An error occured when registering the OpenZWave dimmer device type. {0}",
                         dimmerSaveResult.Message);
-
-
 
             using (var context = new ZvsContext(EntityContextConnection))
             {
@@ -421,34 +398,26 @@ namespace MiLightAdapter
                             .FirstOrDefaultAsync();
             }
 
-
             await base.OnDeviceTypesCreating(deviceTypeBuilder);
         }
 
         private int DimmerTypeId { get; set; }
 
-
-
         private async Task AddNewWifiControllerToDatabase(string ipAddress)
         {
             if (!string.IsNullOrEmpty(ipAddress))
             {
-
-
                 using (var context = new ZvsContext(EntityContextConnection))
                 {
-
                     var devices = from d in context.Devices where d.Type.Adapter.AdapterGuid == AdapterGuid select d;
-
-
                     Device existing = null;
 
                     foreach (var d in devices)
                     {
                         var value =
                             (from v in d.Values
-                                where v.Name == "IPAddress" && v.Value == ipAddress
-                                select v).FirstOrDefault();
+                             where v.Name == "IPAddress" && v.Value == ipAddress
+                             select v).FirstOrDefault();
 
                         if (value != null)
                         {
@@ -460,7 +429,6 @@ namespace MiLightAdapter
                     //If already have the device, don't install a duplicate
                     if (existing != null)
                         return;
-
 
                     existing = new Device
                     {
@@ -485,10 +453,8 @@ namespace MiLightAdapter
                             Log.ReportErrorFormatAsync(CancellationToken, "Failed to save new device. {0}",
                                 result.Message);
 
-                    await Log.ReportInfoAsync(string.Format("{0} New Controller added to the database, IP:{1}", this.Name, ipAddress), CancellationToken);
+                    await Log.ReportInfoAsync(string.Format("{0} New Controller added to the database, IP:{1}", Name, ipAddress), CancellationToken);
                 }
-
-
             }
         }
 

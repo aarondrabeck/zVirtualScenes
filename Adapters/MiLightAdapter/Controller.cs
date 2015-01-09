@@ -1,58 +1,56 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using MiLight.Net.Api;
 using MiLight.Net.Commands;
-using MiLight.Net.WifiCintroller;
+using MiLightAdapter.MiLight;
 
 namespace MiLightAdapter
 {
     public class Controller
     {
-        public List<MiLight.Net.WifiCintroller.WifiController> Controllers { get; set; }
+        public List<WifiController> Controllers { get; set; }
 
         public async Task Send(string ipAddress, string command, string zone = null, decimal level = 0)
         {
             var controller = GetController(ipAddress);
             if (controller != null)
             {
-                var z = Zone.One;
+                Zone z;
                 byte[] bCommand = null;
-                System.Enum.TryParse(zone, out z);
+                Enum.TryParse(zone, out z);
                 switch (command)
                 {
                     case "On":
-                        if(zone!=null) bCommand = MiLight.Net.Api.Colour.On(z);
+                        if(zone!=null) bCommand = Colour.On(z);
                         break;
                     case "AllOff":
-                        bCommand = MiLight.Net.Api.Colour.AllOff();
+                        bCommand = Colour.AllOff();
                         break;
                     case "AllOn":
-                        bCommand = MiLight.Net.Api.Colour.AllOn();
+                        bCommand = Colour.AllOn();
                         break;
                     case "EffectDown":
-                        bCommand = MiLight.Net.Api.Colour.EffectDown();
+                        bCommand = Colour.EffectDown();
                         break;
                     case "EffectUp":
-                        bCommand = MiLight.Net.Api.Colour.EffectUp();
+                        bCommand = Colour.EffectUp();
                         break;
                     case "Hue":
-                        bCommand = MiLight.Net.Api.Colour.Hue(level);
+                        bCommand = Colour.Hue(level);
                         break;
                     case "Off":
-                        if (zone != null) bCommand = MiLight.Net.Api.Colour.Off(z);
+                        if (zone != null) bCommand = Colour.Off(z);
                         break;
                     case "SetBrightness":
-                        bCommand = MiLight.Net.Api.Colour.SetBrightness((int)level);
+                        bCommand = Colour.SetBrightness((int)level);
                         break;
                     case "SpeedDown":
-                        bCommand = MiLight.Net.Api.Colour.SpeedDown();
+                        bCommand = Colour.SpeedDown();
                         break;
                     case "SpeedUp":
-                        bCommand = MiLight.Net.Api.Colour.SpeedUp();
-                        break;
-                    default:
+                        bCommand = Colour.SpeedUp();
                         break;
                 }
                 if (bCommand != null) await controller.Send(bCommand);
@@ -61,7 +59,7 @@ namespace MiLightAdapter
 
         private WifiController GetController(string ipAddress)
         {
-            return (from x in Controllers where x.IPAddress == ipAddress select x).FirstOrDefault();
+            return (from x in Controllers where x.IpAddress == ipAddress select x).FirstOrDefault();
         }
 
         public void RemoveController(string ipAddress)

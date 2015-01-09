@@ -1,28 +1,24 @@
-﻿namespace MiLight.Net.WifiCintroller
+﻿using System;
+using System.Net;
+using System.Net.Sockets;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace MiLightAdapter.MiLight
 {
-    using System;
-    using System.Net;
-    using System.Net.Sockets;
-    using System.Threading;
-    using System.Threading.Tasks;
-
-    using MiLight.Net.Contracts;
-
     public class WifiController : IController
     {
-        private static readonly ManualResetEvent connectDone = new ManualResetEvent(false);
-        private static readonly ManualResetEvent sendDone = new ManualResetEvent(false);
+        private static readonly ManualResetEvent ConnectDone = new ManualResetEvent(false);
+        private static readonly ManualResetEvent SendDone = new ManualResetEvent(false);
+        private  string Ip { get; set; }
+        private  int Port { get; set; }
 
-        private readonly string ip;
-
-        private readonly int port;
-
-        public string IPAddress { get; private set; }
+        public string IpAddress { get; private set; }
         public WifiController(string ip, int port = 8899)
         {
-            this.ip = ip;
-            this.IPAddress = ip;
-            this.port = port;
+            Ip = ip;
+            IpAddress = ip;
+            Port = port;
         }
 
         /// <summary>
@@ -31,37 +27,34 @@
         /// <param name="command">The command to control the lights</param>
         public async Task Send(byte[] command)
         {
+            //TODO:  USE ASYNC COMMANDS
+            // ConnectAsync and SendAsync
+
             var sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            var serverAddr = System.Net.IPAddress.Parse(this.ip);
-
-            var endPoint = new IPEndPoint(serverAddr, this.port);
-
+            var serverAddr = IPAddress.Parse(Ip);
+            var endPoint = new IPEndPoint(serverAddr, Port);
             sock.BeginConnect(endPoint, ConnectCallback, sock);
-            connectDone.WaitOne();
+            ConnectDone.WaitOne();
 
             sock.BeginSend(command, 0, command.Length, 0, SendCallback, sock);
 
-            sendDone.WaitOne();
+            SendDone.WaitOne();
             //sock.SendTo(command, endPoint);
-
-            System.Threading.Thread.Sleep(100);
+            await Task.Delay(100);
         }
 
         private static void ConnectCallback(IAsyncResult ar)
         {
             var client = (Socket)ar.AsyncState;
-
             client.EndConnect(ar);
-            connectDone.Set();
+            ConnectDone.Set();
         }
 
         private static void SendCallback(IAsyncResult ar)
         {
             var client = (Socket)ar.AsyncState;
-
             client.EndSend(ar);
-
-            sendDone.Set();
+            SendDone.Set();
         }
     }
 }
