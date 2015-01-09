@@ -19,7 +19,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\bin\debug\adapters\</OutputPath>
+    <OutputPath>..\..\bin\debug\adapters\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -27,7 +27,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\..\bin\release\adapters\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -59,15 +59,15 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\zvs.Entities\zvs.DataModel.csproj">
+    <ProjectReference Include="..\..\zvs.Entities\zvs.DataModel.csproj">
       <Project>{e1758d0b-5a3a-4a1b-b5de-acd1302f23a7}</Project>
       <Name>zvs.DataModel</Name>
     </ProjectReference>
-    <ProjectReference Include="..\zvs.Processor\zvs.Processor.csproj">
+    <ProjectReference Include="..\..\zvs.Processor\zvs.Processor.csproj">
       <Project>{10cd1de3-4e83-4bb0-a7ca-c774c298be27}</Project>
       <Name>zvs.Processor</Name>
     </ProjectReference>
-    <ProjectReference Include="..\zvs\zvs.csproj">
+    <ProjectReference Include="..\..\zvs\zvs.csproj">
       <Project>{26f2b6c6-0325-415c-bb0f-314c69f44d5a}</Project>
       <Name>zvs</Name>
     </ProjectReference>

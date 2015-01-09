@@ -40,7 +40,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LightSwitchPlugin", "Plugin
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThingSpeak", "Plugins\ThingSpeak\ThingSpeak.csproj", "{3E17D76A-0043-446C-BF43-544B284228A1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiLightAdapter", "MiLightAdapter\MiLightAdapter.csproj", "{E4C9BC26-E485-4221-9969-1CA331949710}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiLightAdapter", "Adapters\MiLightAdapter\MiLightAdapter.csproj", "{E4C9BC26-E485-4221-9969-1CA331949710}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
