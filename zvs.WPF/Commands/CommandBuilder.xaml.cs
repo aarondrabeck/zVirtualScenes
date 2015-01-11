@@ -191,8 +191,7 @@ namespace zvs.WPF.Commands
                                  var g = arg as Group;
                                  if (g != null)
                                      _selectedBuiltinArg = g.Id.ToString(CultureInfo.InvariantCulture);
-
-
+                                 
                                  return Task.FromResult(0);
 
                              },
@@ -201,8 +200,9 @@ namespace zvs.WPF.Commands
                         {
                             Header = selectedCmd.Name,
                             Description = selectedCmd.Description,
-                            SelectedItem = selectedGroup
+                            SelectedItem = selectedGroup,
                         };
+                        control.ComboBox.DisplayMemberPath = "Name";
                         BuiltinArgSckPnl.Children.Add(control);
                     }
                     break;

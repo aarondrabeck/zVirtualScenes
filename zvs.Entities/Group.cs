@@ -10,7 +10,7 @@ namespace zvs.DataModel
     public class Group : INotifyPropertyChanged, IIdentity
     {
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
-        public int Id {get; set; }
+        public int Id { get; set; }
 
         private ObservableCollection<Device> _devices = new ObservableCollection<Device>();
         public virtual ObservableCollection<Device> Devices
@@ -18,7 +18,7 @@ namespace zvs.DataModel
             get { return _devices; }
             set { _devices = value; }
         }
-        
+
         private string _name;
         [StringLength(255)]
         public string Name
@@ -54,11 +54,12 @@ namespace zvs.DataModel
                 }
             }
         }
-        
+
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
         protected void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
+        
     }
 }
