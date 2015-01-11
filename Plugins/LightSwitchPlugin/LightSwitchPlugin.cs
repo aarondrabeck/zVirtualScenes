@@ -497,9 +497,9 @@ namespace LightSwitchPlugin
 
                 #region Find Command
 
-                switch (d.Type.UniqueIdentifier)
+                switch (d.Type.UniqueIdentifier.ToLower())
                 {
-                    case "SWITCH":
+                    case "switch":
                         {
                             var cmdUniqueId = (level == 0 ? "TURNOFF" : "TURNON");
 
@@ -519,20 +519,11 @@ namespace LightSwitchPlugin
                             arg2 = d.Id.ToString();
                             break;
                         }
-                    case "DIMMER":
+                    case "dimmer":
                         {
                             var l = (level == 255 ? "99" : level.ToString());
-                            if (!_pluginToDimmerBasicCommand.ContainsKey(d.Type.Adapter.AdapterGuid))
-                            {
-                                const string error = "No command defines for this plug-in";
-                                await SendLightSwitchCommand(args.LightSwitchClient, LightSwitchProtocol.CreateErrorMsgCmd(error));
-                                await Log.ReportErrorAsync(error, CancellationToken);
-
-                                return;
-                            }
-
-                            var cmdUniqueId = _pluginToDimmerBasicCommand[d.Type.Adapter.AdapterGuid];
-                            var dcmd = d.Commands.FirstOrDefault(c => c.UniqueIdentifier.Contains(cmdUniqueId));
+                         
+                            var dcmd = d.Commands.FirstOrDefault(c => c.CustomData1 == "Basic");
                             if (dcmd == null)
                             {
                                 const string error = "Cannot locate zvs command";
@@ -646,18 +637,8 @@ namespace LightSwitchPlugin
                     return;
                 }
 
-                var plugin = d.Type.Adapter.AdapterGuid;
-                var key = plugin + args.Mode;
-
-                if (!_thermoTempCommandTranslations.ContainsKey(key))
-                {
-                    const string error = "No command defined for this plug-in";
-                    await SendLightSwitchCommand(args.LightSwitchClient, LightSwitchProtocol.CreateErrorMsgCmd(error));
-                    await Log.ReportErrorAsync(error, CancellationToken);
-                    return;
-                }
-
-                var dcmd = d.Commands.FirstOrDefault(c => c.UniqueIdentifier.StartsWith(_thermoTempCommandTranslations[key]));
+                var commandName = args.Mode == "2" ? "Heating 1" : "Cooling 1";
+                var dcmd = d.Commands.FirstOrDefault(c => c.CustomData1 == commandName);
                 if (dcmd == null)
                 {
                     const string error = "Cannot locate zvs command";
@@ -683,7 +664,8 @@ namespace LightSwitchPlugin
 
             int deviceId = int.TryParse(args.DeviceId, out deviceId) ? deviceId : 0;
             int mode = int.TryParse(args.Mode, out mode) ? mode : 0;
-
+            
+           
             string arg1 = null;
             string arg2 = null;
             Command command = null;
@@ -708,31 +690,45 @@ namespace LightSwitchPlugin
 
                 if (mode < 6)
                 {
-                    var plugin = d.Type.Adapter.AdapterGuid.ToString();
-                    var key = plugin + args.Mode;
-
-                    if (!_thermoCommandTranslations.ContainsKey(key))
+                    var commandName = string.Empty;
+                    switch (args.Mode)
                     {
-                        const string error = "No command defined for this plug-in";
-                        await SendLightSwitchCommand(args.LightSwitchClient, LightSwitchProtocol.CreateErrorMsgCmd(error));
-                        await Log.ReportErrorAsync(error, CancellationToken);
-
-                        return;
+                        case "0":
+                            commandName = "Mode";
+                            arg1 = "Off";
+                            break;
+                        case "1":
+                            commandName = "Mode";
+                            arg1 = "Auto";
+                            break;
+                        case "2":
+                            commandName = "Mode";
+                            arg1 = "Heat";
+                            break;
+                        case "3":
+                            commandName = "Mode";
+                            arg1 = "Cool";
+                            break;
+                        case "4":
+                            commandName = "Fan Mode";
+                            arg1 = "On Low";
+                            break;
+                        case "5":
+                            commandName = "Fan Mode";
+                            arg1 = "Auto Low";
+                            break;
                     }
 
-                    var cmd = _thermoCommandTranslations[key];
-                    var dcmd = d.Commands.FirstOrDefault(c => c.UniqueIdentifier.Contains(cmd.CmdName));
+                    var dcmd = d.Commands.FirstOrDefault(c => c.CustomData1 == commandName);
                     if (dcmd == null)
                     {
                         const string error = "Cannot locate zvs command";
                         await SendLightSwitchCommand(args.LightSwitchClient, LightSwitchProtocol.CreateErrorMsgCmd(error));
                         await Log.ReportErrorAsync(error, CancellationToken);
-
                         return;
                     }
 
                     command = dcmd;
-                    arg1 = cmd.Arg;
                     cmdMsg = string.Format("[{0}] Executed command '{1}' on '{2}'.", args.LightSwitchClient.RemoteEndPoint, dcmd.Name, d.Name);
 
                 }
@@ -794,42 +790,6 @@ namespace LightSwitchPlugin
                 await BroadcastCommandAsync(LightSwitchProtocol.CreateMsgCmd(cmdMsg));
         }
         #endregion
-
-        private readonly Dictionary<Guid, string> _pluginToDimmerBasicCommand = new Dictionary<Guid, string>()
-        {
-            {Guid.Parse("70f91ca6-08bb-406a-a60f-aeb13f50aae8"), "DYNAMIC_CMD_BASIC"}
-           // {"THINKSTICK", "BASIC"} 
-        };
-
-        private readonly Dictionary<string, string> _thermoTempCommandTranslations = new Dictionary<string, string>()
-        {
-            {"THINKSTICK2", "DYNAMIC_SP_R207_Heating1"},
-            {"70f91ca6-08bb-406a-a60f-aeb13f50aae82", "DYNAMIC_CMD_HEATING 1_"},
-            {"THINKSTICK3", "DYNAMIC_SP_R207_Cooling1"},
-            {"70f91ca6-08bb-406a-a60f-aeb13f50aae83", "DYNAMIC_CMD_COOLING 1_"} 
-        };
-
-        private class ZvsCmd
-        {
-            public string CmdName;
-            public string Arg;
-        }
-
-        private readonly Dictionary<string, ZvsCmd> _thermoCommandTranslations = new Dictionary<string, ZvsCmd>()
-        {
-            {"THINKSTICK0", new ZvsCmd() { CmdName="MODE", Arg="Off"}},
-            {"70f91ca6-08bb-406a-a60f-aeb13f50aae80", new ZvsCmd() { CmdName="DYNAMIC_CMD_MODE", Arg="Off"}},
-            {"THINKSTICK1", new ZvsCmd() { CmdName="MODE", Arg="Auto"}},
-            {"70f91ca6-08bb-406a-a60f-aeb13f50aae81", new ZvsCmd() { CmdName="DYNAMIC_CMD_MODE", Arg="Auto"}},
-            {"THINKSTICK2", new ZvsCmd() { CmdName="MODE", Arg="Heat"}},
-            {"70f91ca6-08bb-406a-a60f-aeb13f50aae82", new ZvsCmd() { CmdName="DYNAMIC_CMD_MODE", Arg="Heat"}},
-            {"THINKSTICK3", new ZvsCmd() { CmdName="MODE", Arg="Cool"}},
-            {"70f91ca6-08bb-406a-a60f-aeb13f50aae83", new ZvsCmd() { CmdName="DYNAMIC_CMD_MODE", Arg="Cool"}},
-            {"THINKSTICK4", new ZvsCmd() { CmdName="FAN_MODE", Arg="OnLow"}},
-            {"70f91ca6-08bb-406a-a60f-aeb13f50aae84", new ZvsCmd() { CmdName="DYNAMIC_CMD_FAN MODE", Arg="On Low"}},
-            {"THINKSTICK5", new ZvsCmd() { CmdName="FAN_MODE", Arg="AutoLow"}},
-            {"70f91ca6-08bb-406a-a60f-aeb13f50aae85", new ZvsCmd() { CmdName="DYNAMIC_CMD_FAN MODE", Arg="Auto Low"}}
-        };
 
         public async Task StopLightSwitchServer()
         {
