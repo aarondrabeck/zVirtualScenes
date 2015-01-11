@@ -164,16 +164,17 @@
 
                     </DataGridTemplateColumn>
 
-                    <DataGridTemplateColumn HeaderStyle="{StaticResource SelectionDataGridHeader}"   x:Name="LevelCol" Header="Status" Width="170" CanUserResize="True" 
+                    <DataGridTemplateColumn HeaderStyle="{StaticResource SelectionDataGridHeader}" x:Name="LevelCol" Header="Status" Width="170" CanUserResize="True" 
                                         CanUserSort="True" SortMemberPath="CurrentLevelInt" IsReadOnly="True" >
                         <DataGridTemplateColumn.CellTemplate >
                             <DataTemplate>
                                 <Grid Margin="5,0" HorizontalAlignment="Left">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="50"></ColumnDefinition>
                                         <ColumnDefinition Width="90"></ColumnDefinition>
+                                        <ColumnDefinition Width="Auto"></ColumnDefinition>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Name="LevelTxtBlock" Text="{Binding CurrentLevelText, NotifyOnTargetUpdated=True}" Background="Transparent"
+                                    <ProgressBar  Name="LevelProgressBr" Foreground="#757575" Value="{Binding CurrentLevelInt}" Height="10" Opacity="6" Margin="0 2 7 0" />
+                                    <TextBlock Grid.Column="1" Name="LevelTxtBlock" Text="{Binding CurrentLevelText, NotifyOnTargetUpdated=True}" Background="Transparent"
                                            Foreground="#B2B2B2" FontSize="16" VerticalAlignment="Center" TextAlignment="Center" >
                                         <TextBlock.Triggers>
                                             <EventTrigger RoutedEvent="Binding.TargetUpdated">
@@ -186,7 +187,6 @@
                                             </EventTrigger>
                                         </TextBlock.Triggers>
                                     </TextBlock>
-                                    <ProgressBar  Name="LevelProgressBr" Foreground="#757575" Value="{Binding CurrentLevelInt}" Grid.Column="1" Height="10" Opacity="6" Margin="5,0,0,0" />
                                 </Grid>
                                 <DataTemplate.Triggers>
                                     <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier}" Value="Thermostat">
