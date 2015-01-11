@@ -1101,7 +1101,7 @@ namespace OpenZWaveAdapter
                         };
                         var readOnly = MManager.IsValueReadOnly(vid);
                         node.AddValue(value);
-                        var vIdString = vid.GetId().ToString(CultureInfo.InvariantCulture);
+                        var valueIdString = vid.GetId().ToString(CultureInfo.InvariantCulture);
 
 #if DEBUG
                         var sw = new Stopwatch();
@@ -1132,7 +1132,7 @@ namespace OpenZWaveAdapter
                             var valueSaveResult = await DeviceValueBuilder.RegisterAsync(new DeviceValue
                             {
                                 DeviceId = d.Id,
-                                UniqueIdentifier = vIdString,
+                                UniqueIdentifier = valueIdString,
                                 Name = value.Label,
                                 Genre = value.Genre,
                                 Index = value.Index,
@@ -1146,33 +1146,33 @@ namespace OpenZWaveAdapter
 
                             #region Install Dynamic Commands
 
-                            if (!readOnly || !string.IsNullOrEmpty(value.Label))
+                            if (!readOnly)
                             {
-                                var pType = TranslateDataType(vid.GetType());
+                                var argumentType = TranslateDataType(vid.GetType());
 
-                                var dynamicDc = new DeviceCommand
+                                var deviceCommand = new DeviceCommand
                                 {
                                     DeviceId = d.Id,
-                                    UniqueIdentifier = string.Format("DYNAMIC_CMD_{0}_{1}", value.Label.ToUpper(), vid.GetId()),
+                                    UniqueIdentifier = string.Format("DYNAMIC_CMD_{0}", valueIdString),
                                     Name = string.Format("Set {0}", value.Label),
-                                    ArgumentType = pType,
+                                    ArgumentType = argumentType,
                                     Help = string.IsNullOrEmpty(value.Help) ? string.Empty : value.Help,
                                     CustomData1 = string.IsNullOrEmpty(value.Label) ? string.Empty : value.Label,
-                                    CustomData2 = string.IsNullOrEmpty(vIdString) ? string.Empty : vIdString,
+                                    CustomData2 = string.IsNullOrEmpty(valueIdString) ? string.Empty : valueIdString,
                                     SortOrder = EvaluateOrder(value.Genre)
                                 };
 
                                 //Special case for lists add additional info
-                                if (pType == DataType.LIST)
+                                if (argumentType == DataType.LIST)
                                 {
                                     //Install the allowed options/values
                                     String[] options;
                                     if (MManager.GetValueListItems(vid, out options))
                                         foreach (var option in options)
-                                            dynamicDc.Options.Add(new CommandOption { Name = option });
+                                            deviceCommand.Options.Add(new CommandOption { Name = option });
                                 }
 
-                                var saveDynamicResult = await DeviceCommandBuilder.RegisterAsync(d.Id, dynamicDc, CancellationToken);
+                                var saveDynamicResult = await DeviceCommandBuilder.RegisterAsync(d.Id, deviceCommand, CancellationToken);
                                 if (saveDynamicResult.HasError)
                                     await Log.ReportErrorFormatAsync(CancellationToken, "An error occured when registering dynamic command. {0}", saveDynamicResult.Message);
 
@@ -1242,15 +1242,15 @@ namespace OpenZWaveAdapter
                                 await Log.ReportWarningAsync("ValueChanged called on a node id that was not found in the database", CancellationToken);
                                 break;
                             }
-                            var valueUId = vid.GetId().ToString(CultureInfo.InvariantCulture);
+                            var valueIdString = vid.GetId().ToString(CultureInfo.InvariantCulture);
                             var oldValue =
                                 await
                                     context.DeviceValues.Where(
-                                        o => o.DeviceId == device.Id && o.UniqueIdentifier == valueUId)
+                                        o => o.DeviceId == device.Id && o.UniqueIdentifier == valueIdString)
                                         .Select(o => o.Value).FirstOrDefaultAsync();
 
                             if (oldValue != null && oldValue != data)
-                                await Log.ReportInfoFormatAsync(CancellationToken, "{0} {1} {2} changed from {3} to {4}", 
+                                await Log.ReportInfoFormatAsync(CancellationToken, "{0} {1} {2} changed from {3} to {4}",
                                     device.Location,
                                     device.Name,
                                     value.Label,
@@ -1261,7 +1261,7 @@ namespace OpenZWaveAdapter
                             var deviceValueResult = await DeviceValueBuilder.RegisterAsync(new DeviceValue
                              {
                                  DeviceId = device.Id,
-                                 UniqueIdentifier = valueUId,
+                                 UniqueIdentifier = valueIdString,
                                  Name = value.Label,
                                  Genre = value.Genre,
                                  Index = value.Index,
@@ -1343,6 +1343,20 @@ namespace OpenZWaveAdapter
                                 }
 
                             }
+                            else if (device.Type.UniqueIdentifier == OpenzWaveDeviceTypes.Sensor.ToString())
+                            {
+                                if (value.Label == "Power")
+                                {
+                                    double watts;
+                                    if (double.TryParse(data, out watts))
+                                    {
+                                        device.CurrentLevelInt = watts;
+                                        device.CurrentLevelText = string.Format("{0}W", watts);
+                                        changed = true;
+                                    }
+
+                                }
+                            }
                             else
                             {
                                 if (value.Label == "Basic")
@@ -1377,32 +1391,39 @@ namespace OpenZWaveAdapter
                             #region Update Device Commands
                             if (!readOnly)
                             {
-                                //User commands are more important so lets see them first in the GUIs
-                                int order;
-                                switch (value.Genre)
-                                {
-                                    case "User":
-                                        order = 1;
-                                        break;
-                                    case "Config":
-                                        order = 2;
-                                        break;
-                                    default:
-                                        order = 99;
-                                        break;
-                                }
+                                var uid = string.Format("DYNAMIC_CMD_{0}", valueIdString);
+                                var deviceCommand = await context.DeviceCommands.FirstOrDefaultAsync(o => o.DeviceId == device.Id &&
+                                    o.UniqueIdentifier == uid);
 
-                                var vidId = vid.GetId().ToString(CultureInfo.InvariantCulture);
-                                var dc = await context.DeviceCommands.FirstOrDefaultAsync(o => o.DeviceId == device.Id &&
-                                    o.CustomData2 == vidId);
-
-                                if (dc != null)
+                                if (deviceCommand != null)
                                 {
+                                    //User commands are more important so lets see them first in the GUIs
+                                    int order;
+                                    switch (value.Genre)
+                                    {
+                                        case "Basic":
+                                            order = 4;
+                                            break;
+                                        case "User":
+                                            order = 3;
+                                            break;
+                                        case "Config":
+                                            order = 2;
+                                            break;
+                                        default:
+                                            order = 1;
+                                            break;
+                                    }
+
                                     //After Value is Added, Value Name other values properties can change so update.
-                                    dc.Name = "Set " + value.Label;
-                                    dc.Help = value.Help;
-                                    dc.CustomData1 = value.Label;
-                                    dc.SortOrder = order;
+                                    deviceCommand.Name = "Set " + value.Label;
+                                    deviceCommand.Help = value.Help;
+                                    deviceCommand.CustomData1 = value.Label;
+                                    deviceCommand.SortOrder = order;
+
+                                    var result = await context.TrySaveChangesAsync(CancellationToken);
+                                    if (result.HasError)
+                                        await Log.ReportErrorFormatAsync(CancellationToken, "Failed to update device command. {0}", result.Message);
                                 }
                             }
                             #endregion
