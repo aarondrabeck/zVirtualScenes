@@ -38,7 +38,7 @@
       <HintPath>..\packages\EntityFramework.6.1.1\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="MiLight.Net.Commands">
-      <HintPath>..\packages\MiLight.Net.Commands.1.0.1\lib\portable-net40+sl50+win+wp80\MiLight.Net.Commands.dll</HintPath>
+      <HintPath>..\..\packages\MiLight.Net.Commands.1.0.1\lib\portable-net40+sl50+win+wp80\MiLight.Net.Commands.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
