@@ -125,9 +125,9 @@ namespace zvs.WPF.DeviceControls
             _context.Dispose();
         }
 
-        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        public void RepollDevice_OnClick(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            RepollLnk_MouseDown_1(sender, null);
         }
     }
 }
