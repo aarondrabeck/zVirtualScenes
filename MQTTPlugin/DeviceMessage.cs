@@ -8,6 +8,7 @@ namespace MQTTPlugin
 {
     public class DeviceMessage
     {
+        public string Action { get; set; }
         public string DeviceName { get; set; }
         public int DeviceId { get; set; }
         public int NodeNumber { get; set; }

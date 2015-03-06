@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Data.Entity;
+using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using uPLibrary.Networking.M2Mqtt;
 using uPLibrary.Networking.M2Mqtt.Messages;
 using zvs;
 using zvs.DataModel;
@@ -74,7 +77,7 @@ namespace MQTTPlugin
                 NotifyPropertyChanged();
             }
         }
-        private string _topicFormat = "/devices/{Device.Id}/events";
+        private string _topicFormat = "zvirtual/{Device.Id}/events";
         public string TopicFormat
         {
             get { return _topicFormat; }
@@ -85,7 +88,19 @@ namespace MQTTPlugin
                 NotifyPropertyChanged();
             }
         }
-        private string _floodTopic = "/devices/flood/";
+
+        private string _controlTopicFormat = "zvirtual/control";
+        public string ControlTopicFormat
+        {
+            get { return _controlTopicFormat; }
+            set
+            {
+                if (value == _controlTopicFormat) return;
+                _controlTopicFormat = value;
+                NotifyPropertyChanged();
+            }
+        }
+        private string _floodTopic = "zvirtual/events";
         public string FloodTopic
         {
             get { return _floodTopic; }
@@ -145,7 +160,7 @@ namespace MQTTPlugin
             var topicSetting = new PluginSetting
             {
                 Name = "Topic",
-                Value = "/devices/{Device.Id}/",
+                Value = "zvirtual/{Device.Id}/events",
                 ValueType = DataType.STRING,
                 Description = "Enter the topic for changes to be published to, on the broker."
             };
@@ -157,7 +172,7 @@ namespace MQTTPlugin
             var floodTopicSetting = new PluginSetting
             {
                 Name = "Flood Topic",
-                Value = "/devices/flood/",
+                Value = "zvirtual/events",
                 ValueType = DataType.STRING,
                 Description = "Enter the topic name for all messages to get pushed to."
             };
@@ -165,19 +180,39 @@ namespace MQTTPlugin
             await settingBuilder.Plugin(this).RegisterPluginSettingAsync(floodTopicSetting, o => o.FloodTopic);
 
 
+            var controlTopicSetting = new PluginSetting
+            {
+                Name = "Device Control Topic",
+                Value = "zvirtual/control",
+                ValueType = DataType.STRING,
+                Description = "Enter the control topic for all devices."
+            };
+
+            await settingBuilder.Plugin(this).RegisterPluginSettingAsync(controlTopicSetting, o => o.ControlTopicFormat);
+
+
         }
 
-        private Charlotte.MQTTConnection mqtt = null;
+        private uPLibrary.Networking.M2Mqtt.MqttClient mqtt = null;
         private bool enabled = false;
 
         public override async Task StartAsync()
         {
             try
             {
-                mqtt = new Charlotte.MQTTConnection(HostSetting, Port, UserName, Password);
-                mqtt.Connect();
+                mqtt = new MqttClient(HostSetting, Port, false, null);
+                mqtt.Connect("zVirtualScenes", UserName, Password);
+
                 enabled = true;
+                mqtt.MqttMsgPublishReceived += mqtt_MqttMsgPublishReceived;
+
+                var pubTopic = this.ControlTopicFormat;
+                mqtt.Subscribe(new string[] {pubTopic}, new byte[] {0});
+
                 await Publish(FloodTopic, "zVirtualScenes Connected");
+
+
+
             }
             catch (Exception e)
             {
@@ -185,6 +220,66 @@ namespace MQTTPlugin
             }
             await Log.ReportInfoFormatAsync(CancellationToken, "{0} started", Name);
             NotifyEntityChangeContext.ChangeNotifications<DeviceValue>.OnEntityUpdated += Plugin_OnEntityUpdated;
+        }
+
+        private async void mqtt_MqttMsgPublishReceived(object sender, MqttMsgPublishEventArgs e)
+        {
+            try
+            {
+                var control =
+                    Newtonsoft.Json.JsonConvert.DeserializeObject<DeviceCommand>(
+                        System.Text.Encoding.UTF8.GetString(e.Message));
+                if (control != null)
+                {
+                    using (var context = new ZvsContext(EntityContextConnection))
+                    {
+                        var device1 =
+                            (from d1 in context.Devices where d1.Id == control.DeviceId select d1).FirstOrDefault();
+                        if (device1 != null)
+                        {
+                            if (control.Argument1.ToLower() == "list_commands")
+                            {
+                                var topic = this.TopicFormat;
+                                topic = topic.Replace("{Device.Id}", device1.Id.ToString());
+                                string cmdList = "";
+                                foreach (var cmd in device1.Commands)
+                                {
+                                    var outCmd = new
+                                    {
+                                        DeviceId = cmd.DeviceId,
+                                        DeviceName = cmd.Device.Name,
+                                        Id = cmd.Id,
+                                        Name = cmd.Name,
+                                        Value = cmd.Value,
+                                        
+                                    };
+
+                                    Publish(topic, Newtonsoft.Json.JsonConvert.SerializeObject(outCmd));
+
+                                }
+                            }
+                            else
+                            {
+                                var cmd =
+                                    (from c in device1.Commands where c.Id == control.CommandId select c).FirstOrDefault
+                                        ();
+                                if (cmd != null)
+                                {
+                                    await
+                                        this.RunCommandAsync(cmd.Id, control.Argument1, control.Argument2,
+                                            CancellationToken);
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+            catch (Exception exc)
+            {
+                Publish(FloodTopic, "Could not process incoming control message:" + exc.ToString());
+            }
+
         }
 
 
@@ -224,27 +319,28 @@ namespace MQTTPlugin
                         if (dv == null)
                             return;
 
-                        var device = e.NewEntity.Device;
+                        var device = (from d in context.Devices where d.Id == dv.DeviceId select d).FirstOrDefault();
 
-                        var topic = this.TopicFormat;
-                        topic = topic.Replace("{Device.Id}", device.Id.ToString());
-                        topic = topic.Replace("{Device.Name}", device.Name);
-                        topic = topic.Replace("{Device.NodeNumber}", device.NodeNumber.ToString());
-
-
-
-                        var message = new DeviceMessage()
+                        if (device != null)
                         {
-                            DeviceId = device.Id,
-                            DeviceName = device.Name,
-                            NodeNumber = device.NodeNumber,
-                            PropertyName = dv.Name,
-                            PropertyType = dv.ValueType.ToString(),
-                            PropertyValue = dv.Value
-                        };
-                        var msg = Newtonsoft.Json.JsonConvert.SerializeObject(message);
-                        await Publish(topic, msg);
+                            var topic = this.TopicFormat;
+                            topic = topic.Replace("{Device.Id}", device.Id.ToString());
 
+                            var message = new DeviceMessage()
+                            {
+                                Action = "Updated",
+                                DeviceId = device.Id,
+                                DeviceName = device.Name,
+                                NodeNumber = device.NodeNumber,
+                                PropertyName = dv.Name,
+                                PropertyType = dv.ValueType.ToString(),
+                                PropertyValue = dv.Value
+                            };
+                            var msg = Newtonsoft.Json.JsonConvert.SerializeObject(message);
+                            await Publish(topic, msg);
+
+       
+                        }
                     }
 
                 }
@@ -261,12 +357,11 @@ namespace MQTTPlugin
         {
             if (enabled)
             {
-                await Log.ReportInfoFormatAsync(CancellationToken, "MQTT, Publishing Topic:{0}, Message:{1}", topic, message);
-                mqtt.Publish(topic, message, MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE, true);
+                mqtt.Publish(topic, System.Text.Encoding.UTF8.GetBytes(message), MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE, true);
 
                 if (!string.IsNullOrEmpty(FloodTopic) && FloodTopic != topic)
                 {
-                    mqtt.Publish(FloodTopic, message, MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE, true);
+                    mqtt.Publish(FloodTopic, System.Text.Encoding.UTF8.GetBytes(message), MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE, true);
                     
                 }
                 await Log.ReportInfoFormatAsync(CancellationToken, "MQTT, Published Topic:{0}, Message:{1}", topic, message);
