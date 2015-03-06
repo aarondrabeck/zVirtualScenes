@@ -201,14 +201,13 @@ namespace MQTTPlugin
             try
             {
                 mqtt = new MqttClient(HostSetting, Port, false, null);
-                mqtt.Connect("zVirtualScenes", UserName, Password);
-
                 enabled = true;
                 mqtt.MqttMsgPublishReceived += mqtt_MqttMsgPublishReceived;
+                mqtt.ConnectionClosed += mqtt_ConnectionClosed;
+                Connect();
 
                 var pubTopic = this.ControlTopicFormat;
                 mqtt.Subscribe(new string[] {pubTopic}, new byte[] {0});
-
                 await Publish(FloodTopic, "zVirtualScenes Connected");
 
 
@@ -220,6 +219,27 @@ namespace MQTTPlugin
             }
             await Log.ReportInfoFormatAsync(CancellationToken, "{0} started", Name);
             NotifyEntityChangeContext.ChangeNotifications<DeviceValue>.OnEntityUpdated += Plugin_OnEntityUpdated;
+        }
+
+        private void mqtt_ConnectionClosed(object sender, EventArgs e)
+        {
+            enabled = false;
+            Connect();
+
+        }
+
+        private void Connect()
+        {
+            try
+            {
+                mqtt.Connect("zVirtualScenes", UserName, Password);
+                enabled = true;
+            }
+            catch (Exception)
+            {
+                Task.Delay(1000).Wait();
+                Connect();
+            }
         }
 
         private async void mqtt_MqttMsgPublishReceived(object sender, MqttMsgPublishEventArgs e)
