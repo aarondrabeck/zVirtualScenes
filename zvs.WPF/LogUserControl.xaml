@@ -42,7 +42,7 @@
             <DataGrid Grid.Row="1" CellStyle="{DynamicResource NoSelectDataGridCell}" x:Name="LogDataGrid"   BorderThickness="0" Background="#FAFAFA" 
                   CanUserDeleteRows="False" RowBackground="#FAFAFA" AlternatingRowBackground="#FAFAFA" AllowDrop="False" RowHeaderWidth="0" FontWeight="Normal"
                   SelectionUnit="FullRow" SelectionMode="Extended"  AutoGenerateColumns="False" RowHeight="45" FontSize="14"
-                  HorizontalGridLinesBrush="{DynamicResource LogNoFocusBrush}" GridLinesVisibility="Horizontal" 
+                  HorizontalGridLinesBrush="{DynamicResource LogNoFocusBrush}" GridLinesVisibility="Horizontal" ClipboardCopyMode="ExcludeHeader"
                   ItemsSource="{Binding Source={StaticResource LogEntryViewSource}}" CanUserAddRows="False">
                 <DataGrid.Resources>
                     <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="{DynamicResource LogSelectedColor}"/>

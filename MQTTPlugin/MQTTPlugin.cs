@@ -77,7 +77,7 @@ namespace MQTTPlugin
                 NotifyPropertyChanged();
             }
         }
-        private string _topicFormat = "zvirtual/{Device.Id}/events";
+        private string _topicFormat = "zvirtual/{NodeNumber}/events";
         public string TopicFormat
         {
             get { return _topicFormat; }
@@ -160,7 +160,7 @@ namespace MQTTPlugin
             var topicSetting = new PluginSetting
             {
                 Name = "Topic",
-                Value = "zvirtual/{Device.Id}/events",
+                Value = "zvirtual/{NodeNumber}/events",
                 ValueType = DataType.STRING,
                 Description = "Enter the topic for changes to be published to, on the broker."
             };
@@ -223,6 +223,7 @@ namespace MQTTPlugin
 
         private void mqtt_ConnectionClosed(object sender, EventArgs e)
         {
+            Log.ReportInfoAsync("Control queue hung up, reconnecting", CancellationToken);
             enabled = false;
             Connect();
 
@@ -233,10 +234,12 @@ namespace MQTTPlugin
             try
             {
                 mqtt.Connect("zVirtualScenes", UserName, Password);
+                Log.ReportInfoAsync("Control queue connected", CancellationToken);
                 enabled = true;
             }
-            catch (Exception)
+            catch (Exception ec)
             {
+                Log.ReportErrorAsync("Control queue connection error:" + ec.ToString(), CancellationToken);
                 Task.Delay(1000).Wait();
                 Connect();
             }
@@ -246,48 +249,79 @@ namespace MQTTPlugin
         {
             try
             {
-                var control =
-                    Newtonsoft.Json.JsonConvert.DeserializeObject<DeviceCommand>(
-                        System.Text.Encoding.UTF8.GetString(e.Message));
-                if (control != null)
+                var msg = System.Text.Encoding.UTF8.GetString(e.Message);
+                if (msg == "list_nodes")
                 {
                     using (var context = new ZvsContext(EntityContextConnection))
                     {
-                        var device1 =
-                            (from d1 in context.Devices where d1.Id == control.DeviceId select d1).FirstOrDefault();
-                        if (device1 != null)
+                        Publish(ControlTopicFormat, Newtonsoft.Json.JsonConvert.SerializeObject(context.Devices));
+                    }
+                }
+                else
+                {
+                    var control =
+                        Newtonsoft.Json.JsonConvert.DeserializeObject<DeviceCommand>(msg);
+                    if (control != null)
+                    {
+                        using (var context = new ZvsContext(EntityContextConnection))
                         {
-                            if (control.Argument1.ToLower() == "list_commands")
+                            var device1 =
+                                (from d1 in context.Devices where d1.Id == control.DeviceId select d1).FirstOrDefault();
+                            if (device1 != null)
                             {
-                                var topic = this.TopicFormat;
-                                topic = topic.Replace("{Device.Id}", device1.Id.ToString());
-                                string cmdList = "";
-                                foreach (var cmd in device1.Commands)
+                                if (control.Argument1.ToLower() == "list_commands")
                                 {
-                                    var outCmd = new
+                                    var topic = this.TopicFormat;
+                                    topic = topic.Replace("{NodeNumber}", device1.NodeNumber.ToString());
+                                    string cmdList = "";
+                                    foreach (var cmd in device1.Commands)
                                     {
-                                        DeviceId = cmd.DeviceId,
-                                        DeviceName = cmd.Device.Name,
-                                        Id = cmd.Id,
-                                        Name = cmd.Name,
-                                        Value = cmd.Value,
-                                        
-                                    };
+                                        var outCmd = new
+                                        {
+                                            NodeNumber = cmd.Device.NodeNumber,
+                                            DeviceId = cmd.DeviceId,
+                                            DeviceName = cmd.Device.Name,
+                                            Id = cmd.Id,
+                                            Name = cmd.Name,
+                                            Value = cmd.Value,
 
-                                    Publish(topic, Newtonsoft.Json.JsonConvert.SerializeObject(outCmd));
+                                        };
 
+                                        Publish(topic, Newtonsoft.Json.JsonConvert.SerializeObject(outCmd));
+                                    }
                                 }
-                            }
-                            else
-                            {
-                                var cmd =
-                                    (from c in device1.Commands where c.Id == control.CommandId select c).FirstOrDefault
-                                        ();
-                                if (cmd != null)
+                                else if (control.Argument1.ToLower() == "list_values")
                                 {
-                                    await
-                                        this.RunCommandAsync(cmd.Id, control.Argument1, control.Argument2,
-                                            CancellationToken);
+                                    var topic = this.TopicFormat;
+                                    topic = topic.Replace("{NodeNumber}", device1.NodeNumber.ToString());
+                                    string cmdList = "";
+                                    foreach (var v in device1.Values)
+                                    {
+                                        var outPro = new
+                                        {
+                                            NodeNumber = v.Device.NodeNumber,
+                                            DeviceId = v.DeviceId,
+                                            Genre = v.Genre,
+                                            Name = v.Name,
+                                            Value = v.Value,
+                                            ValueType = v.ValueType                                            
+                                        };
+
+                                        Publish(topic, Newtonsoft.Json.JsonConvert.SerializeObject(outPro));
+                                    }
+                                }
+                                else
+                                {
+                                    var cmd =
+                                        (from c in device1.Commands where c.Id == control.CommandId select c)
+                                            .FirstOrDefault
+                                            ();
+                                    if (cmd != null)
+                                    {
+                                        await
+                                            this.RunCommandAsync(cmd.Id, control.Argument1, control.Argument2,
+                                                CancellationToken);
+                                    }
                                 }
                             }
                         }
@@ -344,7 +378,7 @@ namespace MQTTPlugin
                         if (device != null)
                         {
                             var topic = this.TopicFormat;
-                            topic = topic.Replace("{Device.Id}", device.Id.ToString());
+                            topic = topic.Replace("{NodeNumber}", device.NodeNumber.ToString());
 
                             var message = new DeviceMessage()
                             {
@@ -359,7 +393,7 @@ namespace MQTTPlugin
                             var msg = Newtonsoft.Json.JsonConvert.SerializeObject(message);
                             await Publish(topic, msg);
 
-       
+
                         }
                     }
 
@@ -368,8 +402,12 @@ namespace MQTTPlugin
                 {
                     Log.ReportInfoAsync(exc.Message, CancellationToken);
 
-                    
+
                 }
+            }
+            else
+            {
+                Log.ReportInfoAsync("MQTT Message was not published, the plugin in turned on, but the service state is not connected.", CancellationToken);
             }
         }
 
