@@ -223,10 +223,13 @@ namespace MQTTPlugin
 
         private void mqtt_ConnectionClosed(object sender, EventArgs e)
         {
-            Log.ReportInfoAsync("Control queue hung up, reconnecting", CancellationToken);
-            enabled = false;
-            Connect();
+            if (!stopping)
+            {
+                Log.ReportInfoAsync("Control queue hung up, reconnecting", CancellationToken);
+                enabled = false;
+                Connect();
 
+            }
         }
 
         private void Connect()
@@ -336,6 +339,7 @@ namespace MQTTPlugin
 
         }
 
+        private bool stopping = false;
 
         public override async Task StopAsync()
         {
@@ -343,7 +347,7 @@ namespace MQTTPlugin
             try
             {
                 await Publish(FloodTopic, "zVirtualScenes Disconnecting");
-
+                stopping = true;
                 mqtt.Disconnect();
                 enabled = false;
 
