@@ -257,7 +257,18 @@ namespace MQTTPlugin
                 {
                     using (var context = new ZvsContext(EntityContextConnection))
                     {
-                        Publish(ControlTopicFormat, Newtonsoft.Json.JsonConvert.SerializeObject(context.Devices));
+                        foreach (var d in context.Devices)
+                        {
+                            var cmd = new
+                            {
+                                Name = d.Name,
+                                NodeNumber = d.NodeNumber,
+                                Location = d.Location,
+
+                            };
+                            Publish(ControlTopicFormat, Newtonsoft.Json.JsonConvert.SerializeObject(cmd));
+                     
+                        }
                     }
                 }
                 else
@@ -269,7 +280,7 @@ namespace MQTTPlugin
                         using (var context = new ZvsContext(EntityContextConnection))
                         {
                             var device1 =
-                                (from d1 in context.Devices where d1.Id == control.DeviceId select d1).FirstOrDefault();
+                                (from d1 in context.Devices where d1.NodeNumber == control.NodeId select d1).FirstOrDefault();
                             if (device1 != null)
                             {
                                 if (control.Argument1.ToLower() == "list_commands")
