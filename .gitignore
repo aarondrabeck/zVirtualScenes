@@ -230,3 +230,4 @@ $RECYCLE.BIN/
 *.msm
 *.msp
 /setup/output
+/packages
