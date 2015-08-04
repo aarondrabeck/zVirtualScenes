@@ -22,7 +22,7 @@ namespace zvs.Processor.Tests
             Database.SetInitializer(new CreateFreshDbInitializer());
             //arrange 
             //act
-            new SceneRunner(null, new StubICommandProcessor(), new ZvsEntityContextConnection());
+            new SceneRunner(null, new StubICommandProcessor(), new UnitTestDbConnection());
             //assert - throws exception
         }
         [TestMethod]
@@ -31,7 +31,7 @@ namespace zvs.Processor.Tests
         {
             //arrange 
             //act
-            new SceneRunner(new StubIFeedback<LogEntry>(), null, new ZvsEntityContextConnection());
+            new SceneRunner(new StubIFeedback<LogEntry>(), null, new UnitTestDbConnection());
             //assert - throws exception
         }
 
@@ -49,7 +49,7 @@ namespace zvs.Processor.Tests
         public void ConstructorNoNullArgsTest()
         {
             //arrange, act
-            var tm = new SceneRunner(new StubIFeedback<LogEntry>(), new StubICommandProcessor(), new ZvsEntityContextConnection());
+            var tm = new SceneRunner(new StubIFeedback<LogEntry>(), new StubICommandProcessor(), new UnitTestDbConnection());
 
             //Assert
             Assert.IsNotNull(tm);

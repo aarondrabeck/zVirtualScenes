@@ -21,7 +21,7 @@ namespace zvs.Processor.Tests
         {
             //arrange 
             //act
-            new ScheduledTaskRunner(null, new StubICommandProcessor(), new ZvsEntityContextConnection(), new CurrentTimeProvider());
+            new ScheduledTaskRunner(null, new StubICommandProcessor(), new UnitTestDbConnection(), new CurrentTimeProvider());
             //assert - throws exception
         }
         [TestMethod]
@@ -30,7 +30,7 @@ namespace zvs.Processor.Tests
         {
             //arrange 
             //act
-            new ScheduledTaskRunner(new StubIFeedback<LogEntry>(), null, new ZvsEntityContextConnection(), new CurrentTimeProvider());
+            new ScheduledTaskRunner(new StubIFeedback<LogEntry>(), null, new UnitTestDbConnection(), new CurrentTimeProvider());
             //assert - throws exception
         }
 
@@ -49,7 +49,7 @@ namespace zvs.Processor.Tests
         public void ConstructorPath4()
         {
             //arrange, act
-            var tm = new ScheduledTaskRunner(new StubIFeedback<LogEntry>(), new StubICommandProcessor(), new ZvsEntityContextConnection(), null);
+            var tm = new ScheduledTaskRunner(new StubIFeedback<LogEntry>(), new StubICommandProcessor(), new UnitTestDbConnection(), null);
             //assert - throws exception
         }
 
@@ -57,7 +57,7 @@ namespace zvs.Processor.Tests
         public void ConstructorPath5()
         {
             //arrange, act
-            var tm = new ScheduledTaskRunner(new StubIFeedback<LogEntry>(), new StubICommandProcessor(), new ZvsEntityContextConnection(), new CurrentTimeProvider());
+            var tm = new ScheduledTaskRunner(new StubIFeedback<LogEntry>(), new StubICommandProcessor(), new UnitTestDbConnection(), new CurrentTimeProvider());
 
             //Assert
             Assert.IsNotNull(tm);
@@ -77,7 +77,7 @@ namespace zvs.Processor.Tests
                 }
             };
             var cts = new CancellationTokenSource();
-            var tm = new ScheduledTaskRunner(log, new StubICommandProcessor(), new ZvsEntityContextConnection(), new CurrentTimeProvider());
+            var tm = new ScheduledTaskRunner(log, new StubICommandProcessor(), new UnitTestDbConnection(), new CurrentTimeProvider());
 
             //Act
             await tm.StartAsync(cts.Token);
@@ -102,7 +102,7 @@ namespace zvs.Processor.Tests
                 }
             };
             var cts = new CancellationTokenSource();
-            var tm = new ScheduledTaskRunner(log, new StubICommandProcessor(), new ZvsEntityContextConnection(), new CurrentTimeProvider());
+            var tm = new ScheduledTaskRunner(log, new StubICommandProcessor(), new UnitTestDbConnection(), new CurrentTimeProvider());
 
             //Act
             await tm.StartAsync(cts.Token);
@@ -126,7 +126,7 @@ namespace zvs.Processor.Tests
                 }
             };
             var cts = new CancellationTokenSource();
-            var tm = new ScheduledTaskRunner(log, new StubICommandProcessor(), new ZvsEntityContextConnection(), new CurrentTimeProvider());
+            var tm = new ScheduledTaskRunner(log, new StubICommandProcessor(), new UnitTestDbConnection(), new CurrentTimeProvider());
 
             //Act
             await tm.StartAsync(cts.Token);
@@ -152,7 +152,7 @@ namespace zvs.Processor.Tests
                 }
             };
             var cts = new CancellationTokenSource();
-            var tm = new ScheduledTaskRunner(log, new StubICommandProcessor(), new ZvsEntityContextConnection(), new CurrentTimeProvider());
+            var tm = new ScheduledTaskRunner(log, new StubICommandProcessor(), new UnitTestDbConnection(), new CurrentTimeProvider());
 
             //Act
             await tm.StopAsync(cts.Token);

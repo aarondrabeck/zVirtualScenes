@@ -22,7 +22,7 @@ namespace zvs.Processor.Tests
             Database.SetInitializer(new CreateFreshDbInitializer());
             //arrange 
             //act
-            new JavaScriptRunner(null, new StubICommandProcessor(), new ZvsEntityContextConnection());
+            new JavaScriptRunner(null, new StubICommandProcessor(), new UnitTestDbConnection());
             //assert - throws exception
         }
         [TestMethod]
@@ -31,7 +31,7 @@ namespace zvs.Processor.Tests
         {
             //arrange 
             //act
-            new JavaScriptRunner(new StubIFeedback<LogEntry>(), null, new ZvsEntityContextConnection());
+            new JavaScriptRunner(new StubIFeedback<LogEntry>(), null, new UnitTestDbConnection());
             //assert - throws exception
         }
 
@@ -49,7 +49,7 @@ namespace zvs.Processor.Tests
         public void ConstructorNoNullArgsTest()
         {
             //arrange, act
-            var tm = new JavaScriptRunner(new StubIFeedback<LogEntry>(), new StubICommandProcessor(), new ZvsEntityContextConnection());
+            var tm = new JavaScriptRunner(new StubIFeedback<LogEntry>(), new StubICommandProcessor(), new UnitTestDbConnection());
 
             //Assert
             Assert.IsNotNull(tm);
@@ -62,7 +62,7 @@ namespace zvs.Processor.Tests
             var logEntries = new List<LogEntry>();
             var log = new StubIFeedback<LogEntry>();
             var cts = new CancellationTokenSource();
-            var runner = new JavaScriptRunner(log, new StubICommandProcessor(), new ZvsEntityContextConnection());
+            var runner = new JavaScriptRunner(log, new StubICommandProcessor(), new UnitTestDbConnection());
             const string script = @"logInfo(a'unit test message');";
 
             //Act
@@ -88,7 +88,7 @@ namespace zvs.Processor.Tests
             };
 
             var cts = new CancellationTokenSource();
-            var runner = new JavaScriptRunner(log, new StubICommandProcessor(), new ZvsEntityContextConnection());
+            var runner = new JavaScriptRunner(log, new StubICommandProcessor(), new UnitTestDbConnection());
             const string script = @"logInfo('unit test message');";
 
             //Act
@@ -117,7 +117,7 @@ namespace zvs.Processor.Tests
             };
 
             var cts = new CancellationTokenSource();
-            var runner = new JavaScriptRunner(log, new StubICommandProcessor(), new ZvsEntityContextConnection());
+            var runner = new JavaScriptRunner(log, new StubICommandProcessor(), new UnitTestDbConnection());
             const string script = @"logInfo(null);";
 
             //Act
@@ -146,7 +146,7 @@ namespace zvs.Processor.Tests
             };
 
             var cts = new CancellationTokenSource();
-            var runner = new JavaScriptRunner(log, new StubICommandProcessor(), new ZvsEntityContextConnection());
+            var runner = new JavaScriptRunner(log, new StubICommandProcessor(), new UnitTestDbConnection());
             const string script = @"logWarn('unit test message');";
 
             //Act
@@ -175,7 +175,7 @@ namespace zvs.Processor.Tests
             };
 
             var cts = new CancellationTokenSource();
-            var runner = new JavaScriptRunner(log, new StubICommandProcessor(), new ZvsEntityContextConnection());
+            var runner = new JavaScriptRunner(log, new StubICommandProcessor(), new UnitTestDbConnection());
             const string script = @"logWarn(null);";
 
             //Act
@@ -204,7 +204,7 @@ namespace zvs.Processor.Tests
             };
 
             var cts = new CancellationTokenSource();
-            var runner = new JavaScriptRunner(log, new StubICommandProcessor(), new ZvsEntityContextConnection());
+            var runner = new JavaScriptRunner(log, new StubICommandProcessor(), new UnitTestDbConnection());
             const string script = @"logError('unit test message');";
 
             //Act
@@ -233,7 +233,7 @@ namespace zvs.Processor.Tests
             };
 
             var cts = new CancellationTokenSource();
-            var runner = new JavaScriptRunner(log, new StubICommandProcessor(), new ZvsEntityContextConnection());
+            var runner = new JavaScriptRunner(log, new StubICommandProcessor(), new UnitTestDbConnection());
             const string script = @"logError(null);";
 
             //Act
@@ -262,7 +262,7 @@ namespace zvs.Processor.Tests
             };
 
             var cts = new CancellationTokenSource();
-            var runner = new JavaScriptRunner(log, new StubICommandProcessor(), new ZvsEntityContextConnection());
+            var runner = new JavaScriptRunner(log, new StubICommandProcessor(), new UnitTestDbConnection());
             const string script = @"
 function delayTest() { 
         logInfo('start');
@@ -287,7 +287,7 @@ delayTest();";
             var log = new StubIFeedback<LogEntry>();
 
             var cts = new CancellationTokenSource();
-            var runner = new JavaScriptRunner(log, new StubICommandProcessor(), new ZvsEntityContextConnection());
+            var runner = new JavaScriptRunner(log, new StubICommandProcessor(), new UnitTestDbConnection());
             const string script = @"
 function f1() { 
        var proc = shell('cmd.exe', 'dir');        
@@ -326,7 +326,7 @@ f1();";
             };
             var expected = Path.Combine(Utils.AppPath, "/test");
             var cts = new CancellationTokenSource();
-            var runner = new JavaScriptRunner(log, new StubICommandProcessor(), new ZvsEntityContextConnection());
+            var runner = new JavaScriptRunner(log, new StubICommandProcessor(), new UnitTestDbConnection());
             const string script = @"
 function f1() { 
        var path = mappath('/test');  
@@ -359,7 +359,7 @@ f1();";
                 }
             };
             var cts = new CancellationTokenSource();
-            var runner = new JavaScriptRunner(log, new StubICommandProcessor(), new ZvsEntityContextConnection());
+            var runner = new JavaScriptRunner(log, new StubICommandProcessor(), new UnitTestDbConnection());
             const string script = @"
 function f1() { 
        require('NonExistantScript.js');      
@@ -389,7 +389,7 @@ f1();";
                 }
             };
             var cts = new CancellationTokenSource();
-            var runner = new JavaScriptRunner(log, new StubICommandProcessor(), new ZvsEntityContextConnection());
+            var runner = new JavaScriptRunner(log, new StubICommandProcessor(), new UnitTestDbConnection());
             const string script = @"
 function f1() { 
        require('TestScript0.js');      
@@ -421,7 +421,7 @@ f1();";
                 }
             };
             var cts = new CancellationTokenSource();
-            var runner = new JavaScriptRunner(log, new StubICommandProcessor(), new ZvsEntityContextConnection());
+            var runner = new JavaScriptRunner(log, new StubICommandProcessor(), new UnitTestDbConnection());
             const string script = @"
 function f1() { 
        require('TestScript1.js');      
@@ -453,7 +453,7 @@ f1();";
                 }
             };
             var cts = new CancellationTokenSource();
-            var runner = new JavaScriptRunner(log, new StubICommandProcessor(), new ZvsEntityContextConnection());
+            var runner = new JavaScriptRunner(log, new StubICommandProcessor(), new UnitTestDbConnection());
             const string script = @"
 function f1() { 
        require('TestScript2.js');      

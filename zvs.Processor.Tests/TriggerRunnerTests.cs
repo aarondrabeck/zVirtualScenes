@@ -23,7 +23,7 @@ namespace zvs.Processor.Tests
             Database.SetInitializer(new CreateFreshDbInitializer());
             //arrange 
             //act
-            new TriggerRunner(null, new StubICommandProcessor(), new ZvsEntityContextConnection());
+            new TriggerRunner(null, new StubICommandProcessor(), new UnitTestDbConnection());
             //assert - throws exception
         }
         [TestMethod]
@@ -32,7 +32,7 @@ namespace zvs.Processor.Tests
         {
             //arrange 
             //act
-            new TriggerRunner(new StubIFeedback<LogEntry>(), null, new ZvsEntityContextConnection());
+            new TriggerRunner(new StubIFeedback<LogEntry>(), null, new UnitTestDbConnection());
             //assert - throws exception
         }
 
@@ -50,7 +50,7 @@ namespace zvs.Processor.Tests
         public void ConstructorNoNullArgsTest()
         {
             //arrange, act
-            var tm = new TriggerRunner(new StubIFeedback<LogEntry>(), new StubICommandProcessor(), new ZvsEntityContextConnection());
+            var tm = new TriggerRunner(new StubIFeedback<LogEntry>(), new StubICommandProcessor(), new UnitTestDbConnection());
 
             //Assert
             Assert.IsNotNull(tm);
@@ -70,7 +70,7 @@ namespace zvs.Processor.Tests
                 }
             };
             var cts = new CancellationTokenSource();
-            var tm = new TriggerRunner(log, new StubICommandProcessor(), new ZvsEntityContextConnection());
+            var tm = new TriggerRunner(log, new StubICommandProcessor(), new UnitTestDbConnection());
 
             //Act
             await tm.StartAsync(cts.Token);
@@ -95,7 +95,7 @@ namespace zvs.Processor.Tests
                 }
             };
             var cts = new CancellationTokenSource();
-            var tm = new TriggerRunner(log, new StubICommandProcessor(), new ZvsEntityContextConnection());
+            var tm = new TriggerRunner(log, new StubICommandProcessor(), new UnitTestDbConnection());
 
             //Act
             await tm.StartAsync(cts.Token);
@@ -118,7 +118,7 @@ namespace zvs.Processor.Tests
                 }
             };
             var cts = new CancellationTokenSource();
-            var tm = new TriggerRunner(log, new StubICommandProcessor(), new ZvsEntityContextConnection());
+            var tm = new TriggerRunner(log, new StubICommandProcessor(), new UnitTestDbConnection());
 
             //Act
             await tm.ActivateTriggerAsync(0, cts.Token);

@@ -9,7 +9,7 @@ namespace zvs.Processor.Tests
         [TestMethod]
         public void TestMethod1()
         {
-            using (var context = new ZvsContext(new ZvsEntityContextConnection()))
+            using (var context = new ZvsContext(new UnitTestDbConnection()))
             {
                 var device = UnitTesting.CreateFakeDevice();
                 context.Devices.Add(device);
