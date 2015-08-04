@@ -93,7 +93,8 @@
       <build-trigger id="vcsTrigger" type="vcsTrigger">
         <parameters>
           <param name="quietPeriodMode" value="DO_NOT_USE" />
-          <param name="triggerRules" value="-:root=zVirtualScenesRepo;comment=TeamCity change in*:**" />
+          <param name="triggerRules"><![CDATA[-:root=zVirtualScenesRepo;comment=TeamCity change in*:**
+-:comment=minor:*:**]]></param>
         </parameters>
       </build-trigger>
     </build-triggers>
