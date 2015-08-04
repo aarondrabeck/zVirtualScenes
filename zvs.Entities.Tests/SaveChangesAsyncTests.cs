@@ -71,7 +71,7 @@ namespace zvs.DataModel.Tests
                 //Assert
                 Assert.IsTrue(currentLogEntryCount == 2000, "Expected 2000 entries and got " + currentLogEntryCount);
                 Assert.AreEqual("hello world 23", firstentry.Message);
-                Assert.AreEqual("hello world 2024",lastEntry.Message);
+                Assert.AreEqual("hello world 2022",lastEntry.Message);
             }
         }
 
