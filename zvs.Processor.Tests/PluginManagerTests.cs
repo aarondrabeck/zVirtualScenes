@@ -21,7 +21,7 @@ namespace zvs.Processor.Tests
         {
             //arrange 
             //act
-            new PluginManager(null, new StubIEntityContextConnection(), new StubIFeedback<LogEntry>(), new StubIAdapterManager());
+            new PluginManager(null, new UnitTestDbConnection(), new StubIFeedback<LogEntry>(), new StubIAdapterManager());
             //assert - throws exception
         }
 
@@ -41,7 +41,7 @@ namespace zvs.Processor.Tests
         {
             //arrange 
             //act
-            new PluginManager(new List<ZvsPlugin>(), new StubIEntityContextConnection(), null, new StubIAdapterManager());
+            new PluginManager(new List<ZvsPlugin>(), new UnitTestDbConnection(), null, new StubIAdapterManager());
             //assert - throws exception
         }
 
@@ -51,7 +51,7 @@ namespace zvs.Processor.Tests
         {
             //arrange 
             //act
-            new PluginManager(new List<ZvsPlugin>(), new StubIEntityContextConnection(), new StubIFeedback<LogEntry>(), null);
+            new PluginManager(new List<ZvsPlugin>(), new UnitTestDbConnection(), new StubIFeedback<LogEntry>(), null);
             //assert - throws exception
         }
 

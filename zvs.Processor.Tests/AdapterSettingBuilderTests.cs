@@ -39,7 +39,7 @@ namespace zvs.Processor.Tests
         {
             //Arrange 
             Database.SetInitializer(new CreateFreshDbInitializer());
-            var adapterBuilder = new AdapterSettingBuilder(new StubIEntityContextConnection(), CancellationToken.None);
+            var adapterBuilder = new AdapterSettingBuilder(new UnitTestDbConnection(), CancellationToken.None);
             var adapter = new StubUnitTestAdapter();
 
             //act

@@ -21,7 +21,7 @@ namespace zvs.Processor.Tests
             var fb = new StubIFeedback<LogEntry>();
             var am = new StubIAdapterManager();
             var pm = new StubIPluginManager();
-            var connection = new StubIEntityContextConnection();
+            var connection = new UnitTestDbConnection();
             var tr = new TriggerRunner(fb, new StubICommandProcessor(), connection);
             var st = new StubScheduledTaskRunner(fb, new StubICommandProcessor(), connection, new StubITimeProvider());
 
@@ -37,7 +37,7 @@ namespace zvs.Processor.Tests
             //arrange 
             var fb = new StubIFeedback<LogEntry>();
             var pm = new StubIPluginManager();
-            var connection = new StubIEntityContextConnection();
+            var connection = new UnitTestDbConnection();
             var tr = new TriggerRunner(fb, new StubICommandProcessor(), connection);
             var st = new StubScheduledTaskRunner(fb, new StubICommandProcessor(), connection, new StubITimeProvider());
 
@@ -53,7 +53,7 @@ namespace zvs.Processor.Tests
             //arrange 
             var fb = new StubIFeedback<LogEntry>();
             var am = new StubIAdapterManager();
-            var connection = new StubIEntityContextConnection();
+            var connection = new UnitTestDbConnection();
             var tr = new TriggerRunner(fb, new StubICommandProcessor(), connection);
             var st = new StubScheduledTaskRunner(fb, new StubICommandProcessor(), connection, new StubITimeProvider());
 
@@ -70,7 +70,7 @@ namespace zvs.Processor.Tests
             var fb = new StubIFeedback<LogEntry>();
             var am = new StubIAdapterManager();
             var pm = new StubIPluginManager();
-            var connection = new StubIEntityContextConnection();
+            var connection = new UnitTestDbConnection();
             var tr = new TriggerRunner(fb, new StubICommandProcessor(), connection);
             var st = new StubScheduledTaskRunner(fb, new StubICommandProcessor(), connection, new StubITimeProvider());
 
@@ -87,7 +87,7 @@ namespace zvs.Processor.Tests
             var fb = new StubIFeedback<LogEntry>();
             var am = new StubIAdapterManager();
             var pm = new StubIPluginManager();
-            var connection = new StubIEntityContextConnection();
+            var connection = new UnitTestDbConnection();
             var st = new StubScheduledTaskRunner(fb, new StubICommandProcessor(), connection, new StubITimeProvider());
 
             //act
@@ -103,7 +103,7 @@ namespace zvs.Processor.Tests
             var fb = new StubIFeedback<LogEntry>();
             var am = new StubIAdapterManager();
             var pm = new StubIPluginManager();
-            var connection = new StubIEntityContextConnection();
+            var connection = new UnitTestDbConnection();
             var tr = new TriggerRunner(fb, new StubICommandProcessor(), connection);
 
             //act
@@ -118,7 +118,7 @@ namespace zvs.Processor.Tests
             var fb = new StubIFeedback<LogEntry>();
             var am = new StubIAdapterManager();
             var pm = new StubIPluginManager();
-            var connection = new StubIEntityContextConnection();
+            var connection = new UnitTestDbConnection();
             var tr = new TriggerRunner(fb, new StubICommandProcessor(), connection);
             var st = new StubScheduledTaskRunner(fb, new StubICommandProcessor(), connection, new StubITimeProvider());
 

@@ -39,7 +39,7 @@ namespace zvs.Processor.Tests
         {
             //Arrange 
             Database.SetInitializer(new CreateFreshDbInitializer());
-            var pluginBuilder = new PluginSettingBuilder(new StubIEntityContextConnection(), CancellationToken.None);
+            var pluginBuilder = new PluginSettingBuilder(new UnitTestDbConnection(), CancellationToken.None);
             var plugin = new StubUnitTestPlugin();
 
             //act

@@ -18,7 +18,7 @@ namespace zvs.Processor.Tests
         public void ConstructorNullArg1Test()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection();
+            var dbConnection = new UnitTestDbConnection();
             //act
             new DeviceCommandBuilder(null);
             //assert - throws exception
@@ -28,7 +28,7 @@ namespace zvs.Processor.Tests
         public void ConstructorTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection();
+            var dbConnection = new UnitTestDbConnection();
             //act
             var dvb = new DeviceCommandBuilder(dbConnection);
             //assert 
@@ -39,7 +39,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAsyncNullDeviceValueTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection();
+            var dbConnection = new UnitTestDbConnection();
             var dvb = new DeviceCommandBuilder( dbConnection);
 
             //act

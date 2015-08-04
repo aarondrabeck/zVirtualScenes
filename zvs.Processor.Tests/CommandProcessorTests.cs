@@ -633,10 +633,7 @@ namespace zvs.Processor.Tests
         public async Task ExecuteBuiltinCommandAsyncGroupOnNoDevicesTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection
-            {
-                NameOrConnectionStringGet = () => "CP-ExecuteBuiltinCommandAsyncGroupOnNoDevicesTest"
-            };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var groupOnIdsRequestSentToAdapter = new List<Group>();
@@ -685,10 +682,7 @@ namespace zvs.Processor.Tests
         public async Task ExecuteBuiltinCommandAsyncGroupOnTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection
-            {
-                NameOrConnectionStringGet = () => "CP-ExecuteBuiltinCommandAsyncGroupOnTest"
-            };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var groupOnIdsRequestSentToAdapter = new List<Group>();

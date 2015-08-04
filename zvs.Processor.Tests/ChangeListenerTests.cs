@@ -107,7 +107,7 @@ namespace zvs.Processor.Tests
                 }
             };
             var cts = new CancellationTokenSource();
-            var tm = new ChangeListener(log, new StubIEntityContextConnection());
+            var tm = new ChangeListener(log, new UnitTestDbConnection());
 
             //Act
             await tm.StartAsync(cts.Token);
@@ -133,7 +133,7 @@ namespace zvs.Processor.Tests
                 }
             };
             var cts = new CancellationTokenSource();
-            var tm = new ChangeListener(log, new StubIEntityContextConnection());
+            var tm = new ChangeListener(log, new UnitTestDbConnection());
 
             //Act
             await tm.StopAsync(cts.Token);

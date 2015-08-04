@@ -21,7 +21,7 @@ namespace zvs.Processor.Tests
         {
             //arrange 
             //act
-            new AdapterManager(null, new StubIEntityContextConnection(), new StubIFeedback<LogEntry>());
+            new AdapterManager(null, new UnitTestDbConnection(), new StubIFeedback<LogEntry>());
             //assert - throws exception
         }
 
@@ -41,7 +41,7 @@ namespace zvs.Processor.Tests
         {
             //arrange 
             //act
-            new AdapterManager(new List<ZvsAdapter>(), new StubIEntityContextConnection(), null);
+            new AdapterManager(new List<ZvsAdapter>(), new UnitTestDbConnection(), null);
             //assert - throws exception
         }
 

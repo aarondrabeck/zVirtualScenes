@@ -16,7 +16,7 @@ namespace zvs.Processor.Tests
             var adapter = new UnitTestAdapter();
             try
             {
-                await adapter.Initialize(new StubIFeedback<LogEntry>(), new StubIEntityContextConnection());
+                await adapter.Initialize(new StubIFeedback<LogEntry>(), new UnitTestDbConnection());
             }
             catch (Exception ex)
             {

@@ -25,7 +25,7 @@ namespace zvs.Processor.Tests
         public void ConstructorTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection();
+            var dbConnection = new UnitTestDbConnection();
             //act
             var ssb = new SceneSettingBuilder(dbConnection);
             //assert 
@@ -36,7 +36,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAsyncNullSceneTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection();
+            var dbConnection = new UnitTestDbConnection();
             var ssb = new SceneSettingBuilder(dbConnection);
 
             //act

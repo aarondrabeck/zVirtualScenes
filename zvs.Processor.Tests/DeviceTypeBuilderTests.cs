@@ -17,7 +17,7 @@ namespace zvs.Processor.Tests
         public void ConstructorNullArg1Test()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection();
+            var dbConnection = new UnitTestDbConnection();
             //act
             new DeviceTypeBuilder(null);
             //assert - throws exception
@@ -27,7 +27,7 @@ namespace zvs.Processor.Tests
         public void ConstructorTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection();
+            var dbConnection = new UnitTestDbConnection();
             //act
             var dvb = new DeviceTypeBuilder(dbConnection);
             //assert 
