@@ -473,7 +473,7 @@ f1();";
         public async Task RunBadDeviceCommandTest()
         {
             //Arrange
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "JavaScriptRunner-RunBadDeviceCommandTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -507,7 +507,7 @@ f1();";
         public async Task RunDeviceCommandTest()
         {
             //Arrange
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "JavaScriptRunner-RunDeviceCommandTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             int? commandIdRan = 0;
@@ -568,7 +568,7 @@ f1();";
         public async Task RunCommandTest()
         {
             //Arrange
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "JavaScriptRunner-RunCommandTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             int? commandIdRan = 0;

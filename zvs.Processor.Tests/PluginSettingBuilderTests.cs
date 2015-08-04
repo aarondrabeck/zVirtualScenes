@@ -52,7 +52,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterPluginSettingNullPluginTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "asb-RegisterPluginSettingNullPluginTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var pluginBuilder = new PluginSettingBuilder( dbConnection, CancellationToken.None);
             var plugin = new StubUnitTestPlugin();
@@ -69,7 +69,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterPluginSettingPluginTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "asb-RegisterPluginSettingPluginTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var pluginBuilder = new PluginSettingBuilder(dbConnection, CancellationToken.None);
             var dbPlugin = UnitTesting.CreateFakePlugin();
@@ -112,7 +112,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterPluginSettingValueTypeChangedTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "asb-RegisterPluginSettingValueTypeChangedTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var pluginBuilder = new PluginSettingBuilder(dbConnection, CancellationToken.None);
             var dbPlugin = UnitTesting.CreateFakePlugin();
@@ -159,7 +159,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterPluginSettingValueDonestTriggerChangedTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "asb-RegisterPluginSettingValueDonestTriggerChangedTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var pluginBuilder = new PluginSettingBuilder( dbConnection, CancellationToken.None);
             var dbPlugin = UnitTesting.CreateFakePlugin();
@@ -207,7 +207,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterPluginSettingOptionAddedTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "asb-RegisterPluginSettingOptionAddedTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var pluginBuilder = new PluginSettingBuilder( dbConnection, CancellationToken.None);
             var dbPlugin = UnitTesting.CreateFakePlugin();
@@ -264,7 +264,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterPluginSettingOptionRemovedTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "asb-RegisterPluginSettingOptionRemovedTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var pluginBuilder = new PluginSettingBuilder( dbConnection, CancellationToken.None);
             var dbPlugin = UnitTesting.CreateFakePlugin();

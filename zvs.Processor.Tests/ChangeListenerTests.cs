@@ -146,7 +146,7 @@ namespace zvs.Processor.Tests
         public async Task ValueChangeTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "changelistener-ValueChangeTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();

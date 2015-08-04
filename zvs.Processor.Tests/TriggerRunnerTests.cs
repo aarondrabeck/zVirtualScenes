@@ -19,7 +19,7 @@ namespace zvs.Processor.Tests
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorNullArg1Test()
         {
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "MultilpleTriggersTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             //arrange 
             //act
@@ -131,7 +131,7 @@ namespace zvs.Processor.Tests
         public async Task ActivateTriggerAsyncPath2Test()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "ActivateTriggerAsyncPath2Test" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -208,7 +208,7 @@ namespace zvs.Processor.Tests
         [TestMethod]
         public async Task StopPath1()
         {
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "TriggerStopPath1" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             //Arrange 
@@ -236,7 +236,7 @@ namespace zvs.Processor.Tests
         [TestMethod]
         public async Task StopPath2()
         {
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "TriggerStopPath2" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             //Arrange 
@@ -264,7 +264,7 @@ namespace zvs.Processor.Tests
         public async Task ValueNotChangedTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "Trigger-ValueNotChangedTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -339,7 +339,7 @@ namespace zvs.Processor.Tests
         public async Task DisabledTriggerTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "Trigger-DisabledTriggerTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -413,7 +413,7 @@ namespace zvs.Processor.Tests
         public async Task EqualTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "Trigger-EqualTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -489,7 +489,7 @@ namespace zvs.Processor.Tests
         public async Task ContraEqualTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "Trigger-ContraEqualTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -562,7 +562,7 @@ namespace zvs.Processor.Tests
         public async Task GreaterThanTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "Trigger-GreaterThanTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -639,7 +639,7 @@ namespace zvs.Processor.Tests
         public async Task GreaterThanInvalidValuesTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "Trigger-GreaterThanInvalidValuesTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -712,7 +712,7 @@ namespace zvs.Processor.Tests
         public async Task ContraGreaterThanTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "Trigger-ContraGreaterThanTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -785,7 +785,7 @@ namespace zvs.Processor.Tests
         public async Task LessThanTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "Trigger-LessThanTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -860,7 +860,7 @@ namespace zvs.Processor.Tests
         public async Task ContraLessThanTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "Trigger-ContraLessThanTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -932,7 +932,7 @@ namespace zvs.Processor.Tests
         public async Task LessThanInvalidValuesTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "Trigger-LessThanInvalidValuesTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -1006,7 +1006,7 @@ namespace zvs.Processor.Tests
         public async Task NotEqualTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "Trigger-NotEqualTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -1081,7 +1081,7 @@ namespace zvs.Processor.Tests
         public async Task ContraNotEqualTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "Trigger-ContraNotEqualTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -1154,7 +1154,8 @@ namespace zvs.Processor.Tests
         [TestMethod]
         public async Task QuickFireTriggerTest()
         {
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "Trigger-QuickFireTriggerTest" };
+
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();

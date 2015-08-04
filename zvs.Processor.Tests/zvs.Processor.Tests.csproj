@@ -104,6 +104,7 @@
     <Compile Include="FeedbackExtensionMethodTests.cs" />
     <Compile Include="CreateFakeData.cs" />
     <Compile Include="JavaScriptRunnerTests.cs" />
+    <Compile Include="UnitTestDbConnection.cs" />
     <Compile Include="ZvsEngineTests.cs" />
     <Compile Include="UnitTestingAdapter.cs" />
     <Compile Include="ZvsPluginTests.cs" />

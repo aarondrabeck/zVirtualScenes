@@ -38,7 +38,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAsyncInvalidAdapterTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "dtb-RegisterAsyncInvalidAdapterTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var dtb = new DeviceTypeBuilder( dbConnection);
@@ -55,7 +55,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAsyncNewDeviceTypeTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "dtb-RegisterAsyncNewDeviceTypeTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var dtb = new DeviceTypeBuilder( dbConnection);
@@ -86,7 +86,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAsyncUpdatedDeviceTypeTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "dtb-RegisterAsyncUpdatedDeviceTypeTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var dtb = new DeviceTypeBuilder(dbConnection);
@@ -119,7 +119,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAsyncAddCommandDeviceTypeTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "dtb-RegisterAsyncAddCommandDeviceTypeTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var dtb = new DeviceTypeBuilder(dbConnection);
@@ -162,7 +162,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAsyncUpdatedCommandDeviceTypeTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "dtb-RegisterAsyncUpdatedCommandDeviceTypeTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var dtb = new DeviceTypeBuilder( dbConnection);
@@ -207,7 +207,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAsyncAddedCommandOptionDeviceTypeTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "dtb-RegisterAsyncAddedCommandOptionDeviceTypeTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var dtb = new DeviceTypeBuilder( dbConnection);
@@ -263,7 +263,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAsyncRemvoedCommandOptionDeviceTypeTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "dtb-RegisterAsyncRemvoedCommandOptionDeviceTypeTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var dtb = new DeviceTypeBuilder(dbConnection);
@@ -320,7 +320,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAsyncNoUpdateTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "dtb-RegisterAsyncNoUpdateTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var dtb = new DeviceTypeBuilder(dbConnection);

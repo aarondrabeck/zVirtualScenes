@@ -66,7 +66,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAsyncNewDeviceValueTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "dvb-RegisterAsyncNewDeviceValueTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var dvb = new DeviceValueBuilder( dbConnection);
@@ -102,7 +102,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAsyncUpdatedDeviceValueTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "dvb-RegisterAsyncUpdatedDeviceValueTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var dvb = new DeviceValueBuilder( dbConnection);
@@ -149,7 +149,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAsyncNothingToUpdateTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "dvb-RegisterAsyncNothingToUpdateTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var dvb = new DeviceValueBuilder(dbConnection);

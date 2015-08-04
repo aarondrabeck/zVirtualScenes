@@ -59,7 +59,7 @@ namespace zvs.Processor.Tests
         public async Task LoadPluginsAsyncAutoStartTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-LoadPluginsAsyncAutoStartTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var log = new StubIFeedback<LogEntry>
@@ -124,7 +124,7 @@ namespace zvs.Processor.Tests
         public async Task LoadPluginsNameTooLongAsyncTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-LoadPluginsNameTooLongAsyncTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -160,7 +160,7 @@ namespace zvs.Processor.Tests
         public async Task GetZvsPluginsTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-GetZvsPlugins" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var log = new StubIFeedback<LogEntry>();
@@ -187,7 +187,7 @@ namespace zvs.Processor.Tests
         public async Task SetPluginPropertyTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-SetPluginPropertyTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -215,7 +215,7 @@ namespace zvs.Processor.Tests
         public async Task SetPluginPropertyInvalidPropertyTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-SetPluginPropertyInvalidPropertyTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -243,7 +243,7 @@ namespace zvs.Processor.Tests
         public async Task SetPluginPropertyCastPropertyTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-SetPluginPropertyCastPropertyTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -271,7 +271,7 @@ namespace zvs.Processor.Tests
         public async Task StartTwiceTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-LoadPluginsAsyncAutoStartTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var logEntries = new List<LogEntry>();
             var log = new StubIFeedback<LogEntry>
@@ -339,7 +339,7 @@ namespace zvs.Processor.Tests
         public async Task StopTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-StopTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var logEntries = new List<LogEntry>();
             var log = new StubIFeedback<LogEntry>
@@ -414,7 +414,7 @@ namespace zvs.Processor.Tests
         public async Task StopWhenNotStartedTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-StopWhenNotStartedTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var logEntries = new List<LogEntry>();
             var log = new StubIFeedback<LogEntry>
@@ -460,7 +460,7 @@ namespace zvs.Processor.Tests
         public async Task EnablePluginAsyncTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-EnablePluginAsyncTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var log = new StubIFeedback<LogEntry>();
@@ -500,7 +500,7 @@ namespace zvs.Processor.Tests
         public async Task EnablePluginAsyncNotFoundTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-EnablePluginAsyncNotFoundTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var log = new StubIFeedback<LogEntry>();
@@ -517,7 +517,7 @@ namespace zvs.Processor.Tests
         public async Task DisablePluginAsyncTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-DisablePluginAsyncTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var log = new StubIFeedback<LogEntry>();
@@ -557,7 +557,7 @@ namespace zvs.Processor.Tests
         public async Task DisablePluginAsyncNotFoundTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-DisablePluginAsyncNotFoundTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var log = new StubIFeedback<LogEntry>();
@@ -574,7 +574,7 @@ namespace zvs.Processor.Tests
         public async Task FindZvsPluginAsyncTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-FindZvsPluginAsyncTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -614,7 +614,7 @@ namespace zvs.Processor.Tests
         public async Task FindZvsPluginInvalidIdAsyncTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-FindZvsPluginInvalidIdAsyncTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -642,7 +642,7 @@ namespace zvs.Processor.Tests
         public async Task TestPropertyUpdatingOnDatabaseSettingChange()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-TestPropertyUpdatingOnDatabaseSettingChange" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var log = new StubIFeedback<LogEntry>

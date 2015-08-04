@@ -51,7 +51,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAsyncNewTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "dsb-RegisterAsyncNewTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var dsb = new DeviceSettingBuilder(dbConnection);
 
@@ -84,7 +84,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAsyncUpdateTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "dsb-RegisterAsyncUpdateTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var dsb = new DeviceSettingBuilder(dbConnection);
 
@@ -126,7 +126,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAsyncOptionAddTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "dsb-RegisterAsyncOptionAddTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var dsb = new DeviceSettingBuilder(dbConnection);
 
@@ -178,7 +178,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAsyncOptionRemoveTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "dsb-RegisterAsyncOptionRemoveTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var dsb = new DeviceSettingBuilder(dbConnection);
 
@@ -231,7 +231,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAsyncNoUpdateTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "dsb-RegisterAsyncNoUpdateTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var dsb = new DeviceSettingBuilder(dbConnection);
 
