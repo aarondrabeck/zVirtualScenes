@@ -18,7 +18,7 @@ namespace zvs.DataModel.Tests
             var result = entry.ToString();
 
             //Act
-            Assert.AreEqual("2000-01-02-01:01:40:100|UnitTest            |Sample log entry", result);
+            Assert.AreEqual("2000-01-02-01:01:40:100|UnitTest            |Info                |Sample log entry", result);
         }
     }
 }

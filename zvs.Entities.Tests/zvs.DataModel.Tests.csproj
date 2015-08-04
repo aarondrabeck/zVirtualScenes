@@ -72,6 +72,7 @@
     <Compile Include="LogEntryTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SaveChangesAsyncTests.cs" />
+    <Compile Include="UnitTestDbConnection.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\zvs.Entities\zvs.DataModel.csproj">

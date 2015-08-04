@@ -17,7 +17,7 @@ namespace zvs.DataModel.Tests
         public async Task LogEntryMultipleContextLimitTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "LogEntrySingleContextLimitTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new DropCreateDatabaseAlways<ZvsContext>());
 
             var log = new DatabaseFeedback(dbConnection);
@@ -43,7 +43,7 @@ namespace zvs.DataModel.Tests
         public async Task LogEntrySingleContextLimitTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "LogEntrySingleContextLimitTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new DropCreateDatabaseAlways<ZvsContext>());
 
             using (var context = new ZvsContext(dbConnection))
@@ -77,7 +77,7 @@ namespace zvs.DataModel.Tests
         public async Task LogEntryLimitMultiThreadedTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "LogEntryLimitMultiThreadedTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new DropCreateDatabaseAlways<ZvsContext>());
 
             var log = new DatabaseFeedback(dbConnection);
