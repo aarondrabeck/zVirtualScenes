@@ -57,6 +57,7 @@ namespace zvs.DataModel.Tests
                         Message = $"hello world {i}",
                         Source = "Source"
                     });
+                    await Task.Delay(10);
                 }
                 await context.SaveChangesAsync(CancellationToken.None);
             }
@@ -66,10 +67,11 @@ namespace zvs.DataModel.Tests
                 var currentLogEntryCount = context.LogEntries.Count();
                 var firstentry = await context.LogEntries.OrderBy(o => o.Datetime).FirstAsync();
                 var lastEntry = await context.LogEntries.OrderByDescending(o => o.Datetime).FirstAsync();
-                //Aseert
+                
+                //Assert
                 Assert.IsTrue(currentLogEntryCount == 2000, "Expected 2000 entries and got " + currentLogEntryCount);
-                Assert.IsTrue(firstentry.Message == "hello world 24", "Expected first entry to start with 24");
-                Assert.IsTrue(lastEntry.Message == "hello world 2022", "Expected last entry to start with 2002");
+                Assert.AreEqual("hello world 23", firstentry.Message);
+                Assert.AreEqual("hello world 2024",lastEntry.Message);
             }
         }
 

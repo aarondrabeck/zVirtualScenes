@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data.Entity;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
