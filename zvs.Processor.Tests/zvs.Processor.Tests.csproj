@@ -66,14 +66,6 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="WindowsBase" />
-    <Reference Include="xunit, Version=1.9.2.1705, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\xunit.dll</HintPath>
-    </Reference>
-    <Reference Include="xunit.runner.msbuild, Version=1.9.2.1705, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\xunit.runner.msbuild.dll</HintPath>
-    </Reference>
     <Reference Include="zvs.DataModel.Fakes">
       <HintPath>FakesAssemblies\zvs.DataModel.Fakes.dll</HintPath>
     </Reference>
