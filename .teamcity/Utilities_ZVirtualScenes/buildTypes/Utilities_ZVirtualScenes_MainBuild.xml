@@ -77,7 +77,7 @@
       </runner>
       <runner id="RUNNER_310" name="" type="simpleRunner">
         <parameters>
-          <param name="script.content" value="&quot;C:\Program Files (x86)\Inno Setup 5\iscc.exe&quot; /v99 /dBuildPath=&quot;$(MSBuildProjectDirectory)&quot; /dAppVerName=%build.number% /dAppVersion=%build.number%  /dMyAppVersion=%build.number%  /SStandard=$p  &quot;setup\zvs IstallerCreator.iss&quot;" />
+          <param name="script.content" value="&quot;C:\Program Files (x86)\Inno Setup 5\iscc.exe&quot; /v99 /dBuildPath=&quot;%teamcity.build.workingDir%&quot; /dAppVerName=%build.number% /dAppVersion=%build.number%  /dMyAppVersion=%build.number%  /SStandard=$p  &quot;setup\zvs IstallerCreator.iss&quot;" />
           <param name="teamcity.step.mode" value="default" />
           <param name="use.custom.script" value="true" />
         </parameters>
