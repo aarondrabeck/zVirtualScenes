@@ -5,7 +5,7 @@ namespace zvs.DataModel
     [Table("CommandOptions", Schema = "ZVS")]
     public class CommandOption : BaseOption, IIdentity
     {
-        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         public int? CommandId { get; set; }

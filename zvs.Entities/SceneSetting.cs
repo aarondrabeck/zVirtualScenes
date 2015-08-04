@@ -6,7 +6,7 @@ namespace zvs.DataModel
     [Table("SceneSettings", Schema = "ZVS")]
     public class SceneSetting : BaseValue, IIdentity
     {
-        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         private ObservableCollection<SceneSettingOption> _options = new ObservableCollection<SceneSettingOption>();

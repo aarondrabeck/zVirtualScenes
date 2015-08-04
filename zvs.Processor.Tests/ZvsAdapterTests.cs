@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using zvs.DataModel;
 using zvs.Fakes;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using zvs.Processor.Fakes;
 
 namespace zvs.Processor.Tests
 {
@@ -42,54 +41,54 @@ namespace zvs.Processor.Tests
 
         public class UnitTestAdapter : ZvsAdapter
         {
-            public override System.Guid AdapterGuid
+            public override Guid AdapterGuid
             {
-                get { throw new System.NotImplementedException(); }
+                get { throw new NotImplementedException(); }
             }
 
             public override string Name
             {
-                get { throw new System.NotImplementedException(); }
+                get { throw new NotImplementedException(); }
             }
 
             public override string Description
             {
-                get { throw new System.NotImplementedException(); }
+                get { throw new NotImplementedException(); }
             }
 
             public override Task StartAsync()
             {
-                throw new System.NotImplementedException();
+                throw new NotImplementedException();
             }
 
             public override Task StopAsync()
             {
-                throw new System.NotImplementedException();
+                throw new NotImplementedException();
             }
 
             public override Task ProcessDeviceTypeCommandAsync(DeviceType deviceType, Device device, DeviceTypeCommand command, string argument)
             {
-                throw new System.NotImplementedException();
+                throw new NotImplementedException();
             }
 
             public override Task ProcessDeviceCommandAsync(Device device, DeviceCommand command, string argument, string argument2)
             {
-                throw new System.NotImplementedException();
+                throw new NotImplementedException();
             }
 
             public override Task RepollAsync(Device device)
             {
-                throw new System.NotImplementedException();
+                throw new NotImplementedException();
             }
 
             public override Task ActivateGroupAsync(Group group)
             {
-                throw new System.NotImplementedException();
+                throw new NotImplementedException();
             }
 
             public override Task DeactivateGroupAsync(Group group)
             {
-                throw new System.NotImplementedException();
+                throw new NotImplementedException();
             }
         }
     }

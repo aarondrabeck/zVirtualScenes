@@ -77,7 +77,7 @@ namespace zvs.Processor.ImportExport
                     return Result.ReportError(saveResult.Message);
             }
 
-            return Result.ReportSuccess(string.Format("Restored {0} device names. File: '{1}'", importedCount, Path.GetFileName(fileName)));
+            return Result.ReportSuccess($"Restored {importedCount} device names. File: '{Path.GetFileName(fileName)}'");
         }
 
         

@@ -1,14 +1,12 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Data.Entity;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Input;
 using System.Windows.Media.Animation;
 using zvs.DataModel;
 using zvs.Processor;
@@ -21,7 +19,7 @@ namespace zvs.WPF.Groups
     public partial class GroupEditorUserControl
     {
         private ZvsContext Context { get; set; }
-        private IFeedback<LogEntry> Log { get; set; }
+        private IFeedback<LogEntry> Log { get; }
         private readonly App _app = (App)Application.Current;
 
         public GroupEditorUserControl()
@@ -132,8 +130,7 @@ namespace zvs.WPF.Groups
             var selectedGroup = GroupsDataGrid.SelectedItem as Group;
             if (selectedGroup == null || GroupsDevicesLstVw.SelectedItems.Count <= 0) return;
             if (MessageBox.Show(
-                string.Format("Are you sure you want to remove the {0} selected devices from this group?",
-                    GroupsDevicesLstVw.SelectedItems.Count),
+                $"Are you sure you want to remove the {GroupsDevicesLstVw.SelectedItems.Count} selected devices from this group?",
                 "Remove Devices?",
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Error) != MessageBoxResult.Yes)
@@ -175,7 +172,7 @@ namespace zvs.WPF.Groups
             var group = GroupsDataGrid.SelectedItem as Group;
             if (group == null) return;
 
-            if (MessageBox.Show(string.Format("Are you sure you want to delete the '{0}' group?", group.Name),
+            if (MessageBox.Show($"Are you sure you want to delete the '{@group.Name}' group?",
                 "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
                 return;
             Context.Groups.Local.Remove(group);

@@ -1,23 +1,23 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Data.Entity;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using zvs.DataModel;
-using System.Data.Entity;
-using System.Reflection;
-using System.Linq.Expressions;
-using System.ComponentModel;
 
 namespace zvs.Processor
 {
     public class AdapterSettingBuilder
     {
-        private IEntityContextConnection EntityContextConnection { get; set; }
-        private CancellationToken CancellationToken { get; set; }
+        private IEntityContextConnection EntityContextConnection { get; }
+        private CancellationToken CancellationToken { get; }
         public AdapterSettingBuilder(IEntityContextConnection entityContextConnection, CancellationToken cancellationToken)
         {
             if (entityContextConnection == null)
-                throw new ArgumentNullException("entityContextConnection");
+                throw new ArgumentNullException(nameof(entityContextConnection));
 
             EntityContextConnection = entityContextConnection;
             CancellationToken = cancellationToken;
@@ -30,8 +30,8 @@ namespace zvs.Processor
 
         public class AdapterTypeConfiguration<T> where T : ZvsAdapter
         {
-            private T Adapter { get; set; }
-            private AdapterSettingBuilder AdapterSettingBuilder { get; set; }
+            private T Adapter { get; }
+            private AdapterSettingBuilder AdapterSettingBuilder { get; }
 
             public AdapterTypeConfiguration(T adapter, AdapterSettingBuilder sb)
             {

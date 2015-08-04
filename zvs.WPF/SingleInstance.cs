@@ -8,24 +8,25 @@
 // </summary>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Runtime.Remoting;
+using System.Runtime.Remoting.Channels;
+using System.Runtime.Remoting.Channels.Ipc;
+using System.Runtime.Serialization.Formatters;
+using System.Security;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Threading;
+
 namespace Microsoft.Shell
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Runtime.Remoting;
-    using System.Runtime.Remoting.Channels;
-    using System.Runtime.Remoting.Channels.Ipc;
-    using System.Runtime.Serialization.Formatters;
-    using System.Threading;
-    using System.Windows;
-    using System.Windows.Threading;
-    using System.Security;
-    using System.Runtime.InteropServices;
-    using System.ComponentModel;
-    using System.Threading.Tasks;
-
     internal enum WM
     {
         NULL = 0x0000,
@@ -342,7 +343,7 @@ namespace Microsoft.Shell
                 {
                     try
                     {
-                        using (TextReader reader = new StreamReader(cmdLinePath, System.Text.Encoding.Unicode))
+                        using (TextReader reader = new StreamReader(cmdLinePath, Encoding.Unicode))
                         {
                             args = NativeMethods.CommandLineToArgvW(reader.ReadToEnd());
                         }
@@ -465,7 +466,7 @@ namespace Microsoft.Shell
                 {
                     // Do an asynchronous call to ActivateFirstInstance function
                     Application.Current.Dispatcher.BeginInvoke(
-                        DispatcherPriority.Normal, new DispatcherOperationCallback(SingleInstance<TApplication>.ActivateFirstInstanceCallback), args);
+                        DispatcherPriority.Normal, new DispatcherOperationCallback(ActivateFirstInstanceCallback), args);
                 }
             }
 

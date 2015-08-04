@@ -3,8 +3,6 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data.Entity;
-using System.Diagnostics;
-using Microsoft.Win32;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -15,6 +13,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
+using Microsoft.Win32;
 using zvs.DataModel;
 using zvs.Processor;
 
@@ -25,10 +24,10 @@ namespace zvs.WPF.JavaScript
     /// </summary>
     public partial class JavaScriptEditor
     {
-        private ObservableCollection<LogEntry> LogEntries { get; set; }
-        private ZvsContext Context { get; set; }
+        private ObservableCollection<LogEntry> LogEntries { get; }
+        private ZvsContext Context { get; }
         private readonly App _app = (App)Application.Current;
-        private IFeedback<LogEntry> Log { get; set; }
+        private IFeedback<LogEntry> Log { get; }
 
         public JavaScriptEditor()
         {
@@ -64,7 +63,7 @@ namespace zvs.WPF.JavaScript
             var jsCommand = JavascriptGrid.SelectedItem as JavaScriptCommand;
             if (jsCommand == null) return;
 
-            if (MessageBox.Show(string.Format("Are you sure you want to delete the '{0}' JavaScript Command?", jsCommand.Name),
+            if (MessageBox.Show($"Are you sure you want to delete the '{jsCommand.Name}' JavaScript Command?",
                     "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
                 return;
             Context.JavaScriptCommands.Local.Remove(jsCommand);
@@ -219,7 +218,7 @@ namespace zvs.WPF.JavaScript
                 path = path.Replace(Utils.AppPath, ".");
             }
 
-            var script = string.Format("require('{0}')\n", path.Replace("\\", "\\\\"));
+            var script = $"require('{path.Replace("\\", "\\\\")}')\n";
             JsEditor.Editor.InsertText(script);
         }
 

@@ -1,8 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Diagnostics;
+using System.Data.Entity;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -10,7 +9,6 @@ using System.Windows.Media.Imaging;
 using zvs.DataModel;
 using zvs.Processor;
 using zvs.WPF.DynamicActionControls;
-using System.Data.Entity;
 
 namespace zvs.WPF.AdapterManager
 {
@@ -19,10 +17,10 @@ namespace zvs.WPF.AdapterManager
     /// </summary>
     public partial class AdapterManagerWindow : IDisposable
     {
-        private IFeedback<LogEntry> Log { get; set; }
-        private App App { get; set; }
+        private IFeedback<LogEntry> Log { get; }
+        private App App { get; }
         private readonly BitmapImage _icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/save_check.png"));
-        private ZvsContext Context { get; set; }
+        private ZvsContext Context { get; }
 
         public AdapterManagerWindow()
         {
@@ -123,7 +121,7 @@ namespace zvs.WPF.AdapterManager
                 },
                                         _icon)
             {
-                Header = string.Format("{0} is enabled", adapter.Name),
+                Header = $"{adapter.Name} is enabled",
                 Description = "Starts and stops the selected adapter",
                 Value = adapter.IsEnabled
             };

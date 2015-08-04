@@ -6,7 +6,7 @@ namespace zvs.DataModel
     [Table("AdapterSettings", Schema = "ZVS")]
     public class AdapterSetting : BaseValue, IIdentity
     {
-        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         public int AdapterId { get; set; }

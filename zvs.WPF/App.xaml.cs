@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Data.Entity;
+using System.Data.Entity.Migrations;
 using System.Globalization;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Media;
-using zvs.DataModel.Migrations;
-using zvs.Processor;
 using Microsoft.Shell;
 using zvs.DataModel;
-using System.Threading.Tasks;
-using System.Data.Entity;
-using System.Data.Entity.Migrations;
+using zvs.DataModel.Migrations;
+using zvs.Processor;
 using MessageBox = System.Windows.MessageBox;
 
 namespace zvs.WPF
@@ -304,8 +303,8 @@ namespace zvs.WPF
 
             if (!Utils.HasDotNet45())
             {
-                ProgramHasToClosePrompt(string.Format("Microsoft .NET Framework 4.5 Full/Extended is required to run {0}. \r\n\r\nPlease install Microsoft .NET Framework 4.5 and re-launch the application.",
-                    Utils.ApplicationName));
+                ProgramHasToClosePrompt(
+                    $"Microsoft .NET Framework 4.5 Full/Extended is required to run {Utils.ApplicationName}. \r\n\r\nPlease install Microsoft .NET Framework 4.5 and re-launch the application.");
             }
             #endregion
 
@@ -316,8 +315,8 @@ namespace zvs.WPF
 
             if (!Utils.HasSQLCE4())
             {
-                ProgramHasToClosePrompt(string.Format("Microsoft® SQL Server® Compact 4.0 SP1 is required to run {0}. \r\n\r\nPlease install Microsoft® SQL Server® Compact 4.0 SP1 and re-launch the application.",
-                    Utils.ApplicationName));
+                ProgramHasToClosePrompt(
+                    $"Microsoft® SQL Server® Compact 4.0 SP1 is required to run {Utils.ApplicationName}. \r\n\r\nPlease install Microsoft® SQL Server® Compact 4.0 SP1 and re-launch the application.");
             }
             #endregion
 

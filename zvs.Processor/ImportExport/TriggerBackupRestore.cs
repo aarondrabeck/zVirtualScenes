@@ -142,8 +142,8 @@ namespace zvs.Processor.ImportExport
                 }
             }
             return
-                Result.ReportSuccess(string.Format("Imported {0} triggers, skipped {1} from {2}", newTriggers.Count,
-                    skippedCount, Path.GetFileName(fileName)));
+                Result.ReportSuccess(
+                    $"Imported {newTriggers.Count} triggers, skipped {skippedCount} from {Path.GetFileName(fileName)}");
         }
     }
 }

@@ -8,17 +8,17 @@ namespace zvs.Processor
     public class ChangeListener
     {
         private IEntityContextConnection EntityContextConnection { get; set; }
-        private IFeedback<LogEntry> Log { get; set; }
+        private IFeedback<LogEntry> Log { get; }
         private CancellationToken Ct { get; set; }
         bool IsRunning { get; set; }
         public ChangeListener(IFeedback<LogEntry> log, IEntityContextConnection entityContextConnection)
         {
             if (log == null)
-                throw new ArgumentNullException("log");
+                throw new ArgumentNullException(nameof(log));
 
 
             if (entityContextConnection == null)
-                throw new ArgumentNullException("entityContextConnection");
+                throw new ArgumentNullException(nameof(entityContextConnection));
 
             Log = log;
             EntityContextConnection = entityContextConnection;

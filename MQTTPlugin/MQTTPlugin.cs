@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Data.Entity;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using uPLibrary.Networking.M2Mqtt;
@@ -193,7 +193,7 @@ namespace MQTTPlugin
 
         }
 
-        private uPLibrary.Networking.M2Mqtt.MqttClient mqtt = null;
+        private MqttClient mqtt = null;
         private bool enabled = false;
 
         public override async Task StartAsync()
@@ -206,7 +206,7 @@ namespace MQTTPlugin
                 mqtt.ConnectionClosed += mqtt_ConnectionClosed;
                 Connect();
 
-                var pubTopic = this.ControlTopicFormat;
+                var pubTopic = ControlTopicFormat;
                 mqtt.Subscribe(new string[] {pubTopic}, new byte[] {0});
                 await Publish(FloodTopic, "zVirtualScenes Connected");
 
@@ -252,7 +252,7 @@ namespace MQTTPlugin
         {
             try
             {
-                var msg = System.Text.Encoding.UTF8.GetString(e.Message);
+                var msg = Encoding.UTF8.GetString(e.Message);
                 if (msg == "list_nodes")
                 {
                     using (var context = new ZvsContext(EntityContextConnection))
@@ -266,7 +266,7 @@ namespace MQTTPlugin
                                 Location = d.Location,
 
                             };
-                            Publish(ControlTopicFormat, Newtonsoft.Json.JsonConvert.SerializeObject(cmd));
+                            Publish(ControlTopicFormat, JsonConvert.SerializeObject(cmd));
                      
                         }
                     }
@@ -274,7 +274,7 @@ namespace MQTTPlugin
                 else
                 {
                     var control =
-                        Newtonsoft.Json.JsonConvert.DeserializeObject<DeviceCommand>(msg);
+                        JsonConvert.DeserializeObject<DeviceCommand>(msg);
                     if (control != null)
                     {
                         using (var context = new ZvsContext(EntityContextConnection))
@@ -285,7 +285,7 @@ namespace MQTTPlugin
                             {
                                 if (control.Argument1.ToLower() == "list_commands")
                                 {
-                                    var topic = this.TopicFormat;
+                                    var topic = TopicFormat;
                                     topic = topic.Replace("{NodeNumber}", device1.NodeNumber.ToString());
                                     string cmdList = "";
                                     foreach (var cmd in device1.Commands)
@@ -301,12 +301,12 @@ namespace MQTTPlugin
 
                                         };
 
-                                        Publish(topic, Newtonsoft.Json.JsonConvert.SerializeObject(outCmd));
+                                        Publish(topic, JsonConvert.SerializeObject(outCmd));
                                     }
                                 }
                                 else if (control.Argument1.ToLower() == "list_values")
                                 {
-                                    var topic = this.TopicFormat;
+                                    var topic = TopicFormat;
                                     topic = topic.Replace("{NodeNumber}", device1.NodeNumber.ToString());
                                     string cmdList = "";
                                     foreach (var v in device1.Values)
@@ -321,7 +321,7 @@ namespace MQTTPlugin
                                             ValueType = v.ValueType                                            
                                         };
 
-                                        Publish(topic, Newtonsoft.Json.JsonConvert.SerializeObject(outPro));
+                                        Publish(topic, JsonConvert.SerializeObject(outPro));
                                     }
                                 }
                                 else
@@ -333,7 +333,7 @@ namespace MQTTPlugin
                                     if (cmd != null)
                                     {
                                         await
-                                            this.RunCommandAsync(cmd.Id, control.Argument1, control.Argument2,
+                                            RunCommandAsync(cmd.Id, control.Argument1, control.Argument2,
                                                 CancellationToken);
                                     }
                                 }
@@ -371,8 +371,7 @@ namespace MQTTPlugin
             
         }
 
-        private async void Plugin_OnEntityUpdated(object sender,
-            NotifyEntityChangeContext.ChangeNotifications<DeviceValue>.EntityUpdatedArgs e)
+        private async void Plugin_OnEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<DeviceValue>.EntityUpdatedArgs e)
         {
             if (enabled)
             {
@@ -392,7 +391,7 @@ namespace MQTTPlugin
 
                         if (device != null)
                         {
-                            var topic = this.TopicFormat;
+                            var topic = TopicFormat;
                             topic = topic.Replace("{NodeNumber}", device.NodeNumber.ToString());
 
                             var message = new DeviceMessage()
@@ -405,7 +404,7 @@ namespace MQTTPlugin
                                 PropertyType = dv.ValueType.ToString(),
                                 PropertyValue = dv.Value
                             };
-                            var msg = Newtonsoft.Json.JsonConvert.SerializeObject(message);
+                            var msg = JsonConvert.SerializeObject(message);
                             await Publish(topic, msg);
 
 
@@ -430,11 +429,11 @@ namespace MQTTPlugin
         {
             if (enabled)
             {
-                mqtt.Publish(topic, System.Text.Encoding.UTF8.GetBytes(message), MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE, true);
+                mqtt.Publish(topic, Encoding.UTF8.GetBytes(message), MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE, true);
 
                 if (!string.IsNullOrEmpty(FloodTopic) && FloodTopic != topic)
                 {
-                    mqtt.Publish(FloodTopic, System.Text.Encoding.UTF8.GetBytes(message), MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE, true);
+                    mqtt.Publish(FloodTopic, Encoding.UTF8.GetBytes(message), MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE, true);
                     
                 }
                 await Log.ReportInfoFormatAsync(CancellationToken, "MQTT, Published Topic:{0}, Message:{1}", topic, message);

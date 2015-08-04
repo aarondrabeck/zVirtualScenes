@@ -9,11 +9,11 @@ namespace zvs.Processor
 {
     public class DeviceValueBuilder
     {
-        private IEntityContextConnection EntityContextConnection { get; set; }
+        private IEntityContextConnection EntityContextConnection { get; }
         public DeviceValueBuilder( IEntityContextConnection entityContextConnection)
         {
             if (entityContextConnection == null)
-                throw new ArgumentNullException("entityContextConnection");
+                throw new ArgumentNullException(nameof(entityContextConnection));
 
             EntityContextConnection = entityContextConnection;
         }

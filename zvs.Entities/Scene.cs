@@ -9,7 +9,7 @@ namespace zvs.DataModel
     [Table("Scenes", Schema = "ZVS")]
     public class Scene : INotifyPropertyChanged, IIdentity
     {
-        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         private ObservableCollection<SceneStoredCommand> _commands = new ObservableCollection<SceneStoredCommand>();

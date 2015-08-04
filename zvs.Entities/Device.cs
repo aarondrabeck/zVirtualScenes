@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -12,12 +11,12 @@ namespace zvs.DataModel
     [Table("Devices", Schema = "ZVS")]
     public class Device : INotifyPropertyChanged, IIdentity
     {
-        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         public override string ToString()
         {
-            return string.Format("{0} {1}", Location, Name);
+            return $"{Location} {Name}";
         }
 
         private string _name;

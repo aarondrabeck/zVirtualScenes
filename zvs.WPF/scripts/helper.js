@@ -100,7 +100,7 @@ helper = function () {
 
     this.deviceDetails = function (device) {
         var details = "";
-        var name = device
+        var name = device;
         if (typeof name == 'string') {
             device = this.deviceByName(device);
         } else {

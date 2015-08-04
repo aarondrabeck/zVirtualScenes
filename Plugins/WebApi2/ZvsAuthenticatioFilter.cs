@@ -16,7 +16,7 @@ namespace zvsWebapi2Plugin
         public ZvsAuthenticatioFilter(WebApi2Plugin webApi2Plugin)
         {
             if (webApi2Plugin == null)
-                throw new ArgumentNullException("webApi2Plugin");
+                throw new ArgumentNullException(nameof(webApi2Plugin));
 
             _webApi2Plugin = webApi2Plugin;
         }

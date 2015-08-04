@@ -1,17 +1,17 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Data.Entity;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using System.Data.Entity;
 
 namespace zvs.DataModel
 {
     [Table("SceneSettingValues", Schema = "ZVS")]
     public class SceneSettingValue : INotifyPropertyChanged, IIdentity
     {
-        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         public int SceneId { get; set; }

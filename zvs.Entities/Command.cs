@@ -9,7 +9,7 @@ namespace zvs.DataModel
     [Table("Commands", Schema = "ZVS")]
     public class Command : INotifyPropertyChanged, IIdentity
     {
-        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         private ObservableCollection<CommandOption> _options = new ObservableCollection<CommandOption>();

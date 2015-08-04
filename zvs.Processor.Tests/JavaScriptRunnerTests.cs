@@ -610,12 +610,14 @@ f1();";
 
                 var cts = new CancellationTokenSource();
                 var runner = new JavaScriptRunner(log, commandProcessor, dbConnection);
-                var script = string.Format(@"
+                var script =
+                    $@"
 function f1() {{ 
-       var result = runCommand({0},'98', '0'); 
+       var result = runCommand({deviceCommand.Id
+                        },'98', '0'); 
        logInfo(result.Message);
 }};
-f1();", deviceCommand.Id);
+f1();";
 
                 //Act
                 var result = await runner.ExecuteScriptAsync(script, cts.Token);

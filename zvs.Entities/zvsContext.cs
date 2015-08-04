@@ -237,8 +237,8 @@ namespace zvs.DataModel
                 {
                     var type = dbEntityValidationResult.Entry.Entity.GetTypeEntityWrapperDetection().Name;
                     var entity = dbEntityValidationResult.Entry.Entity as IIdentity;
-                    sb.Append(string.Format("{0} (Id:{1}){2}", type,
-                        entity == null ? "N/A" : entity.Id.ToString(CultureInfo.InvariantCulture), Environment.NewLine));
+                    sb.Append(
+                        $"{type} (Id:{(entity == null ? "N/A" : entity.Id.ToString(CultureInfo.InvariantCulture))}){Environment.NewLine}");
 
                     foreach (var error in dbEntityValidationResult.ValidationErrors)
                     {

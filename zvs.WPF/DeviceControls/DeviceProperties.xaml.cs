@@ -1,12 +1,12 @@
 ﻿using System;
+using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
+using zvs.DataModel;
 using zvs.Processor;
 using zvs.WPF.DynamicActionControls;
-using zvs.DataModel;
-using System.Data.Entity;
 
 namespace zvs.WPF.DeviceControls
 {
@@ -15,7 +15,7 @@ namespace zvs.WPF.DeviceControls
     /// </summary>
     public partial class DeviceProperties
     {
-        private IFeedback<LogEntry> Log { get; set; }
+        private IFeedback<LogEntry> Log { get; }
         private readonly App _app = (App)Application.Current;
         private readonly BitmapImage _icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/save_check.png"));
         private ZvsContext Context { get; set; }

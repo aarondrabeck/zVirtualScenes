@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using Microsoft.Win32;
 
@@ -26,9 +27,9 @@ namespace zvs.Processor
         {
             get
             {
-                var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                var assembly = Assembly.GetExecutingAssembly();
                 var vrs = assembly.GetName().Version;
-                return string.Format("{0}.{1}", vrs.Major, vrs.Minor);
+                return $"{vrs.Major}.{vrs.Minor}";
             }
         }
 
@@ -38,12 +39,12 @@ namespace zvs.Processor
             get
             {
                 var Data = new StringBuilder();
-                Data.AppendLine(string.Format("OSVersion: {0}", Environment.OSVersion));
-                Data.AppendLine(string.Format("Is64BitOperatingSystem: {0}", Environment.Is64BitOperatingSystem));
-                Data.AppendLine(string.Format("MachineName: {0}", Environment.MachineName));
-                Data.AppendLine(string.Format("UserDomainName: {0}", Environment.UserDomainName));
-                Data.AppendLine(string.Format("UserName: {0}", Environment.UserName));
-                Data.AppendLine(string.Format("Version: {0}", Environment.Version));
+                Data.AppendLine($"OSVersion: {Environment.OSVersion}");
+                Data.AppendLine($"Is64BitOperatingSystem: {Environment.Is64BitOperatingSystem}");
+                Data.AppendLine($"MachineName: {Environment.MachineName}");
+                Data.AppendLine($"UserDomainName: {Environment.UserDomainName}");
+                Data.AppendLine($"UserName: {Environment.UserName}");
+                Data.AppendLine($"Version: {Environment.Version}");
                 return Data.ToString();
             }
         }
@@ -52,7 +53,7 @@ namespace zvs.Processor
         {
             get
             {
-                return string.Format("{0} {1}", ApplicationName, ApplicationVersionLong);
+                return $"{ApplicationName} {ApplicationVersionLong}";
             }
         }
 
@@ -61,7 +62,7 @@ namespace zvs.Processor
             get
             {
                 var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-                var path = System.IO.Path.Combine(appData, @"zVirtualScenes");
+                var path = Path.Combine(appData, @"zVirtualScenes");
                 if (!Directory.Exists(path))
                 {
                     try { Directory.CreateDirectory(path); }

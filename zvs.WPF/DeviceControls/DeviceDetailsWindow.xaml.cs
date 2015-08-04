@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Data.Entity;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -13,8 +12,8 @@ namespace zvs.WPF.DeviceControls
     /// </summary>
     public partial class DeviceDetailsWindow
     {
-        private int DeviceId { get; set; } 
-        private App App { get; set; }
+        private int DeviceId { get; } 
+        private App App { get; }
 
         public Device Device
         {

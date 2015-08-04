@@ -6,9 +6,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Forms;
 using zvs.DataModel;
 using zvs.Processor;
 using zvs.Processor.ImportExport;
+using Application = System.Windows.Application;
+using MessageBox = System.Windows.MessageBox;
 
 namespace zvs.WPF.ImportExport
 {
@@ -17,9 +20,9 @@ namespace zvs.WPF.ImportExport
     /// </summary>
     public partial class BackupRestoreWindow
     {
-        private IFeedback<LogEntry> Log { get; set; }
-        private IEntityContextConnection EntityContextConnection { get; set; }
-        private CancellationTokenSource CancellationTokenSource { get; set; }
+        private IFeedback<LogEntry> Log { get; }
+        private IEntityContextConnection EntityContextConnection { get; }
+        private CancellationTokenSource CancellationTokenSource { get; }
         public string BackupDirectory
         {
             get { return (string)GetValue(BackupDirectoryProperty); }
@@ -114,7 +117,7 @@ namespace zvs.WPF.ImportExport
         }
         private async void BrowseBtn_Click(object sender, RoutedEventArgs e)
         {
-            var dlg = new System.Windows.Forms.FolderBrowserDialog();
+            var dlg = new FolderBrowserDialog();
             var result = dlg.ShowDialog();
 
             if (result != System.Windows.Forms.DialogResult.OK) return;

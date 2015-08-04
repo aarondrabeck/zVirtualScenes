@@ -123,7 +123,8 @@ namespace zvs.Processor.ImportExport
                         return Result.ReportError(saveResult.Message);
                 }
             }
-            return Result.ReportSuccess(string.Format("Imported {0} scenes with {1} scene commands. Skipped {2} scene from {3}", newScene.Count, importedCmdCount, skippedCount, Path.GetFileName(fileName)));
+            return Result.ReportSuccess(
+                $"Imported {newScene.Count} scenes with {importedCmdCount} scene commands. Skipped {skippedCount} scene from {Path.GetFileName(fileName)}");
         }
     }
 }

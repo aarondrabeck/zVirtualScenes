@@ -1,20 +1,21 @@
-﻿using System.ComponentModel.Composition;
-using System.Net.Sockets;
+﻿using System;
 using System.Collections.Generic;
-using System;
-using System.Net;
-using System.Threading;
-using System.Text;
-using System.Security.Cryptography;
 using System.ComponentModel;
+using System.ComponentModel.Composition;
+using System.Data.Entity;
 using System.Linq;
-using Mono.Zeroconf;
-using zvs.Processor;
-using zvs.DataModel;
+using System.Net;
+using System.Net.Sockets;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using LightSwitchPlugin.LightSwitch;
-using System.Data.Entity;
+using Mono.Zeroconf;
 using zvs;
+using zvs.DataModel;
+using zvs.Processor;
+using RegisterService = Mono.Zeroconf.Providers.Bonjour.RegisterService;
 
 namespace LightSwitchPlugin
 {
@@ -121,7 +122,7 @@ namespace LightSwitchPlugin
 
         private readonly HashSet<LightSwitchClient> _lightSwitchClients = new HashSet<LightSwitchClient>();
         private CancellationTokenSource _cts = new CancellationTokenSource();
-        private Mono.Zeroconf.Providers.Bonjour.RegisterService _netservice;
+        private RegisterService _netservice;
         public enum DeviceSettingUids
         {
             ShowInLightswitch
@@ -392,7 +393,7 @@ namespace LightSwitchPlugin
         async void lightSwitchClient_onCmdPassword(object sender, OnPasswordEventArgs args)
         {
             var lightSwitchClient = args.LightSwitchClient;
-            var hashedPassword = EncodePassword(string.Format("{0}:{1}", lightSwitchClient.Nonce, PasswordSetting));
+            var hashedPassword = EncodePassword($"{lightSwitchClient.Nonce}:{PasswordSetting}");
 
             if (args.Password.StartsWith(hashedPassword))
             {
@@ -513,7 +514,8 @@ namespace LightSwitchPlugin
                                 return;
                             }
 
-                            cmdMsg = string.Format("[{0}] Executed command '{1}' on '{2}'.", args.LightSwitchClient.RemoteEndPoint, dtcmd.Name, d.Name);
+                            cmdMsg =
+                                $"[{args.LightSwitchClient.RemoteEndPoint}] Executed command '{dtcmd.Name}' on '{d.Name}'.";
                             command = dtcmd;
                             arg1 = string.Empty;
                             arg2 = d.Id.ToString();
@@ -533,7 +535,8 @@ namespace LightSwitchPlugin
                                 return;
                             }
 
-                            cmdMsg = string.Format("[{0}] Executed command '{1}' on '{2}'.", args.LightSwitchClient.RemoteEndPoint, dcmd.Name, d.Name);
+                            cmdMsg =
+                                $"[{args.LightSwitchClient.RemoteEndPoint}] Executed command '{dcmd.Name}' on '{d.Name}'.";
                             command = dcmd;
                             arg1 = l;
                             arg2 = d.Id.ToString();
@@ -578,7 +581,7 @@ namespace LightSwitchPlugin
                     await Log.ReportErrorAsync(error, CancellationToken);
                     return;
                 }
-                var result = string.Format("[{0}] Ran {1} on group '{2}'", args.LightSwitchClient.RemoteEndPoint, zvsCmd.Name, g.Name);
+                var result = $"[{args.LightSwitchClient.RemoteEndPoint}] Ran {zvsCmd.Name} on group '{g.Name}'";
                 await Log.ReportInfoAsync(result, CancellationToken);
 
                 var r = await RunCommandAsync(zvsCmd.Id, g.Id.ToString(), string.Empty, CancellationToken);
@@ -647,7 +650,7 @@ namespace LightSwitchPlugin
                     return;
                 }
 
-                var cmdMsg = string.Format("[{0}] Executed command '{1}' on '{2}'.", args.LightSwitchClient.RemoteEndPoint, dcmd.Name, d.Name);
+                var cmdMsg = $"[{args.LightSwitchClient.RemoteEndPoint}] Executed command '{dcmd.Name}' on '{d.Name}'.";
                 await Log.ReportInfoAsync(cmdMsg, CancellationToken);
                 var commandResult = await RunCommandAsync(dcmd.Id, args.Temp, string.Empty, CancellationToken);
 
@@ -729,7 +732,7 @@ namespace LightSwitchPlugin
                     }
 
                     command = dcmd;
-                    cmdMsg = string.Format("[{0}] Executed command '{1}' on '{2}'.", args.LightSwitchClient.RemoteEndPoint, dcmd.Name, d.Name);
+                    cmdMsg = $"[{args.LightSwitchClient.RemoteEndPoint}] Executed command '{dcmd.Name}' on '{d.Name}'.";
 
                 }
                 else switch (mode)
@@ -748,7 +751,8 @@ namespace LightSwitchPlugin
                                 command = dcmd;
                                 arg1 = string.Empty;
                                 arg2 = d.Id.ToString();
-                                cmdMsg = string.Format("[{0}] Executed command '{1}' on '{2}'.", args.LightSwitchClient.RemoteEndPoint, dcmd.Name, d.Name);
+                                cmdMsg =
+                                    $"[{args.LightSwitchClient.RemoteEndPoint}] Executed command '{dcmd.Name}' on '{d.Name}'.";
                             }
                             break;
                         case 7:
@@ -766,7 +770,8 @@ namespace LightSwitchPlugin
                                 command = dcmd;
                                 arg1 = string.Empty;
                                 arg2 = d.Id.ToString();
-                                cmdMsg = string.Format("[{0}] Executed command '{1}' on '{2}'.", args.LightSwitchClient.RemoteEndPoint, dcmd.Name, d.Name);
+                                cmdMsg =
+                                    $"[{args.LightSwitchClient.RemoteEndPoint}] Executed command '{dcmd.Name}' on '{d.Name}'.";
                             }
                             break;
                     }
@@ -920,7 +925,8 @@ namespace LightSwitchPlugin
                     if (device.Type.UniqueIdentifier == "switch")
                         level = (device.CurrentLevelInt > 0 ? "255" : "0");
 
-                    var deviceName = string.Format("{0}{1}", string.IsNullOrWhiteSpace(device.Location) ? "" : device.Location + " ", device.Name);
+                    var deviceName =
+                        $"{(string.IsNullOrWhiteSpace(device.Location) ? "" : device.Location + " ")}{device.Name}";
 
                     await SendLightSwitchCommand(client, LightSwitchProtocol.CreateDeviceCmd(deviceName, device.Id.ToString(), level, type));
 
@@ -948,7 +954,7 @@ namespace LightSwitchPlugin
         private void PublishZeroconf()
         {
             var name = "Lightswitch " + Environment.MachineName;
-            _netservice = new Mono.Zeroconf.Providers.Bonjour.RegisterService
+            _netservice = new RegisterService
             {
                 Name = name,
                 RegType = "_lightswitch._tcp",

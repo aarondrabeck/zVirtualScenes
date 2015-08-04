@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>zvs.WPF</RootNamespace>
     <AssemblyName>zVirtualScenes</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -114,9 +114,9 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="WindowsFormsIntegration" />
-    <Reference Include="WpfAnimatedGif, Version=1.4.12.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\WpfAnimatedGif.1.4.12\lib\net\WpfAnimatedGif.dll</HintPath>
+    <Reference Include="WpfAnimatedGif, Version=1.4.13.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WpfAnimatedGif.1.4.13\lib\net\WpfAnimatedGif.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="WPFToolkit.Extended">
       <HintPath>.\WPFToolkit.Extended.dll</HintPath>

@@ -1,20 +1,20 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Data.Entity;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using zvs.DataModel;
-using System.Data.Entity;
-using System.ComponentModel;
 
 namespace zvs.Processor
 {
     public class DeviceTypeBuilder
     {
-        private IEntityContextConnection EntityContextConnection { get; set; }
+        private IEntityContextConnection EntityContextConnection { get; }
         public DeviceTypeBuilder(IEntityContextConnection entityContextConnection)
         {
             if (entityContextConnection == null)
-                throw new ArgumentNullException("entityContextConnection");
+                throw new ArgumentNullException(nameof(entityContextConnection));
 
             EntityContextConnection = entityContextConnection;
         }

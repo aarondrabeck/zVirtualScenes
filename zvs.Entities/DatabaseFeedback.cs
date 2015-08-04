@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace zvs.DataModel
 {
     public class DatabaseFeedback : IFeedback<LogEntry>
     {
-        private IEntityContextConnection EntityContextConnection { get; set; }
+        private IEntityContextConnection EntityContextConnection { get; }
 
         public DatabaseFeedback(IEntityContextConnection entityContextConnection)
         {
             EntityContextConnection = entityContextConnection;
         }
 
-        public async Task ReportAsync(LogEntry value, System.Threading.CancellationToken ct)
+        public async Task ReportAsync(LogEntry value, CancellationToken ct)
         {
             using (var context = new ZvsContext(EntityContextConnection))
             {

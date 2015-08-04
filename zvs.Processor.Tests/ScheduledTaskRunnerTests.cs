@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using zvs.DataModel;
 using zvs.DataModel.Tasks;
-using zvs.DataModel.Tasks.Fakes;
 using zvs.Fakes;
 using zvs.Processor.Fakes;
 

@@ -8,7 +8,7 @@ namespace zvs.DataModel
     [Table("DbInfo", Schema = "ZVS")]
     public class DbInfo : INotifyPropertyChanged, IIdentity
     {
-        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
        
         private string _uniqueIdentifier;

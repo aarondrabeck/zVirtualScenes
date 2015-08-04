@@ -481,7 +481,7 @@ namespace zvs.Processor.Tests
                 FindZvsAdapterGuid = adapterGuid => new StubZvsAdapter
                 {
                     IsEnabled = true,
-                    RepollAsyncDevice = async (d) => repollDeviceIdRequestSentToAdapter.Add(d.Id)
+                    RepollAsyncDevice = async d => repollDeviceIdRequestSentToAdapter.Add(d.Id)
                 }
             };
             var log = new StubIFeedback<LogEntry>();
@@ -523,7 +523,7 @@ namespace zvs.Processor.Tests
                 FindZvsAdapterGuid = adapterGuid => new StubZvsAdapter
                 {
                     IsEnabled = true,
-                    RepollAsyncDevice = async (d) => repollDeviceIdRequestSentToAdapter.Add(d.Id)
+                    RepollAsyncDevice = async d => repollDeviceIdRequestSentToAdapter.Add(d.Id)
                 }
             };
             var log = new StubIFeedback<LogEntry>();
@@ -562,7 +562,7 @@ namespace zvs.Processor.Tests
                 FindZvsAdapterGuid = adapterGuid => new StubZvsAdapter
                 {
                     IsEnabled = true,
-                    RepollAsyncDevice = async (d) => repollDeviceIdRequestSentToAdapter.Add(d.Id)
+                    RepollAsyncDevice = async d => repollDeviceIdRequestSentToAdapter.Add(d.Id)
                 }
             };
             var log = new StubIFeedback<LogEntry>();
@@ -645,7 +645,7 @@ namespace zvs.Processor.Tests
                 FindZvsAdapterGuid = adapterGuid => new StubZvsAdapter
                 {
                     IsEnabled = true,
-                    ActivateGroupAsyncGroup = async (g) => groupOnIdsRequestSentToAdapter.Add(g)
+                    ActivateGroupAsyncGroup = async g => groupOnIdsRequestSentToAdapter.Add(g)
                 }
             };
             var log = new StubIFeedback<LogEntry>();
@@ -697,7 +697,7 @@ namespace zvs.Processor.Tests
                 FindZvsAdapterGuid = adapterGuid => new StubZvsAdapter
                 {
                     IsEnabled = true,
-                    ActivateGroupAsyncGroup = async (g) => groupOnIdsRequestSentToAdapter.Add(g)
+                    ActivateGroupAsyncGroup = async g => groupOnIdsRequestSentToAdapter.Add(g)
                 }
             };
             var log = new StubIFeedback<LogEntry>();
@@ -756,7 +756,7 @@ namespace zvs.Processor.Tests
                 FindZvsAdapterGuid = adapterGuid => new StubZvsAdapter
                 {
                     IsEnabled = true,
-                    DeactivateGroupAsyncGroup = async (g) => groupOnIdsRequestSentToAdapter.Add(g)
+                    DeactivateGroupAsyncGroup = async g => groupOnIdsRequestSentToAdapter.Add(g)
                 }
             };
             var log = new StubIFeedback<LogEntry>();

@@ -12,11 +12,11 @@ namespace zvs.Processor
 {
     public class ScheduledTaskRunner : IRunner
     {
-        private IEntityContextConnection EntityContextConnection { get; set; }
-        private IFeedback<LogEntry> Log { get; set; }
+        private IEntityContextConnection EntityContextConnection { get; }
+        private IFeedback<LogEntry> Log { get; }
         private CancellationTokenSource Cts { get; set; }
-        private ICommandProcessor CommandProcessor { get; set; }
-        private ITimeProvider TimeProvider { get; set; }
+        private ICommandProcessor CommandProcessor { get; }
+        private ITimeProvider TimeProvider { get; }
         private IList<DataModel.ScheduledTask> CommandScheduledTasksCache { get; set; }
         private bool UpdateCache { get; set; }
 
@@ -24,16 +24,16 @@ namespace zvs.Processor
         public ScheduledTaskRunner(IFeedback<LogEntry> log, ICommandProcessor commandProcessor, IEntityContextConnection entityContextConnection, ITimeProvider timeProvider)
         {
             if (log == null)
-                throw new ArgumentNullException("log");
+                throw new ArgumentNullException(nameof(log));
 
             if (commandProcessor == null)
-                throw new ArgumentNullException("commandProcessor");
+                throw new ArgumentNullException(nameof(commandProcessor));
 
             if (entityContextConnection == null)
-                throw new ArgumentNullException("entityContextConnection");
+                throw new ArgumentNullException(nameof(entityContextConnection));
 
             if (timeProvider == null)
-                throw new ArgumentNullException("timeProvider");
+                throw new ArgumentNullException(nameof(timeProvider));
 
             EntityContextConnection = entityContextConnection;
             CommandProcessor = commandProcessor;

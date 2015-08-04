@@ -1,22 +1,23 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Data.Entity;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Input;
+using System.Windows.Forms;
 using System.Windows.Media;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using zvs.Processor;
-using zvs.WPF.Groups;
-using zvs.WPF.AdapterManager;
-using System.Data.Entity;
 using zvs.DataModel;
+using zvs.Processor;
+using zvs.WPF.AdapterManager;
 using zvs.WPF.ImportExport;
-using zvs.WPF.JavaScript;
 using zvs.WPF.PluginManager;
+using Application = System.Windows.Application;
+using KeyEventArgs = System.Windows.Input.KeyEventArgs;
+using MessageBox = System.Windows.MessageBox;
 
 namespace zvs.WPF
 {
@@ -102,7 +103,7 @@ namespace zvs.WPF
         {
             if (_app.Cts.IsCancellationRequested) return;
             if (_app.TaskbarIcon != null)
-                _app.TaskbarIcon.ShowBalloonTip(Utils.ApplicationName, Utils.ApplicationNameAndVersion + " is still running", 3000, System.Windows.Forms.ToolTipIcon.Info);
+                _app.TaskbarIcon.ShowBalloonTip(Utils.ApplicationName, Utils.ApplicationNameAndVersion + " is still running", 3000, ToolTipIcon.Info);
         }
 
         private void MainWindow_Closed_1(object sender, EventArgs e)
@@ -173,12 +174,12 @@ namespace zvs.WPF
     {
         #region IValueConverter Members
 
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             return new Thickness(0, 0, -((ContentPresenter)value).ActualHeight, 0);
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }
@@ -190,7 +191,7 @@ namespace zvs.WPF
     {
         #region IValueConverter Members
 
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var ps = new PathSegmentCollection(4);
             var cp = (ContentPresenter)value;
@@ -207,7 +208,7 @@ namespace zvs.WPF
             return geometry;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }

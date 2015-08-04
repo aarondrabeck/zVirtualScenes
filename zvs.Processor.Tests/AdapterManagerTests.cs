@@ -68,8 +68,8 @@ namespace zvs.Processor.Tests
                 AdapterGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque magna diam, pellentesque et orci eget, pellentesque iaculis odio. Ut ultrices est sapien, ac pellentesque odio malesuada a. Etiam in neque ullamcorper massa gravida ullamcorper vel a posuere.",
                 DescriptionGet = () => "",
-                OnSettingsCreatingAdapterSettingBuilder = (s) => Task.FromResult(0),
-                OnDeviceTypesCreatingDeviceTypeBuilder = (s) => Task.FromResult(0)
+                OnSettingsCreatingAdapterSettingBuilder = s => Task.FromResult(0),
+                OnDeviceTypesCreatingDeviceTypeBuilder = s => Task.FromResult(0)
             };
 
             var adapterManager = new AdapterManager(new List<ZvsAdapter>() { longNameAdapter }, dbConnection, log);
@@ -103,10 +103,10 @@ namespace zvs.Processor.Tests
                 AdapterGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Adapter",
                 DescriptionGet = () => "",
-                OnDeviceTypesCreatingDeviceTypeBuilder = (s) => Task.FromResult(0)
+                OnDeviceTypesCreatingDeviceTypeBuilder = s => Task.FromResult(0)
             };
 
-            unitTestingAdapter.OnSettingsCreatingAdapterSettingBuilder = async (settingBuilder) =>
+            unitTestingAdapter.OnSettingsCreatingAdapterSettingBuilder = async settingBuilder =>
             {
                 var testSetting = new AdapterSetting
                 {
@@ -144,7 +144,7 @@ namespace zvs.Processor.Tests
                 AdapterGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Adapter",
                 DescriptionGet = () => "",
-                OnDeviceTypesCreatingDeviceTypeBuilder = (s) => Task.FromResult(0)
+                OnDeviceTypesCreatingDeviceTypeBuilder = s => Task.FromResult(0)
             };
 
             var adapterManager = new AdapterManager(new List<ZvsAdapter> { unitTestingAdapter }, dbConnection, log);
@@ -200,10 +200,10 @@ namespace zvs.Processor.Tests
                 AdapterGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Adapter",
                 DescriptionGet = () => "",
-                OnDeviceTypesCreatingDeviceTypeBuilder = (s) => Task.FromResult(0)
+                OnDeviceTypesCreatingDeviceTypeBuilder = s => Task.FromResult(0)
             };
 
-            unitTestingAdapter.OnSettingsCreatingAdapterSettingBuilder = async (settingBuilder) =>
+            unitTestingAdapter.OnSettingsCreatingAdapterSettingBuilder = async settingBuilder =>
             {
                 var testSetting = new AdapterSetting
                 {
@@ -251,10 +251,10 @@ namespace zvs.Processor.Tests
                 AdapterGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Adapter",
                 DescriptionGet = () => "",
-                OnDeviceTypesCreatingDeviceTypeBuilder = (s) => Task.FromResult(0)
+                OnDeviceTypesCreatingDeviceTypeBuilder = s => Task.FromResult(0)
             };
 
-            unitTestingAdapter.OnSettingsCreatingAdapterSettingBuilder = async (settingBuilder) =>
+            unitTestingAdapter.OnSettingsCreatingAdapterSettingBuilder = async settingBuilder =>
             {
                 var testSetting = new AdapterSetting
                 {
@@ -310,14 +310,14 @@ namespace zvs.Processor.Tests
                 AdapterGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Adapter",
                 DescriptionGet = () => "",
-                OnDeviceTypesCreatingDeviceTypeBuilder = (s) => Task.FromResult(0),
+                OnDeviceTypesCreatingDeviceTypeBuilder = s => Task.FromResult(0),
                 StartAsync01 = () =>
                 {
                     isStarted = true;
                     return Task.FromResult(0);
                 }
             };
-            unitTestingAdapter.OnSettingsCreatingAdapterSettingBuilder = async (settingBuilder) =>
+            unitTestingAdapter.OnSettingsCreatingAdapterSettingBuilder = async settingBuilder =>
             {
                 var testSetting = new AdapterSetting
                 {
@@ -355,7 +355,7 @@ namespace zvs.Processor.Tests
                 AdapterGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Adapter",
                 DescriptionGet = () => "",
-                OnDeviceTypesCreatingDeviceTypeBuilder = (s) => Task.FromResult(0),
+                OnDeviceTypesCreatingDeviceTypeBuilder = s => Task.FromResult(0),
                 StartAsync01 = async () => hasStarted = true
             };
 
@@ -412,7 +412,7 @@ namespace zvs.Processor.Tests
                 AdapterGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Adapter",
                 DescriptionGet = () => "",
-                OnDeviceTypesCreatingDeviceTypeBuilder = (s) => Task.FromResult(0),
+                OnDeviceTypesCreatingDeviceTypeBuilder = s => Task.FromResult(0),
                 StopAsync01 = async () => hasStopped = true
             };
 
@@ -486,8 +486,8 @@ namespace zvs.Processor.Tests
                 AdapterGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Adapter",
                 DescriptionGet = () => "",
-                OnDeviceTypesCreatingDeviceTypeBuilder = (s) => Task.FromResult(0),
-                OnSettingsCreatingAdapterSettingBuilder = (s) => Task.FromResult(0),
+                OnDeviceTypesCreatingDeviceTypeBuilder = s => Task.FromResult(0),
+                OnSettingsCreatingAdapterSettingBuilder = s => Task.FromResult(0),
                 StartAsync01 = () =>
                 {
                     isStartedCount++;
@@ -540,8 +540,8 @@ namespace zvs.Processor.Tests
                 AdapterGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Adapter",
                 DescriptionGet = () => "",
-                OnDeviceTypesCreatingDeviceTypeBuilder = (s) => Task.FromResult(0),
-                OnSettingsCreatingAdapterSettingBuilder = (s) => Task.FromResult(0),
+                OnDeviceTypesCreatingDeviceTypeBuilder = s => Task.FromResult(0),
+                OnSettingsCreatingAdapterSettingBuilder = s => Task.FromResult(0),
                 StartAsync01 = () =>
                 {
                     isStartedCount++;
@@ -598,7 +598,7 @@ namespace zvs.Processor.Tests
                 AdapterGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Adapter",
                 DescriptionGet = () => "",
-                OnDeviceTypesCreatingDeviceTypeBuilder = (s) => Task.FromResult(0)
+                OnDeviceTypesCreatingDeviceTypeBuilder = s => Task.FromResult(0)
                
             };
 
@@ -634,8 +634,8 @@ namespace zvs.Processor.Tests
                 AdapterGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Adapter",
                 DescriptionGet = () => "",
-                OnDeviceTypesCreatingDeviceTypeBuilder = (s) => Task.FromResult(0),
-                OnSettingsCreatingAdapterSettingBuilder = (s) => Task.FromResult(0),
+                OnDeviceTypesCreatingDeviceTypeBuilder = s => Task.FromResult(0),
+                OnSettingsCreatingAdapterSettingBuilder = s => Task.FromResult(0),
             };
 
             var adapterManager = new AdapterManager(new List<ZvsAdapter> { unitTestingAdapter }, dbConnection, log);
@@ -698,8 +698,8 @@ namespace zvs.Processor.Tests
                 AdapterGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Adapter",
                 DescriptionGet = () => "",
-                OnDeviceTypesCreatingDeviceTypeBuilder = (s) => Task.FromResult(0),
-                OnSettingsCreatingAdapterSettingBuilder = (s) => Task.FromResult(0),
+                OnDeviceTypesCreatingDeviceTypeBuilder = s => Task.FromResult(0),
+                OnSettingsCreatingAdapterSettingBuilder = s => Task.FromResult(0),
             };
 
             var adapter = new Adapter

@@ -1,30 +1,30 @@
 ﻿using System;
+using System.Data.Entity;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using zvs.DataModel;
-using System.Data.Entity;
 
 namespace zvs.Processor
 {
     public class CommandProcessor : ICommandProcessor
     {
-        public IAdapterManager AdapterManager { get; private set; }
-        private IEntityContextConnection EntityContextConnection { get; set; }
-        private IFeedback<LogEntry> Log { get; set; }
+        public IAdapterManager AdapterManager { get; }
+        private IEntityContextConnection EntityContextConnection { get; }
+        private IFeedback<LogEntry> Log { get; }
 
         //Constructor
         public CommandProcessor(IAdapterManager adapterManager, IEntityContextConnection entityContextConnection, IFeedback<LogEntry> log)
         {
             if (entityContextConnection == null)
-                throw new ArgumentNullException("entityContextConnection");
+                throw new ArgumentNullException(nameof(entityContextConnection));
 
             if (adapterManager == null)
-                throw new ArgumentNullException("adapterManager");
+                throw new ArgumentNullException(nameof(adapterManager));
 
             if (log == null)
-                throw new ArgumentNullException("log");
+                throw new ArgumentNullException(nameof(log));
 
             AdapterManager = adapterManager;
             EntityContextConnection = entityContextConnection;
@@ -81,10 +81,8 @@ namespace zvs.Processor
                 if (device == null)
                     return Result.ReportErrorFormat("Cannot find device with id of {0}", dId);
 
-                var commandAction = string.Format("{0}{1} {2}",
-                                                       command.Name,
-                                                       string.IsNullOrEmpty(argument) ? "" : " " + argument,
-                                                       device.Name);
+                var commandAction =
+                    $"{command.Name}{(string.IsNullOrEmpty(argument) ? "" : " " + argument)} {device.Name}";
 
                 var aGuid = device.Type.Adapter.AdapterGuid;
                 var adapter = AdapterManager.FindZvsAdapter(aGuid);
@@ -202,9 +200,7 @@ namespace zvs.Processor
                             var sceneRunner = new SceneRunner(Log, this, EntityContextConnection);
                             var sceneResult = await sceneRunner.RunSceneAsync(id, cancellationToken);
 
-                            var details = string.Format("{0} Built-in cmd '{1}' ({2}) complete",
-                                sceneResult.Message,
-                                command.Name, command.Id);
+                            var details = $"{sceneResult.Message} Built-in cmd '{command.Name}' ({command.Id}) complete";
 
                             return sceneResult.HasError ? Result.ReportError(details) : Result.ReportSuccess(details);
                         }

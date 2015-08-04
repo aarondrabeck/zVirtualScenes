@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using zvs.DataModel;
-using zvs.DataModel.Fakes;
 using zvs.Fakes;
 using zvs.Processor.Fakes;
 
@@ -88,16 +87,16 @@ namespace zvs.Processor.Tests
                 PluginGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Plugin",
                 DescriptionGet = () => "",
-                OnSettingsCreatingPluginSettingBuilder = (s) => Task.FromResult(0),
-                OnDeviceSettingsCreatingDeviceSettingBuilder = (s) => Task.FromResult(0),
-                OnSceneSettingsCreatingSceneSettingBuilder = (s) => Task.FromResult(0),
+                OnSettingsCreatingPluginSettingBuilder = s => Task.FromResult(0),
+                OnDeviceSettingsCreatingDeviceSettingBuilder = s => Task.FromResult(0),
+                OnSceneSettingsCreatingSceneSettingBuilder = s => Task.FromResult(0),
                 StartAsync01 = () =>
                 {
                     isStarted = true;
                     return Task.FromResult(0);
                 }
             };
-            unitTestingPlugin.OnSettingsCreatingPluginSettingBuilder = async (settingBuilder) =>
+            unitTestingPlugin.OnSettingsCreatingPluginSettingBuilder = async settingBuilder =>
             {
                 var testSetting = new PluginSetting
                 {
@@ -144,9 +143,9 @@ namespace zvs.Processor.Tests
                 PluginGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque magna diam, pellentesque et orci eget, pellentesque iaculis odio. Ut ultrices est sapien, ac pellentesque odio malesuada a. Etiam in neque ullamcorper massa gravida ullamcorper vel a posuere.",
                 DescriptionGet = () => "",
-                OnSettingsCreatingPluginSettingBuilder = (s) => Task.FromResult(0),
-                OnDeviceSettingsCreatingDeviceSettingBuilder = (s) => Task.FromResult(0),
-                OnSceneSettingsCreatingSceneSettingBuilder = (s) => Task.FromResult(0)
+                OnSettingsCreatingPluginSettingBuilder = s => Task.FromResult(0),
+                OnDeviceSettingsCreatingDeviceSettingBuilder = s => Task.FromResult(0),
+                OnSceneSettingsCreatingSceneSettingBuilder = s => Task.FromResult(0)
             };
 
             var pluginManager = new PluginManager(new List<ZvsPlugin>() { longNamePlugin }, dbConnection, log, new StubIAdapterManager());
@@ -170,9 +169,9 @@ namespace zvs.Processor.Tests
                 PluginGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Plugin",
                 DescriptionGet = () => "",
-                OnSettingsCreatingPluginSettingBuilder = (s) => Task.FromResult(0),
-                OnDeviceSettingsCreatingDeviceSettingBuilder = (s) => Task.FromResult(0),
-                OnSceneSettingsCreatingSceneSettingBuilder = (s) => Task.FromResult(0)
+                OnSettingsCreatingPluginSettingBuilder = s => Task.FromResult(0),
+                OnDeviceSettingsCreatingDeviceSettingBuilder = s => Task.FromResult(0),
+                OnSceneSettingsCreatingSceneSettingBuilder = s => Task.FromResult(0)
             };
 
             var pluginManager = new PluginManager(new List<ZvsPlugin> { unitTestingPlugin }, dbConnection, log, new StubIAdapterManager());
@@ -301,16 +300,16 @@ namespace zvs.Processor.Tests
                 PluginGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Plugin",
                 DescriptionGet = () => "",
-                OnSettingsCreatingPluginSettingBuilder = (s) => Task.FromResult(0),
-                OnDeviceSettingsCreatingDeviceSettingBuilder = (s) => Task.FromResult(0),
-                OnSceneSettingsCreatingSceneSettingBuilder = (s) => Task.FromResult(0),
+                OnSettingsCreatingPluginSettingBuilder = s => Task.FromResult(0),
+                OnDeviceSettingsCreatingDeviceSettingBuilder = s => Task.FromResult(0),
+                OnSceneSettingsCreatingSceneSettingBuilder = s => Task.FromResult(0),
                 StartAsync01 = () =>
                 {
                     isStartedCount++;
                     return Task.FromResult(0);
                 }
             };
-            unitTestingPlugin.OnSettingsCreatingPluginSettingBuilder = async (settingBuilder) =>
+            unitTestingPlugin.OnSettingsCreatingPluginSettingBuilder = async settingBuilder =>
             {
                 var testSetting = new PluginSetting
                 {
@@ -370,9 +369,9 @@ namespace zvs.Processor.Tests
                 PluginGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Plugin",
                 DescriptionGet = () => "",
-                OnSettingsCreatingPluginSettingBuilder = (s) => Task.FromResult(0),
-                OnDeviceSettingsCreatingDeviceSettingBuilder = (s) => Task.FromResult(0),
-                OnSceneSettingsCreatingSceneSettingBuilder = (s) => Task.FromResult(0),
+                OnSettingsCreatingPluginSettingBuilder = s => Task.FromResult(0),
+                OnDeviceSettingsCreatingDeviceSettingBuilder = s => Task.FromResult(0),
+                OnSceneSettingsCreatingSceneSettingBuilder = s => Task.FromResult(0),
                 StartAsync01 = () =>
                 {
                     isStartedCount++;
@@ -384,7 +383,7 @@ namespace zvs.Processor.Tests
                     return Task.FromResult(0);
                 }
             };
-            unitTestingPlugin.OnSettingsCreatingPluginSettingBuilder = async (settingBuilder) =>
+            unitTestingPlugin.OnSettingsCreatingPluginSettingBuilder = async settingBuilder =>
             {
                 var testSetting = new PluginSetting
                 {
@@ -443,9 +442,9 @@ namespace zvs.Processor.Tests
                 PluginGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Plugin",
                 DescriptionGet = () => "",
-                OnSettingsCreatingPluginSettingBuilder = (s) => Task.FromResult(0),
-                OnDeviceSettingsCreatingDeviceSettingBuilder = (s) => Task.FromResult(0),
-                OnSceneSettingsCreatingSceneSettingBuilder = (s) => Task.FromResult(0)
+                OnSettingsCreatingPluginSettingBuilder = s => Task.FromResult(0),
+                OnDeviceSettingsCreatingDeviceSettingBuilder = s => Task.FromResult(0),
+                OnSceneSettingsCreatingSceneSettingBuilder = s => Task.FromResult(0)
             };
            
             var pluginManager = new PluginManager(new List<ZvsPlugin> { unitTestingPlugin }, dbConnection, log, new StubIAdapterManager());
@@ -471,9 +470,9 @@ namespace zvs.Processor.Tests
                 PluginGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Plugin",
                 DescriptionGet = () => "",
-                OnSettingsCreatingPluginSettingBuilder = (s) => Task.FromResult(0),
-                OnDeviceSettingsCreatingDeviceSettingBuilder = (s) => Task.FromResult(0),
-                OnSceneSettingsCreatingSceneSettingBuilder = (s) => Task.FromResult(0),
+                OnSettingsCreatingPluginSettingBuilder = s => Task.FromResult(0),
+                OnDeviceSettingsCreatingDeviceSettingBuilder = s => Task.FromResult(0),
+                OnSceneSettingsCreatingSceneSettingBuilder = s => Task.FromResult(0),
                 StartAsync01 = async () => hasStarted = true
             };
 
@@ -528,9 +527,9 @@ namespace zvs.Processor.Tests
                 PluginGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Plugin",
                 DescriptionGet = () => "",
-                OnSettingsCreatingPluginSettingBuilder = (s) => Task.FromResult(0),
-                OnDeviceSettingsCreatingDeviceSettingBuilder = (s) => Task.FromResult(0),
-                OnSceneSettingsCreatingSceneSettingBuilder = (s) => Task.FromResult(0),
+                OnSettingsCreatingPluginSettingBuilder = s => Task.FromResult(0),
+                OnDeviceSettingsCreatingDeviceSettingBuilder = s => Task.FromResult(0),
+                OnSceneSettingsCreatingSceneSettingBuilder = s => Task.FromResult(0),
                 StopAsync01 = async () => hasStopped = true
             };
 
@@ -594,9 +593,9 @@ namespace zvs.Processor.Tests
                 PluginGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Plugin",
                 DescriptionGet = () => "",
-                OnSettingsCreatingPluginSettingBuilder = (s) => Task.FromResult(0),
-                OnDeviceSettingsCreatingDeviceSettingBuilder = (s) => Task.FromResult(0),
-                OnSceneSettingsCreatingSceneSettingBuilder = (s) => Task.FromResult(0)
+                OnSettingsCreatingPluginSettingBuilder = s => Task.FromResult(0),
+                OnDeviceSettingsCreatingDeviceSettingBuilder = s => Task.FromResult(0),
+                OnSceneSettingsCreatingSceneSettingBuilder = s => Task.FromResult(0)
             };
 
             var pluginManager = new PluginManager(new List<ZvsPlugin> { unitTestingPlugin }, dbConnection, log, new StubIAdapterManager());
@@ -659,9 +658,9 @@ namespace zvs.Processor.Tests
                 PluginGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Plugin",
                 DescriptionGet = () => "",
-                OnSettingsCreatingPluginSettingBuilder = (s) => Task.FromResult(0),
-                OnDeviceSettingsCreatingDeviceSettingBuilder = (s) => Task.FromResult(0),
-                OnSceneSettingsCreatingSceneSettingBuilder = (s) => Task.FromResult(0),
+                OnSettingsCreatingPluginSettingBuilder = s => Task.FromResult(0),
+                OnDeviceSettingsCreatingDeviceSettingBuilder = s => Task.FromResult(0),
+                OnSceneSettingsCreatingSceneSettingBuilder = s => Task.FromResult(0),
             };
 
             var plugin = new Plugin

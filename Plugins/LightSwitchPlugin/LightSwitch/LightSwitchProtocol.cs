@@ -45,12 +45,12 @@ namespace LightSwitchPlugin.LightSwitch
 
         internal static LightSwitchCommand CreateMsgCmd(string msg)
         {
-            return new LightSwitchCommand(string.Format("MSG~{0}{1}", msg, Environment.NewLine));
+            return new LightSwitchCommand($"MSG~{msg}{Environment.NewLine}");
         }
 
         internal static LightSwitchCommand CreateErrorMsgCmd(string msg)
         {
-            return new LightSwitchCommand(string.Format("ERR~{0}{1}", msg, Environment.NewLine));
+            return new LightSwitchCommand($"ERR~{msg}{Environment.NewLine}");
         }
 
         internal static LightSwitchCommand CreateMsgCmdFormat(string msg, params object[] parameters)
@@ -70,53 +70,37 @@ namespace LightSwitchPlugin.LightSwitch
 
         internal static LightSwitchCommand CreateCookieCmd(string nonce)
         {
-            return new LightSwitchCommand(string.Format("COOKIE~{0}{1}", nonce, Environment.NewLine));
+            return new LightSwitchCommand($"COOKIE~{nonce}{Environment.NewLine}");
         }
 
         internal static LightSwitchCommand CreateVersionCmd(string appNameAndVersion)
         {
-            return new LightSwitchCommand(string.Format("VER~{0}{1}", appNameAndVersion, Environment.NewLine));
+            return new LightSwitchCommand($"VER~{appNameAndVersion}{Environment.NewLine}");
         }
 
         internal static LightSwitchCommand CreateDeviceCmd(string name, string id, string level, DeviceTypes type)
         {
-            return new LightSwitchCommand(string.Format("DEVICE~{0}~{1}~{2}~{3}{4}",
-                name,
-                id,
-                level,
-                type.ToString(),
-                Environment.NewLine));
+            return new LightSwitchCommand($"DEVICE~{name}~{id}~{level}~{type.ToString()}{Environment.NewLine}");
         }
 
         internal static LightSwitchCommand CreateUpdateCmd(string name, string id, string level, DeviceTypes type)
         {
-            return new LightSwitchCommand(string.Format("UPDATE~{0}~{1}~{2}~{3}{4}",
-                name,
-                id,
-                level,
-                type.ToString(),
-                Environment.NewLine));
+            return new LightSwitchCommand($"UPDATE~{name}~{id}~{level}~{type.ToString()}{Environment.NewLine}");
         }
 
         internal static LightSwitchCommand CreateSceneCmd(string name, string id)
         {
-            return new LightSwitchCommand(string.Format("SCENE~{0}~{1}{2}",
-                name,
-                id,
-                Environment.NewLine));
+            return new LightSwitchCommand($"SCENE~{name}~{id}{Environment.NewLine}");
         }
 
         internal static LightSwitchCommand CreateZoneCmd(string name, string id)
         {
-            return new LightSwitchCommand(string.Format("ZONE~{0}~{1}{2}",
-                name,
-                id,
-                Environment.NewLine));
+            return new LightSwitchCommand($"ZONE~{name}~{id}{Environment.NewLine}");
         }
 
         internal static LightSwitchCommand CreateEndListCmd()
         {
-            return new LightSwitchCommand(string.Format("ENDLIST{0}", Environment.NewLine));
+            return new LightSwitchCommand($"ENDLIST{Environment.NewLine}");
         }
 
         public enum DeviceTypes
@@ -132,7 +116,7 @@ namespace LightSwitchPlugin.LightSwitch
 
     public sealed class LightSwitchCommand
     {
-        public string RawCommand { get; private set; }
+        public string RawCommand { get; }
 
         public LightSwitchCommand(string rawCommand)
         {

@@ -1,19 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
-using System;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading;
-using zvs.DataModel;
 using System.Threading.Tasks;
+using zvs.DataModel;
 
 namespace zvs.Processor
 {
     public class AdapterManager : IAdapterManager
     {
-        private IEnumerable<ZvsAdapter> Adapters { get; set; }
-        private IEntityContextConnection EntityContextConnection { get; set; }
-        private IFeedback<LogEntry> Log { get; set; }
+        private IEnumerable<ZvsAdapter> Adapters { get; }
+        private IEntityContextConnection EntityContextConnection { get; }
+        private IFeedback<LogEntry> Log { get; }
         private bool IsRunning { get; set; }
 
         private readonly Dictionary<Guid, ZvsAdapter> _adapterLookup = new Dictionary<Guid, ZvsAdapter>();
@@ -22,13 +22,13 @@ namespace zvs.Processor
         public AdapterManager(IEnumerable<ZvsAdapter> adapters, IEntityContextConnection entityContextConnection, IFeedback<LogEntry> log)
         {
             if (adapters == null)
-                throw new ArgumentNullException("adapters");
+                throw new ArgumentNullException(nameof(adapters));
 
             if (entityContextConnection == null)
-                throw new ArgumentNullException("entityContextConnection");
+                throw new ArgumentNullException(nameof(entityContextConnection));
 
             if (log == null)
-                throw new ArgumentNullException("log");
+                throw new ArgumentNullException(nameof(log));
 
             EntityContextConnection = entityContextConnection;
             Log = log;

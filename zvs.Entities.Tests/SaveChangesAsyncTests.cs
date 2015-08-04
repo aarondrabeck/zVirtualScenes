@@ -54,7 +54,7 @@ namespace zvs.DataModel.Tests
                     {
                         Datetime = DateTime.Now,
                         Level = LogEntryLevel.Info,
-                        Message = string.Format("hello world {0}", i),
+                        Message = $"hello world {i}",
                         Source = "Source"
                     });
                 }
@@ -108,7 +108,7 @@ namespace zvs.DataModel.Tests
                         {
                             Datetime = DateTime.Now,
                             Level = LogEntryLevel.Info,
-                            Message = string.Format("loop3 {0}", i),
+                            Message = $"loop3 {i}",
                             Source = "Source"
                         });
                     }

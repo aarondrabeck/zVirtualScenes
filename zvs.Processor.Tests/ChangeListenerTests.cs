@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading;
@@ -8,7 +7,6 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using zvs.DataModel;
 using zvs.Fakes;
-using zvs.Processor.Fakes;
 
 namespace zvs.Processor.Tests
 {

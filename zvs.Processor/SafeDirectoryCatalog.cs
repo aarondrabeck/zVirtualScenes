@@ -13,7 +13,7 @@ namespace zvs.Processor
     {
         private AggregateCatalog Catalog { get; set; }
         public List<string> LoadErrors { get; set; }
-        private string DirectoryPath { get; set; }
+        private string DirectoryPath { get; }
 
         public SafeDirectoryCatalog(string directoryPath)
         {
@@ -42,11 +42,11 @@ namespace zvs.Processor
                     catch (ReflectionTypeLoadException ex)
                     {
                         foreach (var error in ex.LoaderExceptions)
-                            LoadErrors.Add(string.Format("Error loading '{0}': {1}", file, error.Message));
+                            LoadErrors.Add($"Error loading '{file}': {error.Message}");
                     }
                     catch (Exception ex)
                     {
-                        LoadErrors.Add(string.Format("Error loading '{0}': {1}", file, ex.Message));
+                        LoadErrors.Add($"Error loading '{file}': {ex.Message}");
                     }
                 }
 

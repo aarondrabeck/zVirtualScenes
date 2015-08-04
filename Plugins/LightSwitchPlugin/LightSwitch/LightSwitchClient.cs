@@ -10,7 +10,7 @@ namespace LightSwitchPlugin.LightSwitch
 {
     public class LightSwitchClient : ILightSwitchChannel
     {
-        public TcpClient TcpClient { get; private set; }
+        public TcpClient TcpClient { get; }
         public int Nonce { get; private set; }
         public bool IsAuthenticated { get; set; }
         public string RemoteEndPoint { get; private set; }
@@ -136,7 +136,7 @@ namespace LightSwitchPlugin.LightSwitch
         /// </summary>
         public async Task<Result> SendCommandAsync(LightSwitchCommand command)
         {
-            if (command == null) throw new ArgumentNullException("command");
+            if (command == null) throw new ArgumentNullException(nameof(command));
             if (command.RawCommand.Length > 0 && TcpClient.Connected)
             {
                 try
@@ -147,7 +147,7 @@ namespace LightSwitchPlugin.LightSwitch
                 }
                 catch (SocketException se)
                 {
-                    return Result.ReportError(string.Format("LightSwitch Socket Exception: {0}", se.Message));
+                    return Result.ReportError($"LightSwitch Socket Exception: {se.Message}");
                 }
                 catch (Exception e)
                 {

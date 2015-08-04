@@ -57,8 +57,8 @@ namespace zvs.WPF.DynamicActionControls
 
         #endregion
 
-        private DataType Type { get; set; }
-        private Func<string, Task> SendCommandAction { get; set; }
+        private DataType Type { get; }
+        private Func<string, Task> SendCommandAction { get; }
 
         public NumericControl(Func<string, Task> sendCommandAction, ImageSource signalIcon, DataType type)
         {

@@ -18,7 +18,7 @@ namespace zvsWebapi2Plugin
             return this;
         }
 
-        private WebApi2Plugin WebApi2Plugin { get; set; }
+        private WebApi2Plugin WebApi2Plugin { get; }
 
         public object GetService(Type serviceType)
         {

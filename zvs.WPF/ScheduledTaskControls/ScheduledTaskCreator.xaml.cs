@@ -1,19 +1,15 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Data.Entity;
-using System.Diagnostics;
-using System.Runtime.Remoting.Contexts;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Input;
 using System.Windows.Media.Animation;
 using zvs.DataModel;
 using zvs.DataModel.Tasks;
 using zvs.Processor;
 using zvs.WPF.Commands;
-
 
 namespace zvs.WPF.ScheduledTaskControls
 {
@@ -24,7 +20,7 @@ namespace zvs.WPF.ScheduledTaskControls
     {
         private readonly ZvsContext _context;
         private readonly App _app = (App)Application.Current;
-        private IFeedback<LogEntry> Log { get; set; }
+        private IFeedback<LogEntry> Log { get; }
         public ScheduledTaskCreator()
         {
             _context = new ZvsContext(_app.EntityContextConnection);
@@ -202,7 +198,7 @@ namespace zvs.WPF.ScheduledTaskControls
 
         private async Task<bool> DeleteTask(ScheduledTask task)
         {
-            if (MessageBox.Show(string.Format("Are you sure you want to delete the '{0}' scheduled task?", task.Name),
+            if (MessageBox.Show($"Are you sure you want to delete the '{task.Name}' scheduled task?",
                     "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
                 return false;
             _context.ScheduledTasks.Local.Remove(task);

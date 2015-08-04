@@ -9,22 +9,22 @@ namespace zvs.Processor
 {
     public class TriggerRunner : IRunner
     {
-        private IEntityContextConnection EntityContextConnection { get; set; }
-        private IFeedback<LogEntry> Log { get; set; }
+        private IEntityContextConnection EntityContextConnection { get; }
+        private IFeedback<LogEntry> Log { get; }
         private CancellationToken Ct { get; set; }
-        private ICommandProcessor CommandProcessor { get; set; }
+        private ICommandProcessor CommandProcessor { get; }
 
         public bool IsRunning { get; private set; }
         public TriggerRunner(IFeedback<LogEntry> log, ICommandProcessor commandProcessor, IEntityContextConnection entityContextConnection)
         {
             if (log == null)
-                throw new ArgumentNullException("log");
+                throw new ArgumentNullException(nameof(log));
 
             if (commandProcessor == null)
-                throw new ArgumentNullException("commandProcessor");
+                throw new ArgumentNullException(nameof(commandProcessor));
 
             if (entityContextConnection == null)
-                throw new ArgumentNullException("entityContextConnection");
+                throw new ArgumentNullException(nameof(entityContextConnection));
 
             CommandProcessor = commandProcessor;
             Log = log;

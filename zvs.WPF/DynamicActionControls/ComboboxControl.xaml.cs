@@ -48,12 +48,12 @@ namespace zvs.WPF.DynamicActionControls
 
         #endregion
 
-        private Func<object, Task> SendCommandAction { get; set; }
+        private Func<object, Task> SendCommandAction { get; }
 
         public ComboboxControl(Func<object, Task> sendCommandAction, ImageSource signalIcon, IEnumerable<object> comboValues)
         {
             if (comboValues == null)
-                throw new ArgumentNullException("comboValues");
+                throw new ArgumentNullException(nameof(comboValues));
 
             SendCommandAction = sendCommandAction;
             InitializeComponent();

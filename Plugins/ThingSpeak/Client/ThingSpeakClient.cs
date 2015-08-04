@@ -6,7 +6,7 @@ namespace ThingSpeak.Client
 {
     public class ThingSpeakClient
     {
-        private string ApiKey { get; set; }
+        private string ApiKey { get; }
         private const string Url = "http://api.thingspeak.com/";
 
         public ThingSpeakClient(string apiKey)

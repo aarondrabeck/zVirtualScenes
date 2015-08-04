@@ -158,10 +158,10 @@ namespace zvs.WPF
             /// <summary> Win32 </summary>
             public RECT(RECT rcSrc)
             {
-                this.left = rcSrc.left;
-                this.top = rcSrc.top;
-                this.right = rcSrc.right;
-                this.bottom = rcSrc.bottom;
+                left = rcSrc.left;
+                top = rcSrc.top;
+                right = rcSrc.right;
+                bottom = rcSrc.bottom;
             }
 
             /// <summary> Win32 </summary>
@@ -176,7 +176,7 @@ namespace zvs.WPF
             /// <summary> Return a user friendly representation of this struct </summary>
             public override string ToString()
             {
-                if (this == RECT.Empty) { return "RECT {Empty}"; }
+                if (this == Empty) { return "RECT {Empty}"; }
                 return "RECT { left : " + left + " / top : " + top + " / right : " + right + " / bottom : " + bottom + " }";
             }
 

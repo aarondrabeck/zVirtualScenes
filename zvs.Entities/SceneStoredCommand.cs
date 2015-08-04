@@ -8,7 +8,7 @@ namespace zvs.DataModel
     [Table("SceneStoredCommands", Schema = "ZVS")]
     public class SceneStoredCommand : IStoredCommand, INotifyPropertyChanged, IIdentity
     {
-        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         public int SceneId { get; set; }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Windows;
-using System.Windows.Documents;
+using System.Windows.Data;
 using zvs.DataModel;
 
 namespace zvs.WPF.Groups
@@ -13,15 +13,15 @@ namespace zvs.WPF.Groups
     /// </summary>
     public partial class DeviceMultiselectWindow
     {
-        private ZvsEntityContextConnection ZvsEntityContextConnection { get; set; }
-        private IEnumerable<int> DeviceIdsToExclude { get; set; }
+        private ZvsEntityContextConnection ZvsEntityContextConnection { get; }
+        private IEnumerable<int> DeviceIdsToExclude { get; }
 
         public IEnumerable<Device> SelectedDevices { get; set; }
 
         public DeviceMultiselectWindow(ZvsEntityContextConnection zvsEntityContextConnection, IEnumerable<int> deviceIdsToExclude)
         {
             if (deviceIdsToExclude == null)
-                throw new ArgumentNullException("deviceIdsToExclude");
+                throw new ArgumentNullException(nameof(deviceIdsToExclude));
 
             SelectedDevices = new List<Device>();
 
@@ -34,7 +34,7 @@ namespace zvs.WPF.Groups
         {
             using (var context = new ZvsContext(ZvsEntityContextConnection))
             {
-                var deviceViewSource = ((System.Windows.Data.CollectionViewSource)(FindResource("DeviceViewSource")));
+                var deviceViewSource = ((CollectionViewSource)(FindResource("DeviceViewSource")));
 
                 //Fill the device combo box from db
                 await context.Devices.Where(o => !DeviceIdsToExclude.Contains(o.Id)).ToListAsync();

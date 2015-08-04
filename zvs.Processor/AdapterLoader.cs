@@ -4,7 +4,6 @@ using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Documents;
 
 namespace zvs.Processor
 {
@@ -34,7 +33,9 @@ namespace zvs.Processor
 
                 var msg = "All adapters loaded.";
                 if (catalog.LoadErrors.Count > 0)
-                    msg = string.Format(@"The following plug-ins could not be loaded: {0}", string.Join(", " + Environment.NewLine, catalog.LoadErrors));
+                    msg =
+                        $@"The following plug-ins could not be loaded: {
+                            string.Join(", " + Environment.NewLine, catalog.LoadErrors)}";
                 return new FindAdaptersResult(Adapters, msg);
             }, cancellationToken);
         }

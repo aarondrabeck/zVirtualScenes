@@ -1,21 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Diagnostics;
+using System.Data.Entity;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Input;
-using zvs.Processor;
 using zvs.DataModel;
+using zvs.Processor;
 using zvs.WPF.Commands;
-using System.Data.Entity;
-
 
 namespace zvs.WPF.SceneControls
 {
@@ -27,7 +23,7 @@ namespace zvs.WPF.SceneControls
         private readonly ZvsContext _context;
         private ObservableCollection<Scene> _sceneCollection;
         private readonly App _app = (App)Application.Current;
-        private IFeedback<LogEntry> Log { get; set; }
+        private IFeedback<LogEntry> Log { get; }
         public SceneCreator()
         {
             _context = new ZvsContext(_app.EntityContextConnection);
@@ -320,7 +316,7 @@ namespace zvs.WPF.SceneControls
             var newWindow = new ScenePropertiesWindow(sceneId)
             {
                 Owner = _app.ZvsWindow,
-                Title = string.Format("Scene '{0}' Properties", name)
+                Title = $"Scene '{name}' Properties"
             };
             newWindow.Show();
         }
@@ -328,7 +324,7 @@ namespace zvs.WPF.SceneControls
         private async Task<bool> DeleteSelectedScene(Scene scene)
         {
             if (
-                MessageBox.Show(string.Format("Are you sure you want to delete the '{0}' scene?", scene.Name),
+                MessageBox.Show($"Are you sure you want to delete the '{scene.Name}' scene?",
                     "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
                 return false;
             if (scene.IsRunning)
@@ -346,7 +342,7 @@ namespace zvs.WPF.SceneControls
 
         private static void ShowSceneEditWarning(string sceneName)
         {
-            MessageBox.Show(string.Format("Cannot edit scene '{0}' because it is running.", sceneName),
+            MessageBox.Show($"Cannot edit scene '{sceneName}' because it is running.",
                                   "Scene Edit Warning", MessageBoxButton.YesNo, MessageBoxImage.Question);
         }
 
@@ -357,7 +353,8 @@ namespace zvs.WPF.SceneControls
                 var selectedItemsCopy = new SceneStoredCommand[SceneCmdsGrid.SelectedItems.Count];
                 SceneCmdsGrid.SelectedItems.CopyTo(selectedItemsCopy, 0);
 
-                if (MessageBox.Show(string.Format("Are you sure you want to delete {0} selected scene command(s)?", SceneCmdsGrid.SelectedItems.Count),
+                if (MessageBox.Show(
+                    $"Are you sure you want to delete {SceneCmdsGrid.SelectedItems.Count} selected scene command(s)?",
                                    "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
                     foreach (var sceneStoredCommand in selectedItemsCopy)
@@ -471,13 +468,13 @@ namespace zvs.WPF.SceneControls
         class IgnoreNewItemPlaceholderConverter : IValueConverter {
     public static readonly IgnoreNewItemPlaceholderConverter Instance = new IgnoreNewItemPlaceholderConverter();
 
-    public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
         if (value != null && value.ToString() == "{NewItemPlaceholder}")
             return DependencyProperty.UnsetValue;
         return value;
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
         throw new NotImplementedException();
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Data.Entity;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -19,7 +18,7 @@ namespace zvs.WPF.TriggerControls
     {
         private readonly ZvsContext _context;
         private readonly App _app = (App)Application.Current;
-        private IFeedback<LogEntry> Log { get; set; }
+        private IFeedback<LogEntry> Log { get; }
 
         public TriggerGridUc()
         {
@@ -131,7 +130,7 @@ namespace zvs.WPF.TriggerControls
             var newWindow = new TriggerEditorWindow(trigger.Id, _context)
             {
                 Owner = _app.ZvsWindow,
-                Title = string.Format("Edit Trigger '{0}', ", trigger.Name)
+                Title = $"Edit Trigger '{trigger.Name}', "
             };
             newWindow.Show();
             newWindow.Closing += async (s, a) =>
@@ -157,7 +156,7 @@ namespace zvs.WPF.TriggerControls
             var trigger = (DeviceValueTrigger)TriggerGrid.SelectedItem;
             if (trigger == null) return;
 
-            if (MessageBox.Show(string.Format("Are you sure you want to delete the '{0}' trigger?", trigger.Name),
+            if (MessageBox.Show($"Are you sure you want to delete the '{trigger.Name}' trigger?",
                 "Are you sure?",
                 MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
             _context.DeviceValueTriggers.Local.Remove(trigger);
