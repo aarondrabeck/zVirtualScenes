@@ -4,13 +4,10 @@
   <description />
   <settings>
     <options>
-      <option name="artifactRules" value="release/** =&gt; zVirtualScenes.Trunk.release.%build.number%.zip&#xA;debug/** =&gt; zVirtualScenes.Trunk.debug.%build.number%.zip&#xA;Installer/Output/*.exe" />
+      <option name="artifactRules" value="bin/release/** =&gt; zVirtualScenes.Trunk.release.%build.number%.zip&#xA;setup/output/*.exe" />
       <option name="buildNumberPattern" value="8.0.1.%build.counter%" />
       <option name="cleanBuild" value="true" />
     </options>
-    <disabled-settings>
-      <setting-ref ref="RUNNER_309" />
-    </disabled-settings>
     <parameters>
       <param name="env.PathToXuit" value="E:\xunit" />
     </parameters>
