@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vcs-root xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" uuid="04d5ead8-a9db-46ec-9480-57bde7672512" type="jetbrains.git" xsi:noNamespaceSchemaLocation="http://www.jetbrains.com/teamcity/schemas/9.0/project-config.xsd">
+  <name>zVirtualScenesRepo</name>
+  <param name="agentCleanFilesPolicy" value="ALL_UNTRACKED" />
+  <param name="agentCleanPolicy" value="ON_BRANCH_CHANGE" />
+  <param name="authMethod" value="TEAMCITY_SSH_KEY" />
+  <param name="branch" value="refs/heads/master" />
+  <param name="ignoreKnownHosts" value="true" />
+  <param name="secure:passphrase" value="zxx13826988517431fe0770d8a35d31b462" />
+  <param name="submoduleCheckout" value="CHECKOUT" />
+  <param name="teamcitySshKey" value="Leavitt Software GitHub Private SSH Key2.ppk" />
+  <param name="url" value="git@github.com:aarondrabeck/zVirtualScenes.git" />
+  <param name="usernameStyle" value="USERID" />
+</vcs-root>
+
