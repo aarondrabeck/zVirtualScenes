@@ -5,7 +5,7 @@
   <settings>
     <options>
       <option name="artifactRules" value="bin/release/** =&gt; zVirtualScenes.Trunk.release.%build.number%.zip&#xA;setup/output/*.exe" />
-      <option name="buildNumberPattern" value="8.0.1.%build.counter%" />
+      <option name="buildNumberPattern" value="8.1.0.%build.counter%" />
       <option name="cleanBuild" value="true" />
     </options>
     <parameters>
