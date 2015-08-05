@@ -6,7 +6,7 @@ namespace zvs.DataModel
     [Table("PluginSettings", Schema = "ZVS")]
     public class PluginSetting : BaseValue, IIdentity
     {
-        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         public int PluginId { get; set; }

@@ -11,9 +11,9 @@ var sceneHelper = function () {
         if(typeof scene == 'undefined') return;
         if(typeof waitDuration == 'undefined') waitDuration = 1000;
         if(typeof async == 'undefined') async = false;
-        var cmd = "RunScene('"+scene+"')"
+        var cmd = "RunScene('" + scene + "')";
         if(typeof scene == "number") {
-            cmd = "RunScene("+scene+")"
+            cmd = "RunScene(" + scene + ")";
         }
         if(async) {
             Delay(cmd, waitDuration);

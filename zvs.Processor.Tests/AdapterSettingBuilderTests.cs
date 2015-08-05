@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Data.Entity;
-using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -28,7 +27,7 @@ namespace zvs.Processor.Tests
         {
             //arrange 
             //act
-            var result = new AdapterSettingBuilder(new ZvsEntityContextConnection(), CancellationToken.None);
+            var result = new AdapterSettingBuilder(new UnitTestDbConnection(), CancellationToken.None);
 
             //assert 
             Assert.IsNotNull(result);
@@ -40,7 +39,7 @@ namespace zvs.Processor.Tests
         {
             //Arrange 
             Database.SetInitializer(new CreateFreshDbInitializer());
-            var adapterBuilder = new AdapterSettingBuilder(new StubIEntityContextConnection(), CancellationToken.None);
+            var adapterBuilder = new AdapterSettingBuilder(new UnitTestDbConnection(), CancellationToken.None);
             var adapter = new StubUnitTestAdapter();
 
             //act
@@ -53,7 +52,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAdapterSettingNullAdapterTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "asb-RegisterAdapterSettingNullAdapterTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var adapterBuilder = new AdapterSettingBuilder( dbConnection, CancellationToken.None);
             var adapter = new StubUnitTestAdapter();
@@ -70,7 +69,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAdapterSettingAdapterTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "asb-RegisterAdapterSettingAdapterTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var adapterBuilder = new AdapterSettingBuilder(dbConnection, CancellationToken.None);
             var dbAdapter = UnitTesting.CreateFakeAdapter();
@@ -113,7 +112,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAdapterSettingValueTypeChangedTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "asb-RegisterAdapterSettingValueTypeChangedTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var adapterBuilder = new AdapterSettingBuilder(dbConnection, CancellationToken.None);
             var dbAdapter = UnitTesting.CreateFakeAdapter();
@@ -160,7 +159,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAdapterSettingValueDonestTriggerChangedTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "asb-RegisterAdapterSettingValueDonestTriggerChangedTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var adapterBuilder = new AdapterSettingBuilder( dbConnection, CancellationToken.None);
             var dbAdapter = UnitTesting.CreateFakeAdapter();
@@ -208,7 +207,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAdapterSettingOptionAddedTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "asb-RegisterAdapterSettingOptionAddedTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var adapterBuilder = new AdapterSettingBuilder( dbConnection, CancellationToken.None);
             var dbAdapter = UnitTesting.CreateFakeAdapter();
@@ -265,7 +264,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAdapterSettingOptionRemovedTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "asb-RegisterAdapterSettingOptionRemovedTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var adapterBuilder = new AdapterSettingBuilder( dbConnection, CancellationToken.None);
             var dbAdapter = UnitTesting.CreateFakeAdapter();
@@ -328,7 +327,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterNewDeviceSettingTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "asb-RegisterNewDeviceSettingTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var adapterBuilder = new AdapterSettingBuilder( dbConnection, CancellationToken.None);
             var deviceSetting = new DeviceSetting
@@ -358,7 +357,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterUpdatedDeviceSettingTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "asb-RegisterUpdatedDeviceSettingTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var adapterBuilder = new AdapterSettingBuilder(dbConnection, CancellationToken.None);
@@ -397,7 +396,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterNoUpdateDeviceSettingTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "asb-RegisterNoUpdateDeviceSettingTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var adapterBuilder = new AdapterSettingBuilder(dbConnection, CancellationToken.None);
@@ -434,7 +433,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAddedDeviceSettingOptionTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "asb-RegisterAddedDeviceSettingOptionTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var adapterBuilder = new AdapterSettingBuilder(dbConnection, CancellationToken.None);
@@ -484,7 +483,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterRemovedDeviceSettingOptionTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "asb-RegisterRemovedDeviceSettingOptionTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var adapterBuilder = new AdapterSettingBuilder(dbConnection, CancellationToken.None);
@@ -537,7 +536,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterNewDeviceTypeSettingTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "asb-RegisterNewDeviceTypeSettingTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var adapterBuilder = new AdapterSettingBuilder(dbConnection, CancellationToken.None);
             var deviceType = UnitTesting.CreateFakeDeviceType();
@@ -569,7 +568,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterUpdatedDeviceTypeSettingTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "asb-RegisterUpdatedDeviceTypeSettingTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var adapterBuilder = new AdapterSettingBuilder(dbConnection, CancellationToken.None);
@@ -610,7 +609,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterNoUpdateDeviceTypeSettingTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "asb-RegisterNoUpdateDeviceTypeSettingTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var adapterBuilder = new AdapterSettingBuilder(dbConnection, CancellationToken.None);
@@ -649,7 +648,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAddedDeviceTypeSettingOptionTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "asb-RegisterAddedDeviceTypeSettingOptionTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var adapterBuilder = new AdapterSettingBuilder(dbConnection, CancellationToken.None);
@@ -701,7 +700,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterRemovedDeviceTypeSettingOptionTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "asb-RegisterRemovedDeviceTypeSettingOptionTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var adapterBuilder = new AdapterSettingBuilder(dbConnection, CancellationToken.None);

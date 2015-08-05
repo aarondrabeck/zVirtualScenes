@@ -143,10 +143,10 @@ namespace SpeechPlugin
 
                 foreach (var objTypeValuespair in objTypeValuespairs)
                 {
-                    var thisEvent = string.Format("{0}:{1}", deviceTypeUId, dv.Name);
+                    var thisEvent = $"{deviceTypeUId}:{dv.Name}";
 
                     if (thisEvent.Equals(objTypeValuespair.Trim()))
-                        _synth.SpeakAsync(string.Format("{0} {1}  changed to {2}.", dv.Device.Name, dv.Name, dv.Value));
+                        _synth.SpeakAsync($"{dv.Device.Name} {dv.Name}  changed to {dv.Value}.");
                 }
             }
         }

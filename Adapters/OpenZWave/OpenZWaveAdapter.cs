@@ -1153,8 +1153,8 @@ namespace OpenZWaveAdapter
                                 var deviceCommand = new DeviceCommand
                                 {
                                     DeviceId = d.Id,
-                                    UniqueIdentifier = string.Format("DYNAMIC_CMD_{0}", valueIdString),
-                                    Name = string.Format("Set {0}", value.Label),
+                                    UniqueIdentifier = $"DYNAMIC_CMD_{valueIdString}",
+                                    Name = $"Set {value.Label}",
                                     ArgumentType = argumentType,
                                     Help = string.IsNullOrEmpty(value.Help) ? string.Empty : value.Help,
                                     CustomData1 = string.IsNullOrEmpty(value.Label) ? string.Empty : value.Label,
@@ -1282,7 +1282,7 @@ namespace OpenZWaveAdapter
                                 {
                                     double level;
                                     double.TryParse(data, out level);
-                                    var levelTxt = string.Format("{0}° F", level);
+                                    var levelTxt = $"{level}° F";
 
                                     if (!device.CurrentLevelInt.Equals(level))
                                     {
@@ -1351,7 +1351,7 @@ namespace OpenZWaveAdapter
                                     if (double.TryParse(data, out watts))
                                     {
                                         device.CurrentLevelInt = watts;
-                                        device.CurrentLevelText = string.Format("{0}W", watts);
+                                        device.CurrentLevelText = $"{watts}W";
                                         changed = true;
                                     }
 
@@ -1391,7 +1391,7 @@ namespace OpenZWaveAdapter
                             #region Update Device Commands
                             if (!readOnly)
                             {
-                                var uid = string.Format("DYNAMIC_CMD_{0}", valueIdString);
+                                var uid = $"DYNAMIC_CMD_{valueIdString}";
                                 var deviceCommand = await context.DeviceCommands.FirstOrDefaultAsync(o => o.DeviceId == device.Id &&
                                     o.UniqueIdentifier == uid);
 

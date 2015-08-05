@@ -241,7 +241,7 @@ internal sealed class SunTimes
         int day = date.Day;
         int year = date.Year;
 
-        bool gregorian = (year < 1583) ? false : true;
+        bool gregorian = (year >= 1583);
 
         if ((month == 1) || (month == 2))
         {

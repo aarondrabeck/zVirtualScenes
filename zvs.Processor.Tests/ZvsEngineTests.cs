@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using zvs.DataModel;
-using zvs.DataModel.Fakes;
 using zvs.Fakes;
 using zvs.Processor.Fakes;
 
@@ -22,7 +21,7 @@ namespace zvs.Processor.Tests
             var fb = new StubIFeedback<LogEntry>();
             var am = new StubIAdapterManager();
             var pm = new StubIPluginManager();
-            var connection = new StubIEntityContextConnection();
+            var connection = new UnitTestDbConnection();
             var tr = new TriggerRunner(fb, new StubICommandProcessor(), connection);
             var st = new StubScheduledTaskRunner(fb, new StubICommandProcessor(), connection, new StubITimeProvider());
 
@@ -38,7 +37,7 @@ namespace zvs.Processor.Tests
             //arrange 
             var fb = new StubIFeedback<LogEntry>();
             var pm = new StubIPluginManager();
-            var connection = new StubIEntityContextConnection();
+            var connection = new UnitTestDbConnection();
             var tr = new TriggerRunner(fb, new StubICommandProcessor(), connection);
             var st = new StubScheduledTaskRunner(fb, new StubICommandProcessor(), connection, new StubITimeProvider());
 
@@ -54,7 +53,7 @@ namespace zvs.Processor.Tests
             //arrange 
             var fb = new StubIFeedback<LogEntry>();
             var am = new StubIAdapterManager();
-            var connection = new StubIEntityContextConnection();
+            var connection = new UnitTestDbConnection();
             var tr = new TriggerRunner(fb, new StubICommandProcessor(), connection);
             var st = new StubScheduledTaskRunner(fb, new StubICommandProcessor(), connection, new StubITimeProvider());
 
@@ -71,7 +70,7 @@ namespace zvs.Processor.Tests
             var fb = new StubIFeedback<LogEntry>();
             var am = new StubIAdapterManager();
             var pm = new StubIPluginManager();
-            var connection = new StubIEntityContextConnection();
+            var connection = new UnitTestDbConnection();
             var tr = new TriggerRunner(fb, new StubICommandProcessor(), connection);
             var st = new StubScheduledTaskRunner(fb, new StubICommandProcessor(), connection, new StubITimeProvider());
 
@@ -88,7 +87,7 @@ namespace zvs.Processor.Tests
             var fb = new StubIFeedback<LogEntry>();
             var am = new StubIAdapterManager();
             var pm = new StubIPluginManager();
-            var connection = new StubIEntityContextConnection();
+            var connection = new UnitTestDbConnection();
             var st = new StubScheduledTaskRunner(fb, new StubICommandProcessor(), connection, new StubITimeProvider());
 
             //act
@@ -104,7 +103,7 @@ namespace zvs.Processor.Tests
             var fb = new StubIFeedback<LogEntry>();
             var am = new StubIAdapterManager();
             var pm = new StubIPluginManager();
-            var connection = new StubIEntityContextConnection();
+            var connection = new UnitTestDbConnection();
             var tr = new TriggerRunner(fb, new StubICommandProcessor(), connection);
 
             //act
@@ -119,7 +118,7 @@ namespace zvs.Processor.Tests
             var fb = new StubIFeedback<LogEntry>();
             var am = new StubIAdapterManager();
             var pm = new StubIPluginManager();
-            var connection = new StubIEntityContextConnection();
+            var connection = new UnitTestDbConnection();
             var tr = new TriggerRunner(fb, new StubICommandProcessor(), connection);
             var st = new StubScheduledTaskRunner(fb, new StubICommandProcessor(), connection, new StubITimeProvider());
 
@@ -134,7 +133,7 @@ namespace zvs.Processor.Tests
         public async Task StartAsyncTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "engine-StartAsyncTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -151,8 +150,8 @@ namespace zvs.Processor.Tests
             var isPluginManagerInitialized = false;
            
 
-            var am = new StubIAdapterManager { StartAsyncCancellationToken = async (ct) =>isAdapterManagerInitialized = true };
-            var pm = new StubIPluginManager { StartAsyncCancellationToken = async (ct) => isPluginManagerInitialized = true };
+            var am = new StubIAdapterManager { StartAsyncCancellationToken = async ct =>isAdapterManagerInitialized = true };
+            var pm = new StubIPluginManager { StartAsyncCancellationToken = async ct => isPluginManagerInitialized = true };
             var tr = new TriggerRunner(log, new StubICommandProcessor(), dbConnection);
             var st = new ScheduledTaskRunner(log, new StubICommandProcessor(), dbConnection,new CurrentTimeProvider());
 

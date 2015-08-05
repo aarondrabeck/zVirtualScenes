@@ -159,7 +159,8 @@ namespace zvs.Processor.ImportExport
 
                
             }
-            return Result.ReportSuccess(string.Format("Imported {0} scheduled tasks, skipped {1} from {2}", newSTs.Count, skippedCount, Path.GetFileName(fileName)));
+            return Result.ReportSuccess(
+                $"Imported {newSTs.Count} scheduled tasks, skipped {skippedCount} from {Path.GetFileName(fileName)}");
         }
 
     }

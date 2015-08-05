@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data.Entity;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Media.Imaging;
 using zvs.DataModel;
 using zvs.WPF.DynamicActionControls;
-using System.Data.Entity;
 
 namespace zvs.WPF.Commands
 {
@@ -17,8 +19,8 @@ namespace zvs.WPF.Commands
     /// </summary>
     public partial class CommandBuilder
     {
-        private ZvsContext Context { get; set; }
-        private IStoredCommand StoredCommand { get; set; }
+        private ZvsContext Context { get; }
+        private IStoredCommand StoredCommand { get; }
         private readonly BitmapImage _icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/save_check.png"));
 
         //temp variable to save selected built-in command data
@@ -112,9 +114,9 @@ namespace zvs.WPF.Commands
         private async Task InitializeJavaScriptCommandsAsync()
         {
             // Do not load your data at design time.
-            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+            if (!DesignerProperties.GetIsInDesignMode(this))
             {
-                var cmdsViewSource = ((System.Windows.Data.CollectionViewSource)(FindResource("JSCmdsViewSource")));
+                var cmdsViewSource = ((CollectionViewSource)(FindResource("JSCmdsViewSource")));
                 await Context.JavaScriptCommands.Include(o => o.Options).ToListAsync();
                 cmdsViewSource.Source = Context.JavaScriptCommands.Local;
             }

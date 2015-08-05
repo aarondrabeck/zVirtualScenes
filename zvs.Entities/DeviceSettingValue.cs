@@ -2,17 +2,17 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Data.Entity;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using System.Data.Entity;
 
 namespace zvs.DataModel
 {
     [Table("DeviceSettingValues", Schema = "ZVS")]
     public class DeviceSettingValue : INotifyPropertyChanged, IIdentity, IValidatableObject
     {
-        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         public int DeviceId { get; set; }
@@ -68,7 +68,7 @@ namespace zvs.DataModel
             var results = new List<ValidationResult>();
 
             using (var context = new ZvsContext())
-                if (context.DeviceSettingValues.Any(o => o.DeviceId == this.DeviceId && 
+                if (context.DeviceSettingValues.Any(o => o.DeviceId == DeviceId && 
                     o.DeviceSettingId == DeviceSettingId && 
                     o.Id != Id))  //Check o.Id != this.Id so updates do not fail
                     results.Add(new ValidationResult("Device Setting Value name already exists", new[] { "Name" }));

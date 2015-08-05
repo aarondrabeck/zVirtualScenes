@@ -8,7 +8,7 @@ namespace zvs.DataModel
     [Table("DeviceTypeSettingValues", Schema = "ZVS")]
     public class DeviceTypeSettingValue : INotifyPropertyChanged, IIdentity
     {
-        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         public int DeviceId { get; set; }

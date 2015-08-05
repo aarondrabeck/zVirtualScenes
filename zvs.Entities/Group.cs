@@ -9,7 +9,7 @@ namespace zvs.DataModel
     [Table("Groups", Schema = "ZVS")]
     public class Group : INotifyPropertyChanged, IIdentity
     {
-        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         private ObservableCollection<Device> _devices = new ObservableCollection<Device>();

@@ -1,17 +1,17 @@
 ﻿using System;
+using System.Data.Entity;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using zvs.DataModel;
-using System.Data.Entity;
 
 namespace zvs.Processor
 {
     internal class SceneRunner
     {
-        private IEntityContextConnection EntityContextConnection { get; set; }
-        private IFeedback<LogEntry> Log { get; set; }
-        private ICommandProcessor CommandProcessor { get; set; }
+        private IEntityContextConnection EntityContextConnection { get; }
+        private IFeedback<LogEntry> Log { get; }
+        private ICommandProcessor CommandProcessor { get; }
 
         /// <summary>
         /// Executes a scene asynchronously and reports progress.
@@ -19,13 +19,13 @@ namespace zvs.Processor
         public SceneRunner(IFeedback<LogEntry> log, ICommandProcessor commandProcessor, IEntityContextConnection entityContextConnection)
         {
             if (log == null)
-                throw new ArgumentNullException("log");
+                throw new ArgumentNullException(nameof(log));
 
             if (commandProcessor == null)
-                throw new ArgumentNullException("commandProcessor");
+                throw new ArgumentNullException(nameof(commandProcessor));
 
             if (entityContextConnection == null)
-                throw new ArgumentNullException("entityContextConnection");
+                throw new ArgumentNullException(nameof(entityContextConnection));
 
             CommandProcessor = commandProcessor;
             Log = log;
@@ -46,21 +46,20 @@ namespace zvs.Processor
                     if (scene == null)
                     {
                         var msg =
-                            string.Format("Failed to run scene with Id of {0} because it was not found in the database",
-                                sceneId);
+                            $"Failed to run scene with Id of {sceneId} because it was not found in the database";
                         await Log.ReportWarningAsync(msg, CancellationToken.None);
                         return Result.ReportErrorFormat(msg);
                     }
                     if (scene.IsRunning)
                     {
-                        var msg = string.Format("Failed to run scene '{0}' because it is already running", scene.Name);
+                        var msg = $"Failed to run scene '{scene.Name}' because it is already running";
                         await Log.ReportWarningAsync(msg, CancellationToken.None);
                         return Result.ReportErrorFormat(msg);
                     }
 
                     if (scene.Commands.Count < 1)
                     {
-                        var msg = string.Format("Failed to run scene '{0}' because it has no commands", scene.Name);
+                        var msg = $"Failed to run scene '{scene.Name}' because it has no commands";
 
                         await Log.ReportWarningAsync(msg, CancellationToken.None);
                         return Result.ReportErrorFormat(msg);
@@ -91,18 +90,16 @@ namespace zvs.Processor
 
                     scene.IsRunning = false;
                     await context.SaveChangesAsync(cancellationToken);
-                    var summaryMsg = string.Format("Scene '{0}' completed execution with {1} of {2} commands ran successfully",
-                        scene.Name,
-                        commandsRunSuccessfully,
-                        scene.Commands.Count())
-                    ;
+                    var summaryMsg =
+                        $"Scene '{scene.Name}' completed execution with {commandsRunSuccessfully} of {scene.Commands.Count()} commands ran successfully"
+                        ;
                     await Log.ReportInfoAsync(summaryMsg, CancellationToken.None);
                     return Result.ReportSuccess(summaryMsg);
                 }
             }
             catch (OperationCanceledException)
             {
-                var msg = string.Format("Scene runner running scene Id {0} was cancelled", sceneId);
+                var msg = $"Scene runner running scene Id {sceneId} was cancelled";
                 Log.ReportInfoAsync(msg, CancellationToken.None).Wait(CancellationToken.None);
                 return Result.ReportSuccessFormat(msg);
             }

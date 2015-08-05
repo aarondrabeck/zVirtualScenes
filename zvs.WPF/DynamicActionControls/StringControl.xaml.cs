@@ -57,7 +57,7 @@ namespace zvs.WPF.DynamicActionControls
 
         #endregion
 
-        private Func<string, Task> SendCommandAction { get; set; }
+        private Func<string, Task> SendCommandAction { get; }
 
         public StringControl(Func<string, Task> sendCommandAction, ImageSource signalIcon)
         {

@@ -13,8 +13,8 @@ namespace zvs.WPF.DeviceControls
     /// </summary>
     public partial class DeviceDetailsWindow
     {
-        private int DeviceId { get; set; } 
-        private App App { get; set; }
+        private int DeviceId { get; } 
+        private App App { get; }
 
         public Device Device
         {

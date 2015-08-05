@@ -44,7 +44,7 @@ namespace zvs.WPF.DynamicActionControls
 
         #endregion
 
-        private Func<bool, Task> SendCommandAction { get; set; }
+        private Func<bool, Task> SendCommandAction { get; }
 
         public CheckboxControl(Func<bool, Task> sendCommandAction, ImageSource signalIcon)
         {

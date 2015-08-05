@@ -7,33 +7,33 @@ namespace zvs.Processor
 {
     public class ZvsEngine
     {
-        public IAdapterManager AdapterManager { get; private set; }
-        private IEntityContextConnection EntityContextConnection { get; set; }
-        public IPluginManager PluginManager { get; private set; }
-        public TriggerRunner TriggerRunner { get; private set; }
-        public ScheduledTaskRunner ScheduledTaskRunner { get; private set; }
-        private IFeedback<LogEntry> Log { get; set; }
+        public IAdapterManager AdapterManager { get; }
+        private IEntityContextConnection EntityContextConnection { get; }
+        public IPluginManager PluginManager { get; }
+        public TriggerRunner TriggerRunner { get; }
+        public ScheduledTaskRunner ScheduledTaskRunner { get; }
+        private IFeedback<LogEntry> Log { get; }
 
         public ZvsEngine(IFeedback<LogEntry> feedback, IAdapterManager adapterManager, IPluginManager pluginManager,
             IEntityContextConnection entityContextConnection, TriggerRunner triggerRunner, ScheduledTaskRunner scheduledTaskRunner)
         {
             if (entityContextConnection == null)
-                throw new ArgumentNullException("entityContextConnection");
+                throw new ArgumentNullException(nameof(entityContextConnection));
 
             if (feedback == null)
-                throw new ArgumentNullException("feedback");
+                throw new ArgumentNullException(nameof(feedback));
 
             if (adapterManager == null)
-                throw new ArgumentNullException("adapterManager");
+                throw new ArgumentNullException(nameof(adapterManager));
 
             if (pluginManager == null)
-                throw new ArgumentNullException("pluginManager");
+                throw new ArgumentNullException(nameof(pluginManager));
 
             if (triggerRunner == null)
-                throw new ArgumentNullException("triggerRunner");
+                throw new ArgumentNullException(nameof(triggerRunner));
 
             if (scheduledTaskRunner == null)
-                throw new ArgumentNullException("scheduledTaskRunner");
+                throw new ArgumentNullException(nameof(scheduledTaskRunner));
 
             EntityContextConnection = entityContextConnection;
             Log = feedback;

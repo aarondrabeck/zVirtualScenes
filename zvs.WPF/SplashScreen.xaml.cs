@@ -18,7 +18,7 @@ namespace zvs.WPF
         /// <param name="msg"></param>
         public void SetLoadingText(string msg)
         {
-            this.txtLoading.Text = string.Format("{0}...", msg);
+            txtLoading.Text = $"{msg}...";
         }
 
         public void SetLoadingTextFormat(string format, params object[] args)

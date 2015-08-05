@@ -55,7 +55,7 @@ namespace zvs.Processor.ImportExport
             try
             {
                 if (!File.Exists(fileName))
-                    return ReadAsXmlFromDiskResult<T>.ReportError(string.Format("{0} not found", fileName));
+                    return ReadAsXmlFromDiskResult<T>.ReportError($"{fileName} not found");
 
                 //Open the file written above and read values from it. 
                 //http://stackoverflow.com/questions/1127431/xmlserializer-giving-filenotfoundexception-at-constructor
@@ -70,7 +70,7 @@ namespace zvs.Processor.ImportExport
             }
             catch (Exception e)
             {
-                return ReadAsXmlFromDiskResult<T>.ReportError(string.Format("Error reading {0}: {1}", fileName, e.Message));
+                return ReadAsXmlFromDiskResult<T>.ReportError($"Error reading {fileName}: {e.Message}");
             }
         }
 

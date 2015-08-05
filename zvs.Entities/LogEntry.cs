@@ -15,7 +15,7 @@ namespace zvs.DataModel
             Datetime = provider.Time;
         }
 
-        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         public DateTime Datetime { get; set; }
@@ -33,7 +33,7 @@ namespace zvs.DataModel
 
         public override string ToString()
         {
-            return String.Format("{0:yyyy-MM-dd-hh:mm:ss:fff}|{1,-20}|{2,-20}|{3}", Datetime, Source, Level, Message);
+            return $"{Datetime:yyyy-MM-dd-hh:mm:ss:fff}|{Source,-20}|{Level,-20}|{Message}";
         }
     }
 }

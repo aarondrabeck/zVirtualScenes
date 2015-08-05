@@ -5,7 +5,7 @@ namespace zvsWebapi2Plugin.Controllers
 {
     public abstract class WebApi2PuginController: ODataController
     {
-        protected ZvsContext Context { get; private set; }
+        protected ZvsContext Context { get; }
         protected WebApi2Plugin WebApi2Plugin {get; private set; }
 
         protected WebApi2PuginController(WebApi2Plugin webApi2Plugin)

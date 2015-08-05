@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using zvs.DataModel;
 using zvs.DataModel.Tasks;
-using zvs.DataModel.Tasks.Fakes;
 using zvs.Fakes;
 using zvs.Processor.Fakes;
 
@@ -22,7 +21,7 @@ namespace zvs.Processor.Tests
         {
             //arrange 
             //act
-            new ScheduledTaskRunner(null, new StubICommandProcessor(), new ZvsEntityContextConnection(), new CurrentTimeProvider());
+            new ScheduledTaskRunner(null, new StubICommandProcessor(), new UnitTestDbConnection(), new CurrentTimeProvider());
             //assert - throws exception
         }
         [TestMethod]
@@ -31,7 +30,7 @@ namespace zvs.Processor.Tests
         {
             //arrange 
             //act
-            new ScheduledTaskRunner(new StubIFeedback<LogEntry>(), null, new ZvsEntityContextConnection(), new CurrentTimeProvider());
+            new ScheduledTaskRunner(new StubIFeedback<LogEntry>(), null, new UnitTestDbConnection(), new CurrentTimeProvider());
             //assert - throws exception
         }
 
@@ -50,7 +49,7 @@ namespace zvs.Processor.Tests
         public void ConstructorPath4()
         {
             //arrange, act
-            var tm = new ScheduledTaskRunner(new StubIFeedback<LogEntry>(), new StubICommandProcessor(), new ZvsEntityContextConnection(), null);
+            var tm = new ScheduledTaskRunner(new StubIFeedback<LogEntry>(), new StubICommandProcessor(), new UnitTestDbConnection(), null);
             //assert - throws exception
         }
 
@@ -58,7 +57,7 @@ namespace zvs.Processor.Tests
         public void ConstructorPath5()
         {
             //arrange, act
-            var tm = new ScheduledTaskRunner(new StubIFeedback<LogEntry>(), new StubICommandProcessor(), new ZvsEntityContextConnection(), new CurrentTimeProvider());
+            var tm = new ScheduledTaskRunner(new StubIFeedback<LogEntry>(), new StubICommandProcessor(), new UnitTestDbConnection(), new CurrentTimeProvider());
 
             //Assert
             Assert.IsNotNull(tm);
@@ -78,7 +77,7 @@ namespace zvs.Processor.Tests
                 }
             };
             var cts = new CancellationTokenSource();
-            var tm = new ScheduledTaskRunner(log, new StubICommandProcessor(), new ZvsEntityContextConnection(), new CurrentTimeProvider());
+            var tm = new ScheduledTaskRunner(log, new StubICommandProcessor(), new UnitTestDbConnection(), new CurrentTimeProvider());
 
             //Act
             await tm.StartAsync(cts.Token);
@@ -103,7 +102,7 @@ namespace zvs.Processor.Tests
                 }
             };
             var cts = new CancellationTokenSource();
-            var tm = new ScheduledTaskRunner(log, new StubICommandProcessor(), new ZvsEntityContextConnection(), new CurrentTimeProvider());
+            var tm = new ScheduledTaskRunner(log, new StubICommandProcessor(), new UnitTestDbConnection(), new CurrentTimeProvider());
 
             //Act
             await tm.StartAsync(cts.Token);
@@ -127,7 +126,7 @@ namespace zvs.Processor.Tests
                 }
             };
             var cts = new CancellationTokenSource();
-            var tm = new ScheduledTaskRunner(log, new StubICommandProcessor(), new ZvsEntityContextConnection(), new CurrentTimeProvider());
+            var tm = new ScheduledTaskRunner(log, new StubICommandProcessor(), new UnitTestDbConnection(), new CurrentTimeProvider());
 
             //Act
             await tm.StartAsync(cts.Token);
@@ -153,7 +152,7 @@ namespace zvs.Processor.Tests
                 }
             };
             var cts = new CancellationTokenSource();
-            var tm = new ScheduledTaskRunner(log, new StubICommandProcessor(), new ZvsEntityContextConnection(), new CurrentTimeProvider());
+            var tm = new ScheduledTaskRunner(log, new StubICommandProcessor(), new UnitTestDbConnection(), new CurrentTimeProvider());
 
             //Act
             await tm.StopAsync(cts.Token);
@@ -166,7 +165,7 @@ namespace zvs.Processor.Tests
         [TestMethod]
         public async Task ScheduledTaskOneTimeTest()
         {
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "ScheduledTaskOneTimeTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -230,7 +229,7 @@ namespace zvs.Processor.Tests
         [TestMethod]
         public async Task ScheduledTaskDailyTest()
         {
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "ScheduledTaskDailyTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -294,7 +293,7 @@ namespace zvs.Processor.Tests
         [TestMethod]
         public async Task ScheduledTaskIntervalTest()
         {
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "ScheduledTaskIntervalTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -357,7 +356,7 @@ namespace zvs.Processor.Tests
         [TestMethod]
         public async Task ScheduledTaskWeeklyTest()
         {
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "ScheduledTaskWeeklyTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -421,7 +420,7 @@ namespace zvs.Processor.Tests
         [TestMethod]
         public async Task ScheduledTaskMonthlyTest()
         {
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "ScheduledTaskMonthlyTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -486,7 +485,7 @@ namespace zvs.Processor.Tests
         [TestMethod]
         public async Task ScheduledTaskNothingToRunTest()
         {
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "ScheduledTaskNothingToRunTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -549,7 +548,7 @@ namespace zvs.Processor.Tests
         [TestMethod]
         public async Task UpdatedCommandDoesNotExecuteTest()
         {
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "UpdatedCommandDoesNotExecuteTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -616,7 +615,7 @@ namespace zvs.Processor.Tests
         [TestMethod]
         public async Task DeletedCommandDoesNotExecuteTest()
         {
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "DeletedCommandDoesNotExecuteTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -682,7 +681,7 @@ namespace zvs.Processor.Tests
         [TestMethod]
         public async Task NewCommandExecutesTest()
         {
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "NewCommandExecutesTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -744,7 +743,7 @@ namespace zvs.Processor.Tests
         [TestMethod]
         public async Task UpdatedTaskDoesNotExecuteTest()
         {
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "UpdatedTaskDoesNotExecuteTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -806,7 +805,7 @@ namespace zvs.Processor.Tests
         [TestMethod]
         public async Task DeletedTaskDoesNotExecuteTest()
         {
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "DeletedTaskDoesNotExecuteTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -866,7 +865,7 @@ namespace zvs.Processor.Tests
         [TestMethod]
         public async Task NewTaskExecutesTest()
         {
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "NewTaskExecutesTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -930,7 +929,7 @@ namespace zvs.Processor.Tests
         [TestMethod]
         public async Task MultipleAsyncRequestsTest()
         {
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "MultipleAsyncRequestsTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();

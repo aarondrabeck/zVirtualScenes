@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading;
@@ -8,7 +7,6 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using zvs.DataModel;
 using zvs.Fakes;
-using zvs.Processor.Fakes;
 
 namespace zvs.Processor.Tests
 {
@@ -21,7 +19,7 @@ namespace zvs.Processor.Tests
         {
             //arrange 
             //act
-            new ChangeListener(null, new ZvsEntityContextConnection());
+            new ChangeListener(null, new UnitTestDbConnection());
             //assert - throws exception
         }
 
@@ -40,7 +38,7 @@ namespace zvs.Processor.Tests
         {
             //arrange 
             //act
-            var result = new ChangeListener(new StubIFeedback<LogEntry>(), new ZvsEntityContextConnection());
+            var result = new ChangeListener(new StubIFeedback<LogEntry>(), new UnitTestDbConnection());
             //assert 
             Assert.IsNotNull(result);
         }
@@ -60,7 +58,7 @@ namespace zvs.Processor.Tests
                 }
             };
             var cts = new CancellationTokenSource();
-            var tm = new ChangeListener(log, new ZvsEntityContextConnection());
+            var tm = new ChangeListener(log, new UnitTestDbConnection());
 
             //Act
             await tm.StartAsync(cts.Token);
@@ -85,7 +83,7 @@ namespace zvs.Processor.Tests
                 }
             };
             var cts = new CancellationTokenSource();
-            var tm = new ChangeListener(log, new ZvsEntityContextConnection());
+            var tm = new ChangeListener(log, new UnitTestDbConnection());
 
             //Act
             await tm.StartAsync(cts.Token);
@@ -109,7 +107,7 @@ namespace zvs.Processor.Tests
                 }
             };
             var cts = new CancellationTokenSource();
-            var tm = new ChangeListener(log, new StubIEntityContextConnection());
+            var tm = new ChangeListener(log, new UnitTestDbConnection());
 
             //Act
             await tm.StartAsync(cts.Token);
@@ -135,7 +133,7 @@ namespace zvs.Processor.Tests
                 }
             };
             var cts = new CancellationTokenSource();
-            var tm = new ChangeListener(log, new StubIEntityContextConnection());
+            var tm = new ChangeListener(log, new UnitTestDbConnection());
 
             //Act
             await tm.StopAsync(cts.Token);
@@ -148,7 +146,7 @@ namespace zvs.Processor.Tests
         public async Task ValueChangeTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "changelistener-ValueChangeTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();

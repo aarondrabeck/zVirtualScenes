@@ -1,19 +1,18 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Data.Entity;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
-using System.ComponentModel;
 using zvs.DataModel;
-using System.Data.Entity;
-using System.Threading;
-using System.Threading.Tasks;
 using zvs.Processor;
-
 
 namespace zvs.WPF.DeviceControls
 {
@@ -22,8 +21,8 @@ namespace zvs.WPF.DeviceControls
     /// </summary>
     public partial class DeviceDataGridUc : IDisposable
     {
-        private ZvsContext Context { get; set; }
-        private IFeedback<LogEntry> Log { get; set; }
+        private ZvsContext Context { get; }
+        private IFeedback<LogEntry> Log { get; }
         private readonly App _app = (App)Application.Current;
 
         public DeviceDataGridUc()
@@ -288,9 +287,7 @@ namespace zvs.WPF.DeviceControls
                     foreach (var dvt in await Context.DeviceValueTriggers.Where(t => t.DeviceValue.Device.Id == d.Id).ToListAsync())
                     {
                         var windowResult = MessageBox.Show(
-                            string.Format("Deleting device '{0}' will delete trigger '{1}', would you like continue?",
-                                d.Name,
-                                dvt.Name),
+                            $"Deleting device '{d.Name}' will delete trigger '{dvt.Name}', would you like continue?",
                             "Device Delete Warning",
                             MessageBoxButton.YesNo);
 

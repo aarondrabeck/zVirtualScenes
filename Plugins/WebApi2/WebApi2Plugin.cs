@@ -1,16 +1,15 @@
 ﻿using System;
 using System.ComponentModel;
+using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Cors;
 using System.Web.Http.SelfHost;
 using System.Web.OData.Builder;
 using System.Web.OData.Extensions;
+using zvs;
 using zvs.DataModel;
 using zvs.Processor;
-using System.ComponentModel.Composition;
-using zvs.DataModel.Tasks;
-using zvs;
 
 namespace zvsWebapi2Plugin
 {
@@ -187,7 +186,7 @@ namespace zvsWebapi2Plugin
 
         private async Task StartHttp()
         {
-            var baseAddress = new Uri(string.Format("http://localhost:{0}/", PortSetting));
+            var baseAddress = new Uri($"http://localhost:{PortSetting}/");
             try
             {
                 // Set up server configuration

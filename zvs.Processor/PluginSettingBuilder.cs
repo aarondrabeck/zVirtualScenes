@@ -1,23 +1,23 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Data.Entity;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using zvs.DataModel;
-using System.Data.Entity;
-using System.Linq.Expressions;
-using System.Reflection;
-using System.ComponentModel;
 
 namespace zvs.Processor
 {
     public class PluginSettingBuilder
     {
-        private IEntityContextConnection EntityContextConnection { get; set; }
-        private CancellationToken CancellationToken { get; set; }
+        private IEntityContextConnection EntityContextConnection { get; }
+        private CancellationToken CancellationToken { get; }
         public PluginSettingBuilder(IEntityContextConnection entityContextConnection, CancellationToken cancellationToken)
         {
             if (entityContextConnection == null)
-                throw new ArgumentNullException("entityContextConnection");
+                throw new ArgumentNullException(nameof(entityContextConnection));
 
             EntityContextConnection = entityContextConnection;
             CancellationToken = cancellationToken;
@@ -30,8 +30,8 @@ namespace zvs.Processor
 
         public class PluginTypeConfiguration<T> where T : ZvsPlugin
         {
-            private T Plugin { get; set; }
-            private PluginSettingBuilder PluginSettingBuilder { get; set; }
+            private T Plugin { get; }
+            private PluginSettingBuilder PluginSettingBuilder { get; }
 
             public PluginTypeConfiguration(T plugin, PluginSettingBuilder sb)
             {

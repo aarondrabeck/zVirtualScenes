@@ -1,13 +1,13 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media.Imaging;
+using zvs.DataModel;
 using zvs.Processor;
 using zvs.WPF.DynamicActionControls;
-using zvs.DataModel;
-using System.Data.Entity;
 
 namespace zvs.WPF.SceneControls
 {
@@ -17,8 +17,8 @@ namespace zvs.WPF.SceneControls
     public partial class SceneProperties
     {
         private readonly BitmapImage icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/save_check.png"));
-        private ZvsContext Context { get; set; }
-        private IFeedback<LogEntry> Log { get; set; }
+        private ZvsContext Context { get; }
+        private IFeedback<LogEntry> Log { get; }
         private readonly App _app = (App)Application.Current;
         public int SceneId { get; set; }
 
@@ -28,7 +28,7 @@ namespace zvs.WPF.SceneControls
             Context = new ZvsContext(_app.EntityContextConnection);
             Log = new DatabaseFeedback(_app.EntityContextConnection) { Source = "Scene Properties" };
 
-            if (System.ComponentModel.DesignerProperties.GetIsInDesignMode(this)) return;
+            if (DesignerProperties.GetIsInDesignMode(this)) return;
             InitializeComponent();
         }
 
@@ -39,7 +39,7 @@ namespace zvs.WPF.SceneControls
 
         private async void UserControl_Loaded_1(object sender, RoutedEventArgs e)
         {
-            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+            if (!DesignerProperties.GetIsInDesignMode(this))
             {
                 await LoadCommandsAsync();
             }

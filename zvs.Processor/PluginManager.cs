@@ -1,20 +1,20 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.Entity;
+using System.Linq;
 using System.Threading;
-using zvs.DataModel;
 using System.Threading.Tasks;
+using zvs.DataModel;
 
 namespace zvs.Processor
 {
     public class PluginManager : IPluginManager
     {
-        private IEnumerable<ZvsPlugin> Plugins { get; set; }
-        private IEntityContextConnection EntityContextConnection { get; set; }
-        private IFeedback<LogEntry> Log { get; set; }
-        private IAdapterManager AdapterManager { get; set; }
+        private IEnumerable<ZvsPlugin> Plugins { get; }
+        private IEntityContextConnection EntityContextConnection { get; }
+        private IFeedback<LogEntry> Log { get; }
+        private IAdapterManager AdapterManager { get; }
         private bool IsRunning { get; set; }
 
         private readonly Dictionary<Guid, ZvsPlugin> _pluginLookup = new Dictionary<Guid, ZvsPlugin>();
@@ -23,16 +23,16 @@ namespace zvs.Processor
         public PluginManager(IEnumerable<ZvsPlugin> plugins, IEntityContextConnection entityContextConnection, IFeedback<LogEntry> log, IAdapterManager adapterManager)
         {
             if (plugins == null)
-                throw new ArgumentNullException("plugins");
+                throw new ArgumentNullException(nameof(plugins));
 
             if (entityContextConnection == null)
-                throw new ArgumentNullException("entityContextConnection");
+                throw new ArgumentNullException(nameof(entityContextConnection));
 
             if (log == null)
-                throw new ArgumentNullException("log");
+                throw new ArgumentNullException(nameof(log));
 
             if (adapterManager == null)
-                throw new ArgumentNullException("adapterManager");
+                throw new ArgumentNullException(nameof(adapterManager));
 
             EntityContextConnection = entityContextConnection;
             Log = log;

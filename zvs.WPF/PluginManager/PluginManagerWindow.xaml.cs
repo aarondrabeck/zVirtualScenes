@@ -1,10 +1,11 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Data.Entity;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Media.Imaging;
 using zvs.DataModel;
 using zvs.Processor;
@@ -17,10 +18,10 @@ namespace zvs.WPF.PluginManager
     /// </summary>
     public partial class PluginManagerWindow : IDisposable
     {
-        private IFeedback<LogEntry> Log { get; set; }
-        private App App { get; set; }
+        private IFeedback<LogEntry> Log { get; }
+        private App App { get; }
         private readonly BitmapImage _icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/save_check.png"));
-        private ZvsContext Context { get; set; }
+        private ZvsContext Context { get; }
 
         public PluginManagerWindow()
         {
@@ -45,10 +46,10 @@ namespace zvs.WPF.PluginManager
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             // Do not load your data at design time.
-            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+            if (!DesignerProperties.GetIsInDesignMode(this))
             {
                 //Load your data here and assign the result to the CollectionViewSource.
-                var zvsEntities2ViewSource = ((System.Windows.Data.CollectionViewSource)(FindResource("ZvsEntities2PluginViewSource")));
+                var zvsEntities2ViewSource = ((CollectionViewSource)(FindResource("ZvsEntities2PluginViewSource")));
 
                 //Get a list of loaded plug-ins
                 UpdatePluginList();
@@ -124,7 +125,7 @@ namespace zvs.WPF.PluginManager
                 },
                 _icon)
             {
-                Header = string.Format("{0} is enabled", plugin.Name),
+                Header = $"{plugin.Name} is enabled",
                 Description = "Starts and stops the selected plug-in",
                 Value = plugin.IsEnabled
             };

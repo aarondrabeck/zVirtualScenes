@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using zvs.DataModel;
 using zvs.Fakes;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using zvs.Processor.Fakes;
 
 namespace zvs.Processor.Tests
@@ -17,7 +17,7 @@ namespace zvs.Processor.Tests
             var plugin = new UnitTestPlugin();
             try
             {
-                await plugin.Initialize(new StubIFeedback<LogEntry>(), new StubIEntityContextConnection(), new StubIAdapterManager());
+                await plugin.Initialize(new StubIFeedback<LogEntry>(), new UnitTestDbConnection(), new StubIAdapterManager());
             }
             catch (Exception ex)
             {

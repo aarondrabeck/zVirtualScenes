@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using zvs.DataModel;
 using zvs.Fakes;
-using zvs.Processor.Fakes;
 
 namespace zvs.Processor.Tests
 {
@@ -19,7 +18,7 @@ namespace zvs.Processor.Tests
         public void ConstructorNullArg1Test()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection();
+            var dbConnection = new UnitTestDbConnection();
             //act
             new DeviceCommandBuilder(null);
             //assert - throws exception
@@ -29,7 +28,7 @@ namespace zvs.Processor.Tests
         public void ConstructorTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection();
+            var dbConnection = new UnitTestDbConnection();
             //act
             var dvb = new DeviceCommandBuilder(dbConnection);
             //assert 
@@ -40,7 +39,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAsyncNullDeviceValueTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection();
+            var dbConnection = new UnitTestDbConnection();
             var dvb = new DeviceCommandBuilder( dbConnection);
 
             //act
@@ -55,7 +54,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAsyncInvalidDeviceIdTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "dcb-RegisterAsyncInvalidDeviceIdTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var dvb = new DeviceCommandBuilder(dbConnection);
 
@@ -73,7 +72,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAsyncAddNewCommandTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "dcb-RegisterAsyncAddNewCommandTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var dvb = new DeviceCommandBuilder( dbConnection);
 
@@ -112,7 +111,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAsyncUpdateCommandTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "dcb-RegisterAsyncUpdateCommandTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var dvb = new DeviceCommandBuilder( dbConnection);
 
@@ -153,7 +152,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAsyncRemovedCommandOptionsTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "dcb-RegisterAsyncRemovedCommandOptionsTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var dvb = new DeviceCommandBuilder( dbConnection);
 
@@ -207,7 +206,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAsyncAddedCommandOptionsTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "dcb-RegisterAsyncAddedCommandOptionsTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var dvb = new DeviceCommandBuilder(dbConnection);
 
@@ -265,7 +264,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAsyncNoUpdateCommandTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "dcb-RegisterAsyncNoUpdateCommandTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var dvb = new DeviceCommandBuilder( dbConnection);
 

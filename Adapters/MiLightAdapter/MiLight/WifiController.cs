@@ -10,8 +10,8 @@ namespace MiLightAdapter.MiLight
     {
         private static readonly ManualResetEvent ConnectDone = new ManualResetEvent(false);
         private static readonly ManualResetEvent SendDone = new ManualResetEvent(false);
-        private  string Ip { get; set; }
-        private  int Port { get; set; }
+        private  string Ip { get; }
+        private  int Port { get; }
 
         public string IpAddress { get; private set; }
         public WifiController(string ip, int port = 8899)

@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data.Entity;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using zvs.DataModel;
 using zvs.Processor;
-
 
 namespace zvs.WPF.DeviceControls
 {
@@ -20,9 +17,9 @@ namespace zvs.WPF.DeviceControls
     public partial class DeviceValues : IDisposable
     {
         private readonly App _app = (App)Application.Current;
-        private IFeedback<LogEntry> Log { get; set; }
+        private IFeedback<LogEntry> Log { get; }
         private readonly ZvsContext _context;
-        private int DeviceId { get; set; }
+        private int DeviceId { get; }
         private Device Device { get; set; }
 
         public DeviceValues(int deviceId)

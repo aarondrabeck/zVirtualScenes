@@ -1,12 +1,13 @@
 ﻿using System;
+using System.Data.Entity;
 using System.Diagnostics;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using zvs.DataModel;
 using zvs.Processor;
 using zvs.WPF.Commands;
-using System.Data.Entity;
 
 namespace zvs.WPF.TriggerControls
 {
@@ -15,7 +16,7 @@ namespace zvs.WPF.TriggerControls
     /// </summary>
     public partial class TriggerEditorWindow : Window
     {
-        private IFeedback<LogEntry> Log { get; set; }
+        private IFeedback<LogEntry> Log { get; }
         private readonly App _app = (App)Application.Current;
         private readonly ZvsContext _context;
         private readonly Int64 _deviceValueTriggerId;
@@ -62,7 +63,7 @@ namespace zvs.WPF.TriggerControls
 
             await _context.Scenes.ToListAsync();
 
-            var deviceViewSource = ((System.Windows.Data.CollectionViewSource)(FindResource("deviceViewSource")));
+            var deviceViewSource = ((CollectionViewSource)(FindResource("deviceViewSource")));
             // Load data by setting the CollectionViewSource.Source property:
             deviceViewSource.Source = _context.Devices.Local;
 

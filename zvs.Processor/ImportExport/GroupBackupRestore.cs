@@ -93,7 +93,8 @@ namespace zvs.Processor.ImportExport
                         return Result.ReportError(saveResult.Message);
                 }
             }
-            return Result.ReportSuccess(string.Format("Imported {0} groups, skipped {1} from {2}", newGroups.Count, skippedCount, Path.GetFileName(fileName)));
+            return Result.ReportSuccess(
+                $"Imported {newGroups.Count} groups, skipped {skippedCount} from {Path.GetFileName(fileName)}");
         }
     }
 }

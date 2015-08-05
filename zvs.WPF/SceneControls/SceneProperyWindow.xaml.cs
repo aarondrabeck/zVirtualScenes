@@ -1,7 +1,7 @@
-﻿using System.Diagnostics;
+﻿using System.Data.Entity;
+using System.Diagnostics;
 using System.Windows;
 using zvs.DataModel;
-using System.Data.Entity;
 using zvs.Processor;
 
 namespace zvs.WPF.SceneControls
@@ -11,8 +11,8 @@ namespace zvs.WPF.SceneControls
     /// </summary>
     public partial class ScenePropertiesWindow
     {
-        private int SceneId { get; set; }
-        private IFeedback<LogEntry> Log { get; set; }
+        private int SceneId { get; }
+        private IFeedback<LogEntry> Log { get; }
         private readonly App _app = (App)Application.Current;
 
         public ScenePropertiesWindow(int sceneId)

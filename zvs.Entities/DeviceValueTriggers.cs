@@ -8,7 +8,7 @@ namespace zvs.DataModel
     [Table("DeviceValueTriggers", Schema = "ZVS")]
     public class DeviceValueTrigger : INotifyPropertyChanged, IIdentity, IStoredCommand
     {
-        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public int? DeviceValueId { get; set; }
         private DeviceValue _deviceValue;
@@ -195,10 +195,7 @@ namespace zvs.DataModel
             if (DeviceValue == null || DeviceValue.Device == null)
                 TriggerDescription = "Incomplete ScheduledTask";
             else
-                TriggerDescription = string.Format("{0} {1} is {2} {3}", DeviceValue.Device.Name,
-                                                            DeviceValue.Name,
-                                                            triggerOpName,
-                                                            Value);
+                TriggerDescription = $"{DeviceValue.Device.Name} {DeviceValue.Name} is {triggerOpName} {Value}";
         }
     }
 

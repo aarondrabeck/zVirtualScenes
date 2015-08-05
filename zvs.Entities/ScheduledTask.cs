@@ -19,7 +19,7 @@ namespace zvs.DataModel
             RepeatIntervalInMonths = 1;
         }
 
-        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         private ScheduledTaskType _taskType;

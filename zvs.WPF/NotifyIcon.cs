@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows;
 using System.Windows.Forms;
 using zvs.Processor;
 using zvs.WPF.Properties;

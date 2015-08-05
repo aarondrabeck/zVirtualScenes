@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using zvs.DataModel;
-using zvs.DataModel.Fakes;
 using zvs.Fakes;
 using zvs.Processor.Fakes;
 
@@ -22,7 +21,7 @@ namespace zvs.Processor.Tests
         {
             //arrange 
             //act
-            new PluginManager(null, new StubIEntityContextConnection(), new StubIFeedback<LogEntry>(), new StubIAdapterManager());
+            new PluginManager(null, new UnitTestDbConnection(), new StubIFeedback<LogEntry>(), new StubIAdapterManager());
             //assert - throws exception
         }
 
@@ -42,7 +41,7 @@ namespace zvs.Processor.Tests
         {
             //arrange 
             //act
-            new PluginManager(new List<ZvsPlugin>(), new StubIEntityContextConnection(), null, new StubIAdapterManager());
+            new PluginManager(new List<ZvsPlugin>(), new UnitTestDbConnection(), null, new StubIAdapterManager());
             //assert - throws exception
         }
 
@@ -52,7 +51,7 @@ namespace zvs.Processor.Tests
         {
             //arrange 
             //act
-            new PluginManager(new List<ZvsPlugin>(), new StubIEntityContextConnection(), new StubIFeedback<LogEntry>(), null);
+            new PluginManager(new List<ZvsPlugin>(), new UnitTestDbConnection(), new StubIFeedback<LogEntry>(), null);
             //assert - throws exception
         }
 
@@ -60,7 +59,7 @@ namespace zvs.Processor.Tests
         public async Task LoadPluginsAsyncAutoStartTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-LoadPluginsAsyncAutoStartTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var log = new StubIFeedback<LogEntry>
@@ -88,16 +87,16 @@ namespace zvs.Processor.Tests
                 PluginGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Plugin",
                 DescriptionGet = () => "",
-                OnSettingsCreatingPluginSettingBuilder = (s) => Task.FromResult(0),
-                OnDeviceSettingsCreatingDeviceSettingBuilder = (s) => Task.FromResult(0),
-                OnSceneSettingsCreatingSceneSettingBuilder = (s) => Task.FromResult(0),
+                OnSettingsCreatingPluginSettingBuilder = s => Task.FromResult(0),
+                OnDeviceSettingsCreatingDeviceSettingBuilder = s => Task.FromResult(0),
+                OnSceneSettingsCreatingSceneSettingBuilder = s => Task.FromResult(0),
                 StartAsync01 = () =>
                 {
                     isStarted = true;
                     return Task.FromResult(0);
                 }
             };
-            unitTestingPlugin.OnSettingsCreatingPluginSettingBuilder = async (settingBuilder) =>
+            unitTestingPlugin.OnSettingsCreatingPluginSettingBuilder = async settingBuilder =>
             {
                 var testSetting = new PluginSetting
                 {
@@ -125,7 +124,7 @@ namespace zvs.Processor.Tests
         public async Task LoadPluginsNameTooLongAsyncTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-LoadPluginsNameTooLongAsyncTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -144,9 +143,9 @@ namespace zvs.Processor.Tests
                 PluginGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque magna diam, pellentesque et orci eget, pellentesque iaculis odio. Ut ultrices est sapien, ac pellentesque odio malesuada a. Etiam in neque ullamcorper massa gravida ullamcorper vel a posuere.",
                 DescriptionGet = () => "",
-                OnSettingsCreatingPluginSettingBuilder = (s) => Task.FromResult(0),
-                OnDeviceSettingsCreatingDeviceSettingBuilder = (s) => Task.FromResult(0),
-                OnSceneSettingsCreatingSceneSettingBuilder = (s) => Task.FromResult(0)
+                OnSettingsCreatingPluginSettingBuilder = s => Task.FromResult(0),
+                OnDeviceSettingsCreatingDeviceSettingBuilder = s => Task.FromResult(0),
+                OnSceneSettingsCreatingSceneSettingBuilder = s => Task.FromResult(0)
             };
 
             var pluginManager = new PluginManager(new List<ZvsPlugin>() { longNamePlugin }, dbConnection, log, new StubIAdapterManager());
@@ -161,7 +160,7 @@ namespace zvs.Processor.Tests
         public async Task GetZvsPluginsTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-GetZvsPlugins" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var log = new StubIFeedback<LogEntry>();
@@ -170,9 +169,9 @@ namespace zvs.Processor.Tests
                 PluginGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Plugin",
                 DescriptionGet = () => "",
-                OnSettingsCreatingPluginSettingBuilder = (s) => Task.FromResult(0),
-                OnDeviceSettingsCreatingDeviceSettingBuilder = (s) => Task.FromResult(0),
-                OnSceneSettingsCreatingSceneSettingBuilder = (s) => Task.FromResult(0)
+                OnSettingsCreatingPluginSettingBuilder = s => Task.FromResult(0),
+                OnDeviceSettingsCreatingDeviceSettingBuilder = s => Task.FromResult(0),
+                OnSceneSettingsCreatingSceneSettingBuilder = s => Task.FromResult(0)
             };
 
             var pluginManager = new PluginManager(new List<ZvsPlugin> { unitTestingPlugin }, dbConnection, log, new StubIAdapterManager());
@@ -188,7 +187,7 @@ namespace zvs.Processor.Tests
         public async Task SetPluginPropertyTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-SetPluginPropertyTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -216,7 +215,7 @@ namespace zvs.Processor.Tests
         public async Task SetPluginPropertyInvalidPropertyTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-SetPluginPropertyInvalidPropertyTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -244,7 +243,7 @@ namespace zvs.Processor.Tests
         public async Task SetPluginPropertyCastPropertyTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-SetPluginPropertyCastPropertyTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -272,7 +271,7 @@ namespace zvs.Processor.Tests
         public async Task StartTwiceTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-LoadPluginsAsyncAutoStartTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var logEntries = new List<LogEntry>();
             var log = new StubIFeedback<LogEntry>
@@ -301,16 +300,16 @@ namespace zvs.Processor.Tests
                 PluginGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Plugin",
                 DescriptionGet = () => "",
-                OnSettingsCreatingPluginSettingBuilder = (s) => Task.FromResult(0),
-                OnDeviceSettingsCreatingDeviceSettingBuilder = (s) => Task.FromResult(0),
-                OnSceneSettingsCreatingSceneSettingBuilder = (s) => Task.FromResult(0),
+                OnSettingsCreatingPluginSettingBuilder = s => Task.FromResult(0),
+                OnDeviceSettingsCreatingDeviceSettingBuilder = s => Task.FromResult(0),
+                OnSceneSettingsCreatingSceneSettingBuilder = s => Task.FromResult(0),
                 StartAsync01 = () =>
                 {
                     isStartedCount++;
                     return Task.FromResult(0);
                 }
             };
-            unitTestingPlugin.OnSettingsCreatingPluginSettingBuilder = async (settingBuilder) =>
+            unitTestingPlugin.OnSettingsCreatingPluginSettingBuilder = async settingBuilder =>
             {
                 var testSetting = new PluginSetting
                 {
@@ -340,7 +339,7 @@ namespace zvs.Processor.Tests
         public async Task StopTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-StopTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var logEntries = new List<LogEntry>();
             var log = new StubIFeedback<LogEntry>
@@ -370,9 +369,9 @@ namespace zvs.Processor.Tests
                 PluginGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Plugin",
                 DescriptionGet = () => "",
-                OnSettingsCreatingPluginSettingBuilder = (s) => Task.FromResult(0),
-                OnDeviceSettingsCreatingDeviceSettingBuilder = (s) => Task.FromResult(0),
-                OnSceneSettingsCreatingSceneSettingBuilder = (s) => Task.FromResult(0),
+                OnSettingsCreatingPluginSettingBuilder = s => Task.FromResult(0),
+                OnDeviceSettingsCreatingDeviceSettingBuilder = s => Task.FromResult(0),
+                OnSceneSettingsCreatingSceneSettingBuilder = s => Task.FromResult(0),
                 StartAsync01 = () =>
                 {
                     isStartedCount++;
@@ -384,7 +383,7 @@ namespace zvs.Processor.Tests
                     return Task.FromResult(0);
                 }
             };
-            unitTestingPlugin.OnSettingsCreatingPluginSettingBuilder = async (settingBuilder) =>
+            unitTestingPlugin.OnSettingsCreatingPluginSettingBuilder = async settingBuilder =>
             {
                 var testSetting = new PluginSetting
                 {
@@ -415,7 +414,7 @@ namespace zvs.Processor.Tests
         public async Task StopWhenNotStartedTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-StopWhenNotStartedTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var logEntries = new List<LogEntry>();
             var log = new StubIFeedback<LogEntry>
@@ -443,9 +442,9 @@ namespace zvs.Processor.Tests
                 PluginGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Plugin",
                 DescriptionGet = () => "",
-                OnSettingsCreatingPluginSettingBuilder = (s) => Task.FromResult(0),
-                OnDeviceSettingsCreatingDeviceSettingBuilder = (s) => Task.FromResult(0),
-                OnSceneSettingsCreatingSceneSettingBuilder = (s) => Task.FromResult(0)
+                OnSettingsCreatingPluginSettingBuilder = s => Task.FromResult(0),
+                OnDeviceSettingsCreatingDeviceSettingBuilder = s => Task.FromResult(0),
+                OnSceneSettingsCreatingSceneSettingBuilder = s => Task.FromResult(0)
             };
            
             var pluginManager = new PluginManager(new List<ZvsPlugin> { unitTestingPlugin }, dbConnection, log, new StubIAdapterManager());
@@ -461,7 +460,7 @@ namespace zvs.Processor.Tests
         public async Task EnablePluginAsyncTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-EnablePluginAsyncTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var log = new StubIFeedback<LogEntry>();
@@ -471,9 +470,9 @@ namespace zvs.Processor.Tests
                 PluginGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Plugin",
                 DescriptionGet = () => "",
-                OnSettingsCreatingPluginSettingBuilder = (s) => Task.FromResult(0),
-                OnDeviceSettingsCreatingDeviceSettingBuilder = (s) => Task.FromResult(0),
-                OnSceneSettingsCreatingSceneSettingBuilder = (s) => Task.FromResult(0),
+                OnSettingsCreatingPluginSettingBuilder = s => Task.FromResult(0),
+                OnDeviceSettingsCreatingDeviceSettingBuilder = s => Task.FromResult(0),
+                OnSceneSettingsCreatingSceneSettingBuilder = s => Task.FromResult(0),
                 StartAsync01 = async () => hasStarted = true
             };
 
@@ -501,7 +500,7 @@ namespace zvs.Processor.Tests
         public async Task EnablePluginAsyncNotFoundTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-EnablePluginAsyncNotFoundTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var log = new StubIFeedback<LogEntry>();
@@ -518,7 +517,7 @@ namespace zvs.Processor.Tests
         public async Task DisablePluginAsyncTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-DisablePluginAsyncTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var log = new StubIFeedback<LogEntry>();
@@ -528,9 +527,9 @@ namespace zvs.Processor.Tests
                 PluginGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Plugin",
                 DescriptionGet = () => "",
-                OnSettingsCreatingPluginSettingBuilder = (s) => Task.FromResult(0),
-                OnDeviceSettingsCreatingDeviceSettingBuilder = (s) => Task.FromResult(0),
-                OnSceneSettingsCreatingSceneSettingBuilder = (s) => Task.FromResult(0),
+                OnSettingsCreatingPluginSettingBuilder = s => Task.FromResult(0),
+                OnDeviceSettingsCreatingDeviceSettingBuilder = s => Task.FromResult(0),
+                OnSceneSettingsCreatingSceneSettingBuilder = s => Task.FromResult(0),
                 StopAsync01 = async () => hasStopped = true
             };
 
@@ -558,7 +557,7 @@ namespace zvs.Processor.Tests
         public async Task DisablePluginAsyncNotFoundTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-DisablePluginAsyncNotFoundTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var log = new StubIFeedback<LogEntry>();
@@ -575,7 +574,7 @@ namespace zvs.Processor.Tests
         public async Task FindZvsPluginAsyncTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-FindZvsPluginAsyncTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -594,9 +593,9 @@ namespace zvs.Processor.Tests
                 PluginGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Plugin",
                 DescriptionGet = () => "",
-                OnSettingsCreatingPluginSettingBuilder = (s) => Task.FromResult(0),
-                OnDeviceSettingsCreatingDeviceSettingBuilder = (s) => Task.FromResult(0),
-                OnSceneSettingsCreatingSceneSettingBuilder = (s) => Task.FromResult(0)
+                OnSettingsCreatingPluginSettingBuilder = s => Task.FromResult(0),
+                OnDeviceSettingsCreatingDeviceSettingBuilder = s => Task.FromResult(0),
+                OnSceneSettingsCreatingSceneSettingBuilder = s => Task.FromResult(0)
             };
 
             var pluginManager = new PluginManager(new List<ZvsPlugin> { unitTestingPlugin }, dbConnection, log, new StubIAdapterManager());
@@ -615,7 +614,7 @@ namespace zvs.Processor.Tests
         public async Task FindZvsPluginInvalidIdAsyncTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-FindZvsPluginInvalidIdAsyncTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -643,7 +642,7 @@ namespace zvs.Processor.Tests
         public async Task TestPropertyUpdatingOnDatabaseSettingChange()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-TestPropertyUpdatingOnDatabaseSettingChange" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var log = new StubIFeedback<LogEntry>
@@ -659,9 +658,9 @@ namespace zvs.Processor.Tests
                 PluginGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Plugin",
                 DescriptionGet = () => "",
-                OnSettingsCreatingPluginSettingBuilder = (s) => Task.FromResult(0),
-                OnDeviceSettingsCreatingDeviceSettingBuilder = (s) => Task.FromResult(0),
-                OnSceneSettingsCreatingSceneSettingBuilder = (s) => Task.FromResult(0),
+                OnSettingsCreatingPluginSettingBuilder = s => Task.FromResult(0),
+                OnDeviceSettingsCreatingDeviceSettingBuilder = s => Task.FromResult(0),
+                OnSceneSettingsCreatingSceneSettingBuilder = s => Task.FromResult(0),
             };
 
             var plugin = new Plugin

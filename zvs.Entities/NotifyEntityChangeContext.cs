@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data.Entity;
 using System.Linq;
+using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace zvs.DataModel
@@ -101,7 +102,7 @@ namespace zvs.DataModel
 
 
 
-        public async override Task<int> SaveChangesAsync(System.Threading.CancellationToken cancellationToken)
+        public async override Task<int> SaveChangesAsync(CancellationToken cancellationToken)
         {
             //Record Changes
             var addedEntities = new List<object>();
@@ -172,8 +173,8 @@ namespace zvs.DataModel
         public static T CloneObject<T>(this T obj) where T : class
         {
             if (obj == null) return null;
-            System.Reflection.MethodInfo inst = obj.GetType().GetMethod("MemberwiseClone",
-                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            MethodInfo inst = obj.GetType().GetMethod("MemberwiseClone",
+                BindingFlags.Instance | BindingFlags.NonPublic);
             if (inst != null)
                 return (T)inst.Invoke(obj, null);
             else

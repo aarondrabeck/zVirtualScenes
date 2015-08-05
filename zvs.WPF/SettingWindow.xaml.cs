@@ -1,6 +1,6 @@
-﻿using System.Windows;
+﻿using System.Data.Entity;
+using System.Windows;
 using zvs.DataModel;
-using System.Data.Entity;
 
 namespace zvs.WPF
 {

@@ -22,7 +22,7 @@ namespace zvs.Processor.Tests
         {
             //arrange 
             //act
-            new CommandProcessor(null, new ZvsEntityContextConnection(), new StubIFeedback<LogEntry>());
+            new CommandProcessor(null, new UnitTestDbConnection(), new StubIFeedback<LogEntry>());
             //assert - throws exception
         }
         [TestMethod]
@@ -43,7 +43,7 @@ namespace zvs.Processor.Tests
             //arrange 
             var adapterManager = new StubIAdapterManager();
             //act
-            new CommandProcessor(adapterManager, new ZvsEntityContextConnection(), null);
+            new CommandProcessor(adapterManager, new UnitTestDbConnection(), null);
             //assert - throws exception
         }
 
@@ -53,7 +53,7 @@ namespace zvs.Processor.Tests
             //arrange 
             var adapterManager = new StubIAdapterManager();
             //act
-            new CommandProcessor(adapterManager, new ZvsEntityContextConnection(), new StubIFeedback<LogEntry>());
+            new CommandProcessor(adapterManager, new UnitTestDbConnection(), new StubIFeedback<LogEntry>());
             //assert - throws exception
         }
 
@@ -61,7 +61,7 @@ namespace zvs.Processor.Tests
         public async Task ExecuteDeviceCommandAsyncInvalidIdTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "CP-ExecuteDeviceCommandAsyncInvalidIdTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var adapterManager = new StubIAdapterManager();
@@ -84,7 +84,7 @@ namespace zvs.Processor.Tests
         public async Task ExecuteDeviceCommandAsyncAdapterNotLoadedTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "CP-ExecuteDeviceCommandAsyncAdapterNotLoadedTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var adapterManager = new StubIAdapterManager
@@ -123,7 +123,7 @@ namespace zvs.Processor.Tests
         public async Task ExecuteDeviceCommandAsyncAdapterNotEnabledTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "CP-ExecuteDeviceCommandAsyncAdapterNotEnabledTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var adapterManager = new StubIAdapterManager
@@ -165,7 +165,7 @@ namespace zvs.Processor.Tests
         public async Task ExecuteDeviceCommandAsyncOkTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "CP-ExecuteDeviceCommandAsyncOkTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var commandsSendToAdapter = new List<int>();
@@ -213,7 +213,7 @@ namespace zvs.Processor.Tests
         public async Task ExecuteDeviceTypeCommandAsyncInvalidIdTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "CP-ExecuteDeviceTypeCommandAsyncInvalidIdTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var adapterManager = new StubIAdapterManager();
@@ -236,7 +236,7 @@ namespace zvs.Processor.Tests
         public async Task ExecuteDeviceTypeCommandAsyncAdapterNotLoadedTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "CP-ExecuteDeviceTypeCommandAsyncAdapterNotLoadedTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var adapterManager = new StubIAdapterManager
@@ -275,7 +275,7 @@ namespace zvs.Processor.Tests
         public async Task ExecuteDeviceTypeCommandAsyncAdapterNotEnabledTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "CP-ExecuteDeviceTypeCommandAsyncAdapterNotEnabledTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var adapterManager = new StubIAdapterManager
@@ -317,7 +317,7 @@ namespace zvs.Processor.Tests
         public async Task ExecuteDeviceTypeCommandAsyncOkTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "CP-ExecuteDeviceTypeCommandAsyncOkTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var commandsSendToAdapter = new List<int>();
@@ -361,7 +361,7 @@ namespace zvs.Processor.Tests
         public async Task ExecuteBuiltinCommandAsyncTimeDelayTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "CP-ExecuteBuiltinCommandAsyncTimeDelayTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var adapterManager = new StubIAdapterManager();
@@ -397,7 +397,7 @@ namespace zvs.Processor.Tests
         public async Task ExecuteBuiltinCommandAsyncRepollMeAdapterNotAvailableTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "CP-ExecuteBuiltinCommandAsyncRepollMeAdapterNotAvailableTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var adapterManager = new StubIAdapterManager
@@ -433,7 +433,7 @@ namespace zvs.Processor.Tests
         public async Task ExecuteBuiltinCommandAsyncRepollDisabledAdapterMeTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "CP-ExecuteBuiltinCommandAsyncRepollDisabledAdapterMeTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var adapterManager = new StubIAdapterManager
@@ -472,7 +472,7 @@ namespace zvs.Processor.Tests
         public async Task ExecuteBuiltinCommandAsyncRepollMeTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "CP-ExecuteBuiltinCommandAsyncRepollMeTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var repollDeviceIdRequestSentToAdapter = new List<int>();
@@ -481,7 +481,7 @@ namespace zvs.Processor.Tests
                 FindZvsAdapterGuid = adapterGuid => new StubZvsAdapter
                 {
                     IsEnabled = true,
-                    RepollAsyncDevice = async (d) => repollDeviceIdRequestSentToAdapter.Add(d.Id)
+                    RepollAsyncDevice = async d => repollDeviceIdRequestSentToAdapter.Add(d.Id)
                 }
             };
             var log = new StubIFeedback<LogEntry>();
@@ -514,7 +514,7 @@ namespace zvs.Processor.Tests
         public async Task ExecuteBuiltinCommandInvlaidDeviceIdAsyncRepollMeTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "CP-ExecuteBuiltinCommandInvlaidDeviceIdAsyncRepollMeTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var repollDeviceIdRequestSentToAdapter = new List<int>();
@@ -523,7 +523,7 @@ namespace zvs.Processor.Tests
                 FindZvsAdapterGuid = adapterGuid => new StubZvsAdapter
                 {
                     IsEnabled = true,
-                    RepollAsyncDevice = async (d) => repollDeviceIdRequestSentToAdapter.Add(d.Id)
+                    RepollAsyncDevice = async d => repollDeviceIdRequestSentToAdapter.Add(d.Id)
                 }
             };
             var log = new StubIFeedback<LogEntry>();
@@ -553,7 +553,7 @@ namespace zvs.Processor.Tests
         public async Task ExecuteBuiltinCommandAsyncRepollAllTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "CP-ExecuteBuiltinCommandAsyncRepollAllTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var repollDeviceIdRequestSentToAdapter = new List<int>();
@@ -562,7 +562,7 @@ namespace zvs.Processor.Tests
                 FindZvsAdapterGuid = adapterGuid => new StubZvsAdapter
                 {
                     IsEnabled = true,
-                    RepollAsyncDevice = async (d) => repollDeviceIdRequestSentToAdapter.Add(d.Id)
+                    RepollAsyncDevice = async d => repollDeviceIdRequestSentToAdapter.Add(d.Id)
                 }
             };
             var log = new StubIFeedback<LogEntry>();
@@ -599,7 +599,7 @@ namespace zvs.Processor.Tests
         public async Task ExecuteBuiltinCommandAsyncGroupOnBadIdTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "CP-ExecuteBuiltinCommandAsyncGroupOnBadIdTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var adapterManager = new StubIAdapterManager();
@@ -633,10 +633,7 @@ namespace zvs.Processor.Tests
         public async Task ExecuteBuiltinCommandAsyncGroupOnNoDevicesTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection
-            {
-                NameOrConnectionStringGet = () => "CP-ExecuteBuiltinCommandAsyncGroupOnNoDevicesTest"
-            };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var groupOnIdsRequestSentToAdapter = new List<Group>();
@@ -645,7 +642,7 @@ namespace zvs.Processor.Tests
                 FindZvsAdapterGuid = adapterGuid => new StubZvsAdapter
                 {
                     IsEnabled = true,
-                    ActivateGroupAsyncGroup = async (g) => groupOnIdsRequestSentToAdapter.Add(g)
+                    ActivateGroupAsyncGroup = async g => groupOnIdsRequestSentToAdapter.Add(g)
                 }
             };
             var log = new StubIFeedback<LogEntry>();
@@ -685,10 +682,7 @@ namespace zvs.Processor.Tests
         public async Task ExecuteBuiltinCommandAsyncGroupOnTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection
-            {
-                NameOrConnectionStringGet = () => "CP-ExecuteBuiltinCommandAsyncGroupOnTest"
-            };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var groupOnIdsRequestSentToAdapter = new List<Group>();
@@ -697,7 +691,7 @@ namespace zvs.Processor.Tests
                 FindZvsAdapterGuid = adapterGuid => new StubZvsAdapter
                 {
                     IsEnabled = true,
-                    ActivateGroupAsyncGroup = async (g) => groupOnIdsRequestSentToAdapter.Add(g)
+                    ActivateGroupAsyncGroup = async g => groupOnIdsRequestSentToAdapter.Add(g)
                 }
             };
             var log = new StubIFeedback<LogEntry>();
@@ -747,7 +741,7 @@ namespace zvs.Processor.Tests
         public async Task ExecuteBuiltinCommandAsyncGroupOffTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "CP-ExecuteBuiltinCommandAsyncGroupOffTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var groupOnIdsRequestSentToAdapter = new List<Group>();
@@ -756,7 +750,7 @@ namespace zvs.Processor.Tests
                 FindZvsAdapterGuid = adapterGuid => new StubZvsAdapter
                 {
                     IsEnabled = true,
-                    DeactivateGroupAsyncGroup = async (g) => groupOnIdsRequestSentToAdapter.Add(g)
+                    DeactivateGroupAsyncGroup = async g => groupOnIdsRequestSentToAdapter.Add(g)
                 }
             };
             var log = new StubIFeedback<LogEntry>();
@@ -803,7 +797,7 @@ namespace zvs.Processor.Tests
         public async Task ExecuteBuiltinCommandAsyncSceneTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "CP-ExecuteBuiltinCommandAsyncSceneTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var deviceCommandIds = new List<int>();
@@ -871,7 +865,7 @@ namespace zvs.Processor.Tests
         public async Task ExecuteBuiltinCommandAsyncUnknownCommandTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "CP-ExecuteBuiltinCommandAsyncUnknownCommandTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var deviceCommandIds = new List<int>();
@@ -905,7 +899,7 @@ namespace zvs.Processor.Tests
         public async Task RunCommandAsyncNull()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "CP-RunCommandAsyncNull" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var adapterManager = new StubIAdapterManager();
@@ -926,7 +920,7 @@ namespace zvs.Processor.Tests
         public async Task RunCommandAsyncInvalid()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "CP-RunCommandAsyncInvalid" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var adapterManager = new StubIAdapterManager();
@@ -947,7 +941,7 @@ namespace zvs.Processor.Tests
         public async Task RunCommandAsyncDeviceCommand()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "CP-RunCommandAsyncDeviceCommand" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var adapterManager = new StubIAdapterManager
@@ -987,7 +981,7 @@ namespace zvs.Processor.Tests
         public async Task RunCommandAsyncDeviceTypeCommand()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "CP-RunCommandAsyncDeviceTypeCommand" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var adapterManager = new StubIAdapterManager
@@ -1027,7 +1021,7 @@ namespace zvs.Processor.Tests
         public async Task RunCommandAsyncBuiltinCommand()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "CP-RunCommandAsyncBuiltinCommand" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var adapterManager = new StubIAdapterManager
@@ -1065,7 +1059,7 @@ namespace zvs.Processor.Tests
         public async Task RunCommandAsyncJavaScriptCommand()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "CP-RunCommandAsyncJavaScriptCommand" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var adapterManager = new StubIAdapterManager

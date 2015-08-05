@@ -1,13 +1,8 @@
-﻿using System;
-using System.Data.Entity;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using System.Web.Http;
-using System.Web.Http.Cors;
 using System.Web.OData;
 using System.Web.OData.Routing;
 using zvs.DataModel;
-using zvs.Processor;
 
 namespace zvsWebapi2Plugin.Controllers
 {

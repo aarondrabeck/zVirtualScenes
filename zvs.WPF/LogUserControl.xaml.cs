@@ -17,8 +17,8 @@ namespace zvs.WPF
     /// </summary>
     public partial class LogUserControl
     {
-        private App App { get; set; }
-        private ObservableCollection<LogEntry> LogEntries { get; set; }
+        private App App { get; }
+        private ObservableCollection<LogEntry> LogEntries { get; }
         private const int MaxEntriesToDisplay = 400;
 
         public LogUserControl()

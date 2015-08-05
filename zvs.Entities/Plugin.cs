@@ -10,7 +10,7 @@ namespace zvs.DataModel
     [Table("Plugins", Schema = "ZVS")]
     public class Plugin : INotifyPropertyChanged, IIdentity
     {
-        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         private string _name;

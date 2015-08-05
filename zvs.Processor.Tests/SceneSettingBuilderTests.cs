@@ -25,7 +25,7 @@ namespace zvs.Processor.Tests
         public void ConstructorTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection();
+            var dbConnection = new UnitTestDbConnection();
             //act
             var ssb = new SceneSettingBuilder(dbConnection);
             //assert 
@@ -36,7 +36,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAsyncNullSceneTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection();
+            var dbConnection = new UnitTestDbConnection();
             var ssb = new SceneSettingBuilder(dbConnection);
 
             //act
@@ -51,7 +51,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAsyncNewTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "ssb-RegisterAsyncNewTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var ssb = new SceneSettingBuilder(dbConnection);
 
@@ -84,7 +84,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAsyncUpdateTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "ssb-RegisterAsyncUpdateTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var ssb = new SceneSettingBuilder(dbConnection);
 
@@ -126,7 +126,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAsyncOptionAddTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "ssb-RegisterAsyncOptionAddTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var ssb = new SceneSettingBuilder(dbConnection);
 
@@ -179,7 +179,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAsyncOptionRemoveTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "ssb-RegisterAsyncOptionRemoveTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var ssb = new SceneSettingBuilder(dbConnection);
 
@@ -233,7 +233,7 @@ namespace zvs.Processor.Tests
         public async Task RegisterAsyncNoUpdateTest()
         {
             //arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "ssb-RegisterAsyncNoUpdateTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var ssb = new SceneSettingBuilder(dbConnection);
 

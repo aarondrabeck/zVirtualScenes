@@ -21,7 +21,7 @@ namespace zvs.Processor.Tests
         {
             //arrange 
             //act
-            new AdapterManager(null, new StubIEntityContextConnection(), new StubIFeedback<LogEntry>());
+            new AdapterManager(null, new UnitTestDbConnection(), new StubIFeedback<LogEntry>());
             //assert - throws exception
         }
 
@@ -41,7 +41,7 @@ namespace zvs.Processor.Tests
         {
             //arrange 
             //act
-            new AdapterManager(new List<ZvsAdapter>(), new StubIEntityContextConnection(), null);
+            new AdapterManager(new List<ZvsAdapter>(), new UnitTestDbConnection(), null);
             //assert - throws exception
         }
 
@@ -49,7 +49,7 @@ namespace zvs.Processor.Tests
         public async Task LoadAdaptersNameTooLongAsyncTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-LoadAdaptersNameTooLongAsyncTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -68,8 +68,8 @@ namespace zvs.Processor.Tests
                 AdapterGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque magna diam, pellentesque et orci eget, pellentesque iaculis odio. Ut ultrices est sapien, ac pellentesque odio malesuada a. Etiam in neque ullamcorper massa gravida ullamcorper vel a posuere.",
                 DescriptionGet = () => "",
-                OnSettingsCreatingAdapterSettingBuilder = (s) => Task.FromResult(0),
-                OnDeviceTypesCreatingDeviceTypeBuilder = (s) => Task.FromResult(0)
+                OnSettingsCreatingAdapterSettingBuilder = s => Task.FromResult(0),
+                OnDeviceTypesCreatingDeviceTypeBuilder = s => Task.FromResult(0)
             };
 
             var adapterManager = new AdapterManager(new List<ZvsAdapter>() { longNameAdapter }, dbConnection, log);
@@ -84,7 +84,7 @@ namespace zvs.Processor.Tests
         public async Task LoadAdaptersAsyncTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-LoadAdaptersAsyncTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -103,10 +103,10 @@ namespace zvs.Processor.Tests
                 AdapterGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Adapter",
                 DescriptionGet = () => "",
-                OnDeviceTypesCreatingDeviceTypeBuilder = (s) => Task.FromResult(0)
+                OnDeviceTypesCreatingDeviceTypeBuilder = s => Task.FromResult(0)
             };
 
-            unitTestingAdapter.OnSettingsCreatingAdapterSettingBuilder = async (settingBuilder) =>
+            unitTestingAdapter.OnSettingsCreatingAdapterSettingBuilder = async settingBuilder =>
             {
                 var testSetting = new AdapterSetting
                 {
@@ -135,7 +135,7 @@ namespace zvs.Processor.Tests
         public async Task GetZvsAdaptersTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-GetZvsAdapters" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var log = new StubIFeedback<LogEntry>();
@@ -144,7 +144,7 @@ namespace zvs.Processor.Tests
                 AdapterGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Adapter",
                 DescriptionGet = () => "",
-                OnDeviceTypesCreatingDeviceTypeBuilder = (s) => Task.FromResult(0)
+                OnDeviceTypesCreatingDeviceTypeBuilder = s => Task.FromResult(0)
             };
 
             var adapterManager = new AdapterManager(new List<ZvsAdapter> { unitTestingAdapter }, dbConnection, log);
@@ -160,7 +160,7 @@ namespace zvs.Processor.Tests
         public async Task LoadAdaptersAsyncBadPropertyTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-LoadAdaptersAsync_BadProperty_Test" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -200,10 +200,10 @@ namespace zvs.Processor.Tests
                 AdapterGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Adapter",
                 DescriptionGet = () => "",
-                OnDeviceTypesCreatingDeviceTypeBuilder = (s) => Task.FromResult(0)
+                OnDeviceTypesCreatingDeviceTypeBuilder = s => Task.FromResult(0)
             };
 
-            unitTestingAdapter.OnSettingsCreatingAdapterSettingBuilder = async (settingBuilder) =>
+            unitTestingAdapter.OnSettingsCreatingAdapterSettingBuilder = async settingBuilder =>
             {
                 var testSetting = new AdapterSetting
                 {
@@ -232,7 +232,7 @@ namespace zvs.Processor.Tests
         public async Task LoadAdaptersInvalidCastAsyncTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-LoadAdaptersInvalidCastAsyncTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -251,10 +251,10 @@ namespace zvs.Processor.Tests
                 AdapterGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Adapter",
                 DescriptionGet = () => "",
-                OnDeviceTypesCreatingDeviceTypeBuilder = (s) => Task.FromResult(0)
+                OnDeviceTypesCreatingDeviceTypeBuilder = s => Task.FromResult(0)
             };
 
-            unitTestingAdapter.OnSettingsCreatingAdapterSettingBuilder = async (settingBuilder) =>
+            unitTestingAdapter.OnSettingsCreatingAdapterSettingBuilder = async settingBuilder =>
             {
                 var testSetting = new AdapterSetting
                 {
@@ -282,7 +282,7 @@ namespace zvs.Processor.Tests
         public async Task LoadAdaptersAsyncAutoStartTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-LoadAdaptersAsyncAutoStartTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var log = new StubIFeedback<LogEntry>
@@ -310,14 +310,14 @@ namespace zvs.Processor.Tests
                 AdapterGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Adapter",
                 DescriptionGet = () => "",
-                OnDeviceTypesCreatingDeviceTypeBuilder = (s) => Task.FromResult(0),
+                OnDeviceTypesCreatingDeviceTypeBuilder = s => Task.FromResult(0),
                 StartAsync01 = () =>
                 {
                     isStarted = true;
                     return Task.FromResult(0);
                 }
             };
-            unitTestingAdapter.OnSettingsCreatingAdapterSettingBuilder = async (settingBuilder) =>
+            unitTestingAdapter.OnSettingsCreatingAdapterSettingBuilder = async settingBuilder =>
             {
                 var testSetting = new AdapterSetting
                 {
@@ -345,7 +345,7 @@ namespace zvs.Processor.Tests
         public async Task EnableAdapterAsyncTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-EnableAdapterAsyncTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var log = new StubIFeedback<LogEntry>();
@@ -355,7 +355,7 @@ namespace zvs.Processor.Tests
                 AdapterGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Adapter",
                 DescriptionGet = () => "",
-                OnDeviceTypesCreatingDeviceTypeBuilder = (s) => Task.FromResult(0),
+                OnDeviceTypesCreatingDeviceTypeBuilder = s => Task.FromResult(0),
                 StartAsync01 = async () => hasStarted = true
             };
 
@@ -385,7 +385,7 @@ namespace zvs.Processor.Tests
         public async Task EnableAdapterAsyncNotFoundTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-EnableAdapterAsyncNotFoundTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var log = new StubIFeedback<LogEntry>();
@@ -402,7 +402,7 @@ namespace zvs.Processor.Tests
         public async Task DisableAdapterAsyncTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-DisableAdapterAsyncTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var log = new StubIFeedback<LogEntry>();
@@ -412,7 +412,7 @@ namespace zvs.Processor.Tests
                 AdapterGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Adapter",
                 DescriptionGet = () => "",
-                OnDeviceTypesCreatingDeviceTypeBuilder = (s) => Task.FromResult(0),
+                OnDeviceTypesCreatingDeviceTypeBuilder = s => Task.FromResult(0),
                 StopAsync01 = async () => hasStopped = true
             };
 
@@ -440,7 +440,7 @@ namespace zvs.Processor.Tests
         public async Task DisableAdapterAsyncNotFoundTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-DisableAdapterAsyncNotFoundTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var log = new StubIFeedback<LogEntry>();
@@ -457,7 +457,7 @@ namespace zvs.Processor.Tests
         public async Task StartTwiceTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-LoadPluginsAsyncAutoStartTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var logEntries = new List<LogEntry>();
             var log = new StubIFeedback<LogEntry>
@@ -486,8 +486,8 @@ namespace zvs.Processor.Tests
                 AdapterGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Adapter",
                 DescriptionGet = () => "",
-                OnDeviceTypesCreatingDeviceTypeBuilder = (s) => Task.FromResult(0),
-                OnSettingsCreatingAdapterSettingBuilder = (s) => Task.FromResult(0),
+                OnDeviceTypesCreatingDeviceTypeBuilder = s => Task.FromResult(0),
+                OnSettingsCreatingAdapterSettingBuilder = s => Task.FromResult(0),
                 StartAsync01 = () =>
                 {
                     isStartedCount++;
@@ -510,7 +510,7 @@ namespace zvs.Processor.Tests
         public async Task StopTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-StopTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var logEntries = new List<LogEntry>();
             var log = new StubIFeedback<LogEntry>
@@ -540,8 +540,8 @@ namespace zvs.Processor.Tests
                 AdapterGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Adapter",
                 DescriptionGet = () => "",
-                OnDeviceTypesCreatingDeviceTypeBuilder = (s) => Task.FromResult(0),
-                OnSettingsCreatingAdapterSettingBuilder = (s) => Task.FromResult(0),
+                OnDeviceTypesCreatingDeviceTypeBuilder = s => Task.FromResult(0),
+                OnSettingsCreatingAdapterSettingBuilder = s => Task.FromResult(0),
                 StartAsync01 = () =>
                 {
                     isStartedCount++;
@@ -570,7 +570,7 @@ namespace zvs.Processor.Tests
         public async Task StopWhenNotStartedTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-StopWhenNotStartedTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             var logEntries = new List<LogEntry>();
             var log = new StubIFeedback<LogEntry>
@@ -598,7 +598,7 @@ namespace zvs.Processor.Tests
                 AdapterGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Adapter",
                 DescriptionGet = () => "",
-                OnDeviceTypesCreatingDeviceTypeBuilder = (s) => Task.FromResult(0)
+                OnDeviceTypesCreatingDeviceTypeBuilder = s => Task.FromResult(0)
                
             };
 
@@ -615,7 +615,7 @@ namespace zvs.Processor.Tests
         public async Task FindZvsAdapterAsyncTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-FindZvsAdapterAsyncTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -634,8 +634,8 @@ namespace zvs.Processor.Tests
                 AdapterGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Adapter",
                 DescriptionGet = () => "",
-                OnDeviceTypesCreatingDeviceTypeBuilder = (s) => Task.FromResult(0),
-                OnSettingsCreatingAdapterSettingBuilder = (s) => Task.FromResult(0),
+                OnDeviceTypesCreatingDeviceTypeBuilder = s => Task.FromResult(0),
+                OnSettingsCreatingAdapterSettingBuilder = s => Task.FromResult(0),
             };
 
             var adapterManager = new AdapterManager(new List<ZvsAdapter> { unitTestingAdapter }, dbConnection, log);
@@ -654,7 +654,7 @@ namespace zvs.Processor.Tests
         public async Task FindZvsAdapterInvalidIdAsyncTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-FindZvsAdapterInvalidIdAsyncTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -682,7 +682,7 @@ namespace zvs.Processor.Tests
         public async Task TestPropertyUpdatingOnDatabaseSettingChange()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-TestPropertyUpdatingOnDatabaseSettingChange" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var log = new StubIFeedback<LogEntry>
@@ -698,8 +698,8 @@ namespace zvs.Processor.Tests
                 AdapterGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
                 NameGet = () => "Unit Testing Adapter",
                 DescriptionGet = () => "",
-                OnDeviceTypesCreatingDeviceTypeBuilder = (s) => Task.FromResult(0),
-                OnSettingsCreatingAdapterSettingBuilder = (s) => Task.FromResult(0),
+                OnDeviceTypesCreatingDeviceTypeBuilder = s => Task.FromResult(0),
+                OnSettingsCreatingAdapterSettingBuilder = s => Task.FromResult(0),
             };
 
             var adapter = new Adapter

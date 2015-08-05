@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Data.Entity;
 using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace zvs.DataModel
 {
@@ -42,7 +42,7 @@ namespace zvs.DataModel
                         storedCommand.Description = bc.Name;
                         break;
                     default:
-                        storedCommand.Description = string.Format("{0} to {1} on", bc.Name, storedCommand.Argument);
+                        storedCommand.Description = $"{bc.Name} to {storedCommand.Argument} on";
                         break;
                 }
 
@@ -57,7 +57,7 @@ namespace zvs.DataModel
                         storedCommand.Description = bc.Name;
                         break;
                     default:
-                        storedCommand.Description = string.Format("{0} to {1} on", bc.Name, storedCommand.Argument);
+                        storedCommand.Description = $"{bc.Name} to {storedCommand.Argument} on";
                         break;
                 }
             }
@@ -86,7 +86,7 @@ namespace zvs.DataModel
 
                             var deviceToRepoll = await context.Devices.FirstOrDefaultAsync(d => d.Id == dId);
                             if (deviceToRepoll != null)
-                                storedCommand.TargetObjectName = string.Format("{0} {1}", deviceToRepoll.Location, deviceToRepoll.Name);
+                                storedCommand.TargetObjectName = $"{deviceToRepoll.Location} {deviceToRepoll.Name}";
 
                             break;
                         }
@@ -120,14 +120,14 @@ namespace zvs.DataModel
             else if (storedCommand.Command is DeviceCommand)
             {
                 var device = await context.Devices.FirstOrDefaultAsync(o => o.Commands.Any(p => p.Id == storedCommand.Command.Id));
-                storedCommand.TargetObjectName = string.Format("{0} {1}", device.Location, device.Name);
+                storedCommand.TargetObjectName = $"{device.Location} {device.Name}";
             }
             else if (storedCommand.Command is DeviceTypeCommand)
             {
                 int dId = int.TryParse(storedCommand.Argument2, out dId) ? dId : 0;
                 var d = await context.Devices.FirstOrDefaultAsync(o => o.Id == dId);
 
-                storedCommand.TargetObjectName = d != null ? string.Format("{0} {1}", d.Location, d.Name) : "Unknown Device";
+                storedCommand.TargetObjectName = d != null ? $"{d.Location} {d.Name}" : "Unknown Device";
             }
             else if (storedCommand.Command is JavaScriptCommand)
             {

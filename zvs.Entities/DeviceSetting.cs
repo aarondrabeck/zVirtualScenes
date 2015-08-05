@@ -6,7 +6,7 @@ namespace zvs.DataModel
     [Table("DeviceSettings", Schema = "ZVS")]
     public class DeviceSetting : BaseValue, IIdentity
     {
-        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         private ObservableCollection<DeviceSettingOption> _options = new ObservableCollection<DeviceSettingOption>();

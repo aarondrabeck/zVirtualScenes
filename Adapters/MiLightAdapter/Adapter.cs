@@ -35,7 +35,7 @@ namespace MiLightAdapter
 
         public override async Task StartAsync()
         {
-            await Log.ReportInfoAsync(string.Format("{0} Started", Name), CancellationToken);
+            await Log.ReportInfoAsync($"{Name} Started", CancellationToken);
             await AddNewWifiControllerToDatabase(WiFi1Setting);
             _controller.AddController(WiFi1Setting);
 
@@ -52,7 +52,7 @@ namespace MiLightAdapter
 
         public override async Task StopAsync()
         {
-            await Log.ReportInfoAsync(string.Format("{0} Stopped", Name), CancellationToken);
+            await Log.ReportInfoAsync($"{Name} Stopped", CancellationToken);
         }
 
         public override async Task ProcessDeviceTypeCommandAsync(DeviceType deviceType, Device device,
@@ -66,7 +66,7 @@ namespace MiLightAdapter
             decimal.TryParse(argument, out level);
             await _controller.Send(ip, miCommand, zone, level);
 
-            await Log.ReportInfoAsync(string.Format("{0} Command Sent Command:{1}, Zone:{2}, IP:{3}, Level:{4}", Name, miCommand, zone, ip, level), CancellationToken);
+            await Log.ReportInfoAsync($"{Name} Command Sent Command:{miCommand}, Zone:{zone}, IP:{ip}, Level:{level}", CancellationToken);
         }
 
         public override Task ProcessDeviceCommandAsync(Device device, DeviceCommand command, string argument, string argument2)
@@ -433,8 +433,8 @@ namespace MiLightAdapter
                     existing = new Device
                     {
                         DeviceTypeId = DimmerTypeId,
-                        Name = string.Format("MiLight WiFi Controller - {0}", ipAddress),
-                        Location = string.Format("MiLight WiFi Controller - {0}", ipAddress),
+                        Name = $"MiLight WiFi Controller - {ipAddress}",
+                        Location = $"MiLight WiFi Controller - {ipAddress}",
                         CurrentLevelInt = 0,
                         CurrentLevelText = "",
                     };
@@ -453,7 +453,7 @@ namespace MiLightAdapter
                             Log.ReportErrorFormatAsync(CancellationToken, "Failed to save new device. {0}",
                                 result.Message);
 
-                    await Log.ReportInfoAsync(string.Format("{0} New Controller added to the database, IP:{1}", Name, ipAddress), CancellationToken);
+                    await Log.ReportInfoAsync($"{Name} New Controller added to the database, IP:{ipAddress}", CancellationToken);
                 }
             }
         }

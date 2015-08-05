@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
-using zvs.Processor;
 
 namespace zvs.WPF
 {
@@ -43,7 +42,7 @@ namespace zvs.WPF
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Close();
         }
     }
 }

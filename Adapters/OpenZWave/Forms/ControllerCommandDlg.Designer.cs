@@ -1,3 +1,6 @@
+using System.ComponentModel;
+using System.Windows.Forms;
+
 namespace OpenZWavePlugin.Forms
 {
     partial class ControllerCommandDlg
@@ -5,7 +8,7 @@ namespace OpenZWavePlugin.Forms
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -73,7 +76,7 @@ namespace OpenZWavePlugin.Forms
 
         #endregion
 
-        private System.Windows.Forms.Button ButtonCancel;
-        private System.Windows.Forms.Label label1;
+        private Button ButtonCancel;
+        private Label label1;
     }
 }

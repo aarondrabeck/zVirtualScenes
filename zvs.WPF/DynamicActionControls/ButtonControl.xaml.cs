@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 
@@ -45,7 +44,7 @@ namespace zvs.WPF.DynamicActionControls
 
         #endregion
 
-        private Func<Task> SendCommandAction { get; set; }
+        private Func<Task> SendCommandAction { get; }
         public ButtonControl(Func<Task> sendCommandAction, ImageSource signalIcon)
         {
             SendCommandAction = sendCommandAction;

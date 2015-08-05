@@ -1,37 +1,40 @@
 ﻿using System;
+using System.Data.Entity;
+using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Jint;
 using zvs.DataModel;
-using System.Data.Entity;
 
 namespace zvs.Processor
 {
     public class JavaScriptRunner
     {
-        private IEntityContextConnection EntityContextConnection { get; set; }
-        private IFeedback<LogEntry> Log { get; set; }
-        private Jint.Engine JintEngine { get; set; }
-        private ICommandProcessor CommandProcessor { get; set; }
+        private IEntityContextConnection EntityContextConnection { get; }
+        private IFeedback<LogEntry> Log { get; }
+        private Engine JintEngine { get; }
+        private ICommandProcessor CommandProcessor { get; }
 
         public static bool JavascriptDebugEnabled { get; set; }
 
         public JavaScriptRunner(IFeedback<LogEntry> log, ICommandProcessor commandProcessor, IEntityContextConnection entityContextConnection)
         {
             if (log == null)
-                throw new ArgumentNullException("log");
+                throw new ArgumentNullException(nameof(log));
 
             if (commandProcessor == null)
-                throw new ArgumentNullException("commandProcessor");
+                throw new ArgumentNullException(nameof(commandProcessor));
 
             if (entityContextConnection == null)
-                throw new ArgumentNullException("entityContextConnection");
+                throw new ArgumentNullException(nameof(entityContextConnection));
 
             Log = log;
             CommandProcessor = commandProcessor;
             EntityContextConnection = entityContextConnection;
             log.Source = "JavaScript Runner";
 
-            JintEngine = new Jint.Engine(cfg =>
+            JintEngine = new Engine(cfg =>
             {
                 cfg.AllowClr();
                 cfg.AllowDebuggerStatement(JavascriptDebugEnabled);
@@ -55,7 +58,7 @@ namespace zvs.Processor
                 JintEngine.SetValue("logWarn", new Action<object>(LogWarn));
                 JintEngine.SetValue("logError", new Action<object>(LogError));
                 JintEngine.SetValue("setTimeout", new Action<string, double>(SetTimeout));
-                JintEngine.SetValue("shell", new Func<string, string, System.Diagnostics.Process>(Shell));
+                JintEngine.SetValue("shell", new Func<string, string, Process>(Shell));
                 
                 JintEngine.SetValue("runDeviceNameCommandName", new Func<string, string, string, Result>(RunDeviceNameCommandName));
                 JintEngine.SetValue("runCommand", new Func<int, string, string, Result>(RunCommand));
@@ -113,29 +116,29 @@ namespace zvs.Processor
         }
 
         //shell("wget.exe", "http://10.0.0.55/webcam/latest.jpg");
-        private static System.Diagnostics.Process Shell(string path, string arguments)
+        private static Process Shell(string path, string arguments)
         {
-            return System.Diagnostics.Process.Start(path, arguments);
+            return Process.Start(path, arguments);
         }
 
         public string MapPath(string path)
         {
-            return System.IO.Path.Combine(Utils.AppPath, path);
+            return Path.Combine(Utils.AppPath, path);
         }
 
         public void Require(string script)
         {
             var path = script;
-            if (!System.IO.File.Exists(path))
+            if (!File.Exists(path))
             {
-                path = string.Format("scripts\\{0}", script);
-                if (!System.IO.File.Exists(path))
+                path = $"scripts\\{script}";
+                if (!File.Exists(path))
                     return;
 
                 script = path;
             }
 
-            var s = System.IO.File.ReadAllText(script);
+            var s = File.ReadAllText(script);
             try
             {
                 JintEngine.Execute(s);

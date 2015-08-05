@@ -96,7 +96,7 @@ namespace zvs.Processor.ImportExport
                 stream = File.Open(pathFileName, FileMode.Create);
                 var xmlSerializer = new XmlSerializer(typeof(List<JavaScriptBackup>));
                 xmlSerializer.Serialize(stream, scripts);
-                callback(string.Format("Exported {0} JavaScript commands to '{1}'", scripts.Count, Path.GetFileName(pathFileName)));
+                callback($"Exported {scripts.Count} JavaScript commands to '{Path.GetFileName(pathFileName)}'");
             }
             catch (Exception e)
             {
@@ -148,7 +148,8 @@ namespace zvs.Processor.ImportExport
                         return Result.ReportError(saveResult.Message);
                 }
             }
-            return Result.ReportSuccess(string.Format("Imported {0} Javascript commands, skipped {1} from {2}", newJavaScriptCommands.Count, skippedCount, Path.GetFileName(fileName)));
+            return Result.ReportSuccess(
+                $"Imported {newJavaScriptCommands.Count} Javascript commands, skipped {skippedCount} from {Path.GetFileName(fileName)}");
         }
     }
 }

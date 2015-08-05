@@ -18,11 +18,11 @@ namespace zvs.Processor.Tests
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorNullArg1Test()
         {
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "MultilpleTriggersTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
             //arrange 
             //act
-            new SceneRunner(null, new StubICommandProcessor(), new ZvsEntityContextConnection());
+            new SceneRunner(null, new StubICommandProcessor(), new UnitTestDbConnection());
             //assert - throws exception
         }
         [TestMethod]
@@ -31,7 +31,7 @@ namespace zvs.Processor.Tests
         {
             //arrange 
             //act
-            new SceneRunner(new StubIFeedback<LogEntry>(), null, new ZvsEntityContextConnection());
+            new SceneRunner(new StubIFeedback<LogEntry>(), null, new UnitTestDbConnection());
             //assert - throws exception
         }
 
@@ -49,7 +49,7 @@ namespace zvs.Processor.Tests
         public void ConstructorNoNullArgsTest()
         {
             //arrange, act
-            var tm = new SceneRunner(new StubIFeedback<LogEntry>(), new StubICommandProcessor(), new ZvsEntityContextConnection());
+            var tm = new SceneRunner(new StubIFeedback<LogEntry>(), new StubICommandProcessor(), new UnitTestDbConnection());
 
             //Assert
             Assert.IsNotNull(tm);
@@ -60,7 +60,7 @@ namespace zvs.Processor.Tests
         public async Task RunSceneAsyncInvalidSceneTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "Scene-RunSceneAsyncInvalidSceneTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -101,7 +101,7 @@ namespace zvs.Processor.Tests
         public async Task RunSceneAsyncSceneIsRunningTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "Scene-RunSceneAsyncSceneIsRunningTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -155,7 +155,7 @@ namespace zvs.Processor.Tests
         public async Task RunSceneAsyncSceneNoCommandsTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "Scene-RunSceneAsyncSceneNoCommandsTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -207,7 +207,7 @@ namespace zvs.Processor.Tests
         public async Task RunSceneAsyncOneCommandTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "Scene-RunSceneAsyncOneCommandTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -274,7 +274,7 @@ namespace zvs.Processor.Tests
         public async Task RunSceneAsyncMultipleCommandSeqenceTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "Scene-RunSceneAsyncMultipleCommandSeqenceTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -373,7 +373,7 @@ namespace zvs.Processor.Tests
         public async Task RunSceneAsyncMultipleCommandOnecommandFailedTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "Scene-RunSceneAsyncMultipleCommandOnecommandFailedTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
@@ -468,7 +468,7 @@ namespace zvs.Processor.Tests
         public async Task RunSceneAsyncMultipleCommandCancelRunTest()
         {
             //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "Scene-RunSceneAsyncMultipleCommandCancelRunTest" };
+            var dbConnection = new UnitTestDbConnection();
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
