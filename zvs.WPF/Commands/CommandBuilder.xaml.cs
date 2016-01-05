@@ -242,6 +242,8 @@ namespace zvs.WPF.Commands
                             Description = selectedCmd.Description,
                             SelectedItem = selectedScene
                         };
+
+                        control.ComboBox.DisplayMemberPath = "Name";
                         BuiltinArgSckPnl.Children.Add(control);
                         break;
                     }
