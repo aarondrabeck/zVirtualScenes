@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<build-type xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" uuid="d101d5ba-f91c-467b-a306-94dd8ddbf0cf" xsi:noNamespaceSchemaLocation="http://www.jetbrains.com/teamcity/schemas/9.0/project-config.xsd">
+<build-type xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" uuid="d101d5ba-f91c-467b-a306-94dd8ddbf0cf" xsi:noNamespaceSchemaLocation="http://www.jetbrains.com/teamcity/schemas/10.0/project-config.xsd">
   <name>Main Build (Trunk)</name>
   <description />
   <settings>
     <options>
       <option name="artifactRules" value="bin/release/** =&gt; zVirtualScenes.Trunk.release.%build.number%.zip&#xA;setup/output/*.exe" />
       <option name="buildNumberPattern" value="8.1.0.%build.counter%" />
+      <option name="checkoutMode" value="ON_SERVER" />
       <option name="cleanBuild" value="true" />
     </options>
     <parameters>
@@ -14,11 +15,11 @@
     <build-runners>
       <runner id="RUNNER_307" name="Restore Packages" type="jb.nuget.installer">
         <parameters>
-          <param name="nuget.path" value="?NuGet.CommandLine.DEFAULT.nupkg" />
+          <param name="nuget.path" value="%teamcity.tool.NuGet.CommandLine.DEFAULT%" />
           <param name="nuget.updatePackages.mode" value="sln" />
           <param name="nuget.use.restore" value="restore" />
-          <param name="nugetCustomPath" value="?NuGet.CommandLine.DEFAULT.nupkg" />
-          <param name="nugetPathSelector" value="?NuGet.CommandLine.DEFAULT.nupkg" />
+          <param name="nugetCustomPath" value="%teamcity.tool.NuGet.CommandLine.DEFAULT%" />
+          <param name="nugetPathSelector" value="%teamcity.tool.NuGet.CommandLine.DEFAULT%" />
           <param name="sln.path" value="zVirtualScenes.sln" />
           <param name="teamcity.step.mode" value="default" />
         </parameters>
@@ -84,7 +85,7 @@
       <vcs-entry-ref root-id="zVirtualScenesRepo" />
     </vcs-settings>
     <requirements>
-      <equals name="env.Visual_Studio" value="2015" />
+      <equals id="RQ_62" name="env.Visual_Studio" value="2015" />
     </requirements>
     <build-triggers>
       <build-trigger id="vcsTrigger" type="vcsTrigger">
